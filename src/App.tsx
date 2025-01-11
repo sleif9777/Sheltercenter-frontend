@@ -1,22 +1,22 @@
+import moment from 'moment';
+import { BrowserRouter, Routes } from 'react-router-dom';
+import { useStore } from 'zustand';
+
+import { LoginApp } from './apps/login/LoginApp.tsx';
+import { AllRoutes } from './components/navigation/AllRoutes.tsx';
+import { NavigationApp } from './components/navigation/NavigationApp.tsx';
+import { useSessionState } from './session/SessionState.ts';
+
+import './App.scss'
+import '@fontsource-variable/inter';
+import '@fontsource-variable/inter/wght-italic.css';
+import "@fontsource/lato/300.css"
+import "@fontsource/lato/400.css"
+import "@fontsource/lato/700.css"
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import "@fontsource/lato/300.css"
-import "@fontsource/lato/400.css"
-import "@fontsource/lato/700.css"
-import '@fontsource-variable/inter';
-import '@fontsource-variable/inter/wght-italic.css';
-
-import './App.scss'
-
-import { useStore } from 'zustand';
-import { useSessionState } from './session/SessionState.ts';
-import { BrowserRouter, Routes } from 'react-router-dom';
-import { AllRoutes } from './components/navigation/AllRoutes.tsx';
-import { NavigationApp } from './components/navigation/NavigationApp.tsx';
-import { LoginApp } from './apps/login/LoginApp.tsx';
-import moment from 'moment';
 
 function App() {
   const session = useStore(useSessionState)
