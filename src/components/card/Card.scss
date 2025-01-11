@@ -1,0 +1,193 @@
+.card {
+    break-inside: avoid-column;
+    margin-bottom: 0.5em;
+    width: 100%;
+
+    &.blue {
+        background-color: var(--light-blue);
+        border: 2px solid var(--teal);
+        color: var(--teal);
+    
+        .actions {
+            button {
+                color: var(--teal);
+    
+                &:focus {
+                    outline: 2px solid var(--teal);
+                }
+            }
+        }
+    
+        .border {
+            border-bottom: 1px solid var(--teal);
+        }
+    }
+
+    &.gray {
+        background-color: var(--light-gray);
+        border: 2px solid var(--medium-gray);
+        color: var(--teal);
+    
+        .actions {
+            button {
+                color: var(--teal);
+    
+                &:focus {
+                    outline: 2px solid var(--teal);
+                }
+            }
+        }
+    
+        .border {
+            border-bottom: 1px solid var(--teal);
+        }
+    }
+
+    &.pink {
+        background-color: var(--light-pink);
+        border: 2px solid var(--pink);
+        color: var(--pink);
+
+        .actions {
+            button {
+                color: var(--pink);
+    
+                &:focus {
+                    outline: 2px solid var(--pink);
+                }
+            }
+        }
+    
+        .border {
+            border-bottom: 1px solid var(--pink);
+        }
+    }
+
+    &.red {
+        background-color: var(--light-red);
+        border: 2px solid var(--maroon);
+        color: var(--maroon);
+
+        &.alert {
+            width: fit-content;
+
+            .description {
+                width: 80%;
+            }
+
+            .actions {
+                width: 20%;
+            }
+        }
+
+        .actions {
+            button {
+                color: var(--maroon);
+    
+                &:focus {
+                    outline: 2px solid var(--maroon);
+                }
+            }
+        }
+    
+        .border {
+            border-bottom: 1px solid var(--maroon);
+        }
+
+        a {
+            color: var(--maroon);
+
+            &:hover {
+                color: var(--medium-red);
+                cursor: pointer;
+                text-decoration: none;
+            }
+        }
+    }
+
+    &.photo-card {
+        #photo-cell {
+            width: 150px;
+        }
+
+        img {
+            border: 1px solid var(--teal);
+            max-height: 200px;
+            object-fit: cover;
+            object-position: center;
+            left: 0;
+            right: 0;
+            width: 150px;
+        }
+    }
+
+    .actions {
+        margin-right: 5px;
+        flex-wrap: nowrap;
+        width: 45%;
+
+        button {
+            background-color: transparent;
+            float: right;
+            padding: 0.5em;
+    
+            &:hover {
+                color: #444;
+            }
+        }
+    }
+
+    table {
+        margin: auto;
+        width: 98%;
+    }
+
+    .description {
+        font-size: 18px;
+        font-weight: bold;
+        padding: auto;
+        padding-left: 2px;
+        text-align: left;
+        text-transform: uppercase;
+        width: 55%;
+    }
+
+    .card-section {
+        text-align: left;
+        width: 98%;
+        margin: auto;
+    
+        th {
+            font-weight: normal;
+        }
+    
+        td {
+            font-size: 9pt;
+        }
+
+        .header {
+            font-size: larger;
+            font-weight: 500;
+            padding-right: 20px;
+            white-space: nowrap;
+            width: 1px;
+        }
+        
+        .actions {
+            float: right;
+            
+            button {
+                background-color: transparent;
+                padding: 0.5em;
+            }
+        }
+
+        &.table-section {
+            .label {
+                padding-right: 20px;
+                white-space: nowrap;
+                width: 1px;
+            }
+        }
+    }
+}

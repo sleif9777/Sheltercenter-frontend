@@ -1,0 +1,12 @@
+.overdue {
+    color: var(--medium-red);
+}
+
+.chosen-board-action {
+    color: var(--pink);
+    font-size: x-large;
+    
+    &:hover {
+        color: var(--teal);
+    }
+}

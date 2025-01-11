@@ -1,0 +1,42 @@
+import { create } from "zustand"
+import { SimpleTimeslotDictionary, TimeslotDictionary } from "../../../components/Timeslot";
+import { Appointment, IAppointment } from "../models/Appointment";
+import { Weekday } from "../../../enums/Enums";
+
+export interface SchedulingHomeContext {
+    viewDate: Date,
+    appointments: SimpleTimeslotDictionary,
+    missingOutcomes: IAppointment[]
+    closedDateID: number | null,
+    weekday: Weekday,
+    emptyDates: Date[],
+    userCurrentAppointment?: IAppointment
+}
+
+interface SchedulingHomeState extends Omit<SchedulingHomeContext, "appointments"> {
+    refresh: (newViewDate: Date, userID?: number) => void,
+    timeslots: TimeslotDictionary
+}
+
+export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
+    viewDate: new Date(),
+    closedDateID: null,
+    refresh: async (newViewDate: Date, userID?: number) => {
+
+        const context: SchedulingHomeContext = await Appointment.fetchAppointmentsForDate(newViewDate, userID ?? 0)
+        set(() => ({ 
+            viewDate: newViewDate, 
+            timeslots: Appointment.setUpTimeslots(context.appointments ?? {}), 
+            closedDateID: context.closedDateID,
+            weekday: (newViewDate.getDay() == 0 ? 6 : newViewDate.getDay() - 1),
+            emptyDates: context.emptyDates,
+            missingOutcomes: context.missingOutcomes ?? [],
+            userCurrentAppointment: context.userCurrentAppointment
+        })
+    )},
+    emptyDates: [],
+    timeslots: [],
+    weekday: (new Date().getDay() == 0 ? 6 : new Date().getDay() - 1),
+    missingOutcomes: [],
+    userCurrentAppointment: undefined
+}));

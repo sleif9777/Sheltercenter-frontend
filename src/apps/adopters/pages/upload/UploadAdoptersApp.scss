@@ -1,0 +1,28 @@
+#batchUpload {
+    display: none;
+}
+
+#separator {
+    height: 30px;
+}
+
+.file-name {
+    font-style: italic;
+    margin-top: 12px;
+    margin-bottom: 8px;
+}
+
+.style-as-button {
+    background-color: var(--light-gray);
+    border-radius: 3px;
+    font-size: 1.25rem;
+    margin-top: 10px;
+    padding: 0.5em 20px;
+    text-transform: uppercase;
+    transition: display .5s;
+
+    &:hover {
+        background-color: var(--light-pink);
+        color: var(--pink);
+    }
+}

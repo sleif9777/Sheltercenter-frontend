@@ -1,0 +1,26 @@
+.timeslot {
+    .timeslot-actions {
+        float: right;
+
+        button {
+            background-color: transparent;
+            margin-left: 2px;
+            padding: 0.5em;
+
+            &:focus {
+                outline: 2px solid var(--light-gray);
+            }
+
+            &:hover {
+                background-color: var(--light-gray);
+                // color: var(--light-gray);
+            }
+        }
+    }
+
+    .description {
+        font-size: 16pt;
+        font-weight: bold;
+        text-align: left;
+    }
+}

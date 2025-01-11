@@ -1,0 +1,42 @@
+.navbar {
+    border-right: 1px solid var(--light-gray);
+    height: 100%;
+    // background-color: var(--light-gray);
+    overflow-y: scroll;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 15%;
+    z-index: 10;
+
+    .logo {
+        margin: auto;
+
+        img {
+            padding-bottom: 10px;
+            z-index: 0;
+        }
+    }
+
+    // a {
+    //     color: var(--pink);
+    //     float: left;
+    //     font-size: 16px;
+    //     padding: 14px;
+    //     text-align: center;
+    //     text-decoration: none;
+
+    //     &.logo {
+    //         padding: 0 5px;
+
+    //         img {
+    //             width: 100%;
+    //         }
+    //     }
+
+    //     &:hover {
+    //         color: var(--pink);
+    //         text-decoration: underline;
+    //     }
+    // }
+}

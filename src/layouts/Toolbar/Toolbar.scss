@@ -1,0 +1,17 @@
+button {
+    background-color: transparent;
+}
+
+.toolbar {
+    color: black;
+}
+
+.toolbar-element {
+    &:hover {
+        color: var(--pink);
+    }
+}
+
+.icon {
+    padding-right: 3px;
+}

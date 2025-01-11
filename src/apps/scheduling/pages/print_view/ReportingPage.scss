@@ -1,0 +1,27 @@
+table.report {
+    // border: 1px solid blue;
+    width: 100%;
+
+    th {
+        font-weight: 700;
+        font-size: medium;
+        text-align: left;
+        text-decoration: underline;
+        padding: 5px;
+    }
+    
+    td {
+        // border: 1px solid red;
+        text-align: left;
+        padding: 5px;
+    }
+    
+    tr:not(.no-border) {
+        border-bottom: 1px solid var(--teal);
+    }
+
+    .small-detail {
+        font-style: italic;
+        font-size: x-small;
+    }
+}

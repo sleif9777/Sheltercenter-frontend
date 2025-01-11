@@ -1,0 +1,16 @@
+.page-button {
+    text-align: center;
+    padding: 5px 0;
+    margin: 5px;
+    font-weight: 500;
+    font-size: larger;
+    text-transform: uppercase;
+    
+    &:not(.no-border) {
+        border-bottom: 1px solid var(--pink);
+    }
+
+    a {
+        color: var(--pink) !important;
+    }
+}

@@ -1,0 +1,30 @@
+.two-col-list {
+    margin: 0;
+    padding-inline-start: 0;
+
+    td {
+        width: 50%;
+        // border: 2px solid purple;
+    }
+
+    ul {
+        width: 100%;
+
+        li {
+            // border: 3px solid blue;
+            // width: 100%;
+        }
+
+        &.left {
+            text-align: left;
+            // width: 100%;
+            // border: 2px solid green;
+        }
+        
+        &.right {
+            text-align: right;
+            // width: 100%;
+            // border: 1px solid red;
+        }
+    }
+}

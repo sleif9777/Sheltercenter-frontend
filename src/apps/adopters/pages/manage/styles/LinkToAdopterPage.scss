@@ -1,0 +1,24 @@
+.adopter-detail-container {
+    border-bottom: 1px solid var(--pink);
+    break-inside: avoid-column;
+
+    :hover {
+        color: var(--pink);
+        text-decoration: underline;
+    }
+
+    a {
+        color: var(--pink);
+        text-align: left;
+
+        .full-name {
+            font-size: 14pt;
+            text-transform: uppercase;
+        }
+
+        .email {
+            font-size: 8pt;
+            text-transform: lowercase;
+        }
+    }
+}
