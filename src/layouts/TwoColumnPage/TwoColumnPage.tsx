@@ -1,3 +1,5 @@
+import { PageProps } from "../PageProps"
+
 import "./TwoColumnPage.scss"
 
 interface TwoColumnPageProps extends PageProps {

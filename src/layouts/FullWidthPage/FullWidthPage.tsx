@@ -1,11 +1,10 @@
-import "./FullWidthPage.scss"
+import { PageProps } from "../PageProps"
 import { ToolbarElement } from "../Toolbar/Toolbar"
 
-interface FullWidthPageProps {
-    children: JSX.Element | JSX.Element[],
-    title: string | JSX.Element,
-    subtitle?: string
+import "./FullWidthPage.scss"
 
+interface FullWidthPageProps extends PageProps {
+    children: JSX.Element | JSX.Element[],
     toolbarItems?: ToolbarElement[]
 }
 
