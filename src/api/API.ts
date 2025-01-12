@@ -1,7 +1,7 @@
 import axios from "axios"
 
 export abstract class API {
-    rootPath: string = "http://localhost:8000"
+    rootPath: string = import.meta.env.VITE_BACKEND_API_ROOT
     subPath: string = ""
 
     constructor(subPath: string) {
