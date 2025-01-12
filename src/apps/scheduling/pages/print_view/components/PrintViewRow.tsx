@@ -60,18 +60,6 @@ export function PrintViewAppointmentRow(props: PrintViewRowProps) {
 
 export function PrintViewAdminRow(props: Omit<PrintViewRowProps, "booking">) {
     const { appointment } = props
-    // const [adoption, setAdoption] = useState<PendingAdoption>()
-    
-    // const fetchAdoptionData = async () => {
-    //     if (appointment.paperworkAdoptionID) {
-    //         const response: AxiosResponse<IPendingAdoption> = await new PendingAdoptionsAPI().getSingleItem(appointment.paperworkAdoptionID)
-    //         setAdoption(new PendingAdoption(response.data))
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     fetchAdoptionData
-    // }, [])
 
     const AdopterInfoCell = <td>
         <b>
@@ -101,5 +89,9 @@ export function PrintViewAdminRow(props: Omit<PrintViewRowProps, "booking">) {
         <td>{moment(appointment.instant).tz("America/New_York").format("h:mm A")}</td>
         {AdopterInfoCell}
         {NotesCell()}
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
     </tr>
 }

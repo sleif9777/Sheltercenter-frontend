@@ -35,6 +35,10 @@ export default function PrintViewApp() {
                 <th>Time</th>
                 <th>Appointment</th>
                 <th>Notes</th>
+                <th>Check-In</th>
+                <th>Clothing Description</th>
+                <th>Counselor</th>
+                <th>Check-Out</th>
             </tr>
             {appointments.map(a => {
                 return <PrintViewRow appointment={a} />
