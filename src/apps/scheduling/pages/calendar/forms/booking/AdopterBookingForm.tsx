@@ -186,7 +186,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
                 value={adopter?.ID}
                 label="Adopter"
                 disabled={booking != null || session.securityLevel == SecurityLevel.ADOPTER}
-                placeholder="Select an adopter"
+                // placeholder="Select an adopter"
                 fullWidth
                 onChange={(e) => {
                     const newAdopter = adopterOptions.find(a => a.ID == e.target.value)
