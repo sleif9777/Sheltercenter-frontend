@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "start": "vite",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -28,7 +29,8 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.1.1",
     "react-tooltip": "^5.28.0",
-    "rsuite": "^5.76.3"
+    "rsuite": "^5.76.3",
+    "vite": "^6.0.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -41,7 +43,6 @@
     "globals": "^15.14.0",
     "sass-embedded": "^1.83.1",
     "typescript": "~5.6.2",
-    "typescript-eslint": "^8.18.2",
-    "vite": "^6.0.5"
+    "typescript-eslint": "^8.18.2"
   }
 }
