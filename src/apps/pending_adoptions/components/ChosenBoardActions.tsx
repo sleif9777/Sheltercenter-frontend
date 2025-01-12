@@ -1,10 +1,12 @@
+import { faCheckCircle, faEraser, faThermometer, faUserDoctor, faVirus, faVirusSlash, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { PendingAdoption } from "../models/PendingAdoption";
-import { IconDefinition, faCarBurst, faCheckCircle, faEraser, faThermometer, faUserDoctor, faVirus, faVirusSlash } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "react-tooltip";
-import { PendingAdoptionsAPI } from "../api/API";
 import { useStore } from "zustand";
+
+import { PendingAdoptionsAPI } from "../api/API";
+import { PendingAdoption } from "../models/PendingAdoption";
 import { useChosenBoardState } from "../state/State";
+
 import "../ChosenBoardApp.scss"
 
 interface ChosenBoardActionProps {

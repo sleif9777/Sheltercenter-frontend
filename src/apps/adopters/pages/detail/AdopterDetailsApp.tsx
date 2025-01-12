@@ -1,16 +1,16 @@
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { AdopterAPI } from "../../api/API";
-import AdopterDetailCard from "./components/AdopterDetailCard";
-import { Adopter, IAdopter } from "../../models/Adopter";
-import TwoColumnPage from "../../../../layouts/TwoColumnPage/TwoColumnPage";
-import { AdopterForm } from "../../shared_components/AdopterForm";
 import { AxiosResponse } from "axios";
-import { AdopterApprovalStatus } from "../../enums/AdopterEnums";
 import moment from "moment";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
+import TwoColumnPage from "../../../../layouts/TwoColumnPage/TwoColumnPage";
+import { AppointmentCard } from "../../../scheduling/pages/calendar/components/card/AppointmentCard";
 import { Appointment, IAppointment } from "../../../scheduling/pages/calendar/models/Appointment";
 import { IBooking } from "../../../scheduling/pages/calendar/models/Booking";
-import { AppointmentCard } from "../../../scheduling/pages/calendar/components/card/AppointmentCard";
+import { AdopterAPI } from "../../api/API";
+import { AdopterApprovalStatus } from "../../enums/AdopterEnums";
+import { Adopter, IAdopter } from "../../models/Adopter";
+import { AdopterForm } from "../../shared_components/AdopterForm";
 
 interface AdopterDetailsAppContext {
     adopter: IAdopter,
@@ -27,7 +27,7 @@ export default function AdopterDetailsApp() {
             const response: AxiosResponse<AdopterDetailsAppContext> = await new AdopterAPI().GetAdopterDetail(parseInt(id))
             setAdopter(new Adopter(response.data.adopter))
             setAppointment(response.data.currentAppointment)
-            setBookings(response.data.bookings)
+            // setBookings(response.data.bookings)
         }
     }
 
@@ -37,7 +37,7 @@ export default function AdopterDetailsApp() {
 
     const [adopter, setAdopter] = useState<Adopter>()
     const [appointment, setAppointment] = useState<IAppointment | null>()
-    const [bookings, setBookings] = useState<IBooking[]>([])
+    // const [bookings, setBookings] = useState<IBooking[]>([]) TODO: Make booking history audit
      
     if (!adopter) {
         return null

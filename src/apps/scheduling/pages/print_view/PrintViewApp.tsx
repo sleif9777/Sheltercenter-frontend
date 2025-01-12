@@ -1,14 +1,14 @@
 import moment from "moment"
+import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { useStore } from "zustand"
-import { useSchedulingHomeState } from "../calendar/state/State"
-import { useEffect } from "react"
+
 import FullWidthPage from "../../../../layouts/FullWidthPage/FullWidthPage"
 import { Appointment, IAppointment } from "../calendar/models/Appointment"
+import { useSchedulingHomeState } from "../calendar/state/State"
+import { PrintViewRow } from "./components/PrintViewRow"
 
 import "./ReportingPage.scss"
-import { PrintViewRow } from "./components/PrintViewRow"
-import { AppointmentType } from "../../enums/Enums"
 
 export default function PrintViewApp() {
     const { date } = useParams()

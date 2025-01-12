@@ -1,10 +1,9 @@
 import { AxiosResponse } from "axios";
-import { create } from "zustand"
-import { createJSONStorage } from 'zustand/middleware'
 import { persistNSync } from "persist-and-sync";
+import { create } from "zustand"
 
-import { SecurityLevel } from "./SecurityLevel";
 import { UserProfilesAPI } from "../apps/login/api/API";
+import { SecurityLevel } from "./SecurityLevel";
 
 export interface SessionContext {
     isAuthenticated: boolean,
@@ -26,7 +25,7 @@ interface SessionState extends SessionContext {
 
 export const useSessionState = create<SessionState>()(
     persistNSync(
-        (set, get) => ({
+        (set, _) => ({
             isAuthenticated: false,
             adminUser: false,
             adopterUser: false,
@@ -48,7 +47,7 @@ export const useSessionState = create<SessionState>()(
                     sessionExpires: new Date(new Date().getTime() + (7 * 24 * 60 * 60 * 1000))
                 }))
             },
-            logOut: async (userID) => {                
+            logOut: async (_) => {                
                 set(() => ({
                     isAuthenticated: false,
                     adminUser: false,

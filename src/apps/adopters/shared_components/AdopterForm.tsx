@@ -1,17 +1,16 @@
 import { TextField } from "@mui/material"
-import { IAdopter } from "../models/Adopter"
-import * as EmailValidator from 'email-validator';
-import { useState } from "react";
-import { SubmissionButton } from "../../../components/forms/SubmissionButton";
-import AdopterStatusTriState from "./AdopterStatusTriState";
-import { AdopterApprovalStatus } from "../enums/AdopterEnums";
-import { AdopterAPI } from "../api/API";
-import moment from "moment";
-import { Message, MessageLevel } from "../../../components/message/Message";
 import { AxiosResponse } from "axios";
+import * as EmailValidator from 'email-validator';
+import moment from "moment";
+import { useState } from "react";
+
+import { SubmissionButton } from "../../../components/forms/SubmissionButton";
+import { Message, MessageLevel } from "../../../components/message/Message";
 import { UserProfilesAPI } from "../../login/api/API";
-import ModalWithButton from "../../../components/modals/ModalWithButton";
+import { AdopterApprovalStatus } from "../enums/AdopterEnums";
+import { IAdopter } from "../models/Adopter"
 import { UpdateEmailForm } from "../pages/detail/components/UpdateEmailForm";
+import AdopterStatusTriState from "./AdopterStatusTriState";
 
 interface AdopterFormProps {
     defaults?: IAdopter,

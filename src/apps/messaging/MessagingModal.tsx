@@ -1,9 +1,9 @@
+import { TextareaAutosize } from "@mui/material"
 import { useState } from "react"
+
+import ButtonGroup from "../../components/forms/fields/ButtonGroup"
 import ModalWithButton, { ModalWithButtonProps } from "../../components/modals/ModalWithButton"
 import { IAdopter } from "../adopters/models/Adopter"
-import { width } from "@fortawesome/free-solid-svg-icons/fa0"
-import { TextField, TextareaAutosize } from "@mui/material"
-import ButtonGroup from "../../components/forms/fields/ButtonGroup"
 import { IQuickText } from "./QuickText"
 
 interface MessagingModalProps extends Omit<ModalWithButtonProps, "extendOnSubmit"> {
@@ -14,7 +14,7 @@ interface MessagingModalProps extends Omit<ModalWithButtonProps, "extendOnSubmit
 }
 
 export function MessagingModal(props: MessagingModalProps) {
-    const { recipient, subject, extendOnSubmit, quickTexts } = props
+    const { subject, extendOnSubmit, quickTexts } = props
     const [message, setMessage] = useState<string>("")
 
     const validate = () => {

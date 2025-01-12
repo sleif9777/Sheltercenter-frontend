@@ -1,6 +1,6 @@
-import "./TwoColumnList.scss"
-
 import { StringUtils } from "../../utils/StringUtils";
+
+import "./TwoColumnList.scss"
 
 export interface TwoColumnListProps {
     data: TwoColumnListItem[],
@@ -16,7 +16,7 @@ export interface TwoColumnListItem {
 }
 
 export function TwoColumnList(props: TwoColumnListProps) {
-    const { data, itemRender, showBorder } = props
+    const { data, itemRender } = props
 
     const splitDataForTwoColList: (data: TwoColumnListItem[]) => TwoColumnListItem[][] = (data) => {
         data = data.filter(d => !StringUtils.isNullUndefinedOrEmpty(d.text))

@@ -1,14 +1,15 @@
-import { useState } from "react";
-import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage";
-import "./LoginApp.scss"
 import { TextField } from "@mui/material";
+import { AxiosResponse } from "axios";
 import * as EmailValidator from 'email-validator';
+import { useState } from "react";
+import { useStore } from "zustand";
+
 import { SubmissionButton } from "../../components/forms/SubmissionButton";
-import axios, { AxiosResponse } from "axios";
-import { UserProfilesAPI } from "./api/API";
 import { Message, MessageLevel } from "../../components/message/Message";
 import { useSessionState } from "../../session/SessionState";
-import { useStore } from "zustand";
+import { UserProfilesAPI } from "./api/API";
+
+import "./LoginApp.scss"
 
 export function LoginApp() {
     const [email, setEmail] = useState<string>("")

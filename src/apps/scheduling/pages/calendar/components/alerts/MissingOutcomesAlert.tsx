@@ -1,14 +1,12 @@
-import { useState } from "react"
+import moment from "moment"
+import { useStore } from "zustand"
+
 import { StandardCard } from "../../../../../../components/card/Card"
 import { CardColor } from "../../../../../../components/card/CardEnums"
 import { CardSectionBase } from "../../../../../../components/card/CardSectionBase"
-import { Appointment, IAppointment } from "../../models/Appointment"
-import moment from "moment"
-import { AppointmentsAPI } from "../../api/AppointmentsAPI"
-import { AxiosResponse } from "axios"
-import { useStore } from "zustand"
-import { useSchedulingHomeState } from "../../state/State"
 import { CheckOutForm } from "../../forms/booking/CheckOutForm"
+import { Appointment } from "../../models/Appointment"
+import { useSchedulingHomeState } from "../../state/State"
 
 export function MissingOutcomesAlert() {
     const store = useStore(useSchedulingHomeState)

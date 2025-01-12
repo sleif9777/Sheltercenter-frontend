@@ -1,15 +1,14 @@
 import { InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
-import { PendingAdoptionsAPI } from "../api/API";
-import { IPendingAdoption } from "../models/PendingAdoption";
-import { Adopter, IAdopter } from "../../adopters/models/Adopter";
+
+import ButtonGroup from "../../../components/forms/fields/ButtonGroup";
 import ModalWithButton from "../../../components/modals/ModalWithButton";
 import { AdopterAPI } from "../../adopters/api/API";
-import { AxiosResponse } from "axios";
-import ButtonGroup from "../../../components/forms/fields/ButtonGroup";
-import { useStore } from "zustand";
-import { useChosenBoardState } from "../state/State";
+import { Adopter, IAdopter } from "../../adopters/models/Adopter";
+import { PendingAdoptionsAPI } from "../api/API";
 import { PendingAdoptionCircumstance } from "../enums/Enums";
+import { IPendingAdoption } from "../models/PendingAdoption";
 
 interface PendingAdoptionFormProps {
     extendOnSubmit?: () => void,
@@ -94,7 +93,7 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
                     id="adopter"
                     value={adopter?.ID}
                     label="Adopter"
-                    placeholder="Select an adopter"
+                    // placeholder="Select an adopter"
                     fullWidth
                     onChange={(e) => {
                         const newAdopter = adopterOptions.find(a => a.ID == e.target.value)

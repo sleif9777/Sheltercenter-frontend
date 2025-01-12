@@ -18,7 +18,7 @@ export interface CardActionButtonProps {
 }
 
 export function CardActionButton(props: CardActionButtonProps) {
-    let { id, linkTo, toggle, tooltipId, extendOnClick } = props
+    let { id, toggle, tooltipId, extendOnClick } = props
 
     const [toggled, setToggled] = useState<boolean>(toggle ? toggle.default : false)
     const [icon, setIcon] = useState<IconProp>(toggled ? props.toggle!.altIcon : props.icon)

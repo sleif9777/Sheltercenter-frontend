@@ -1,11 +1,12 @@
-import ModalWithButton from "../../../../../components/modals/ModalWithButton"
-import { AppointmentType, PaperworkAppointmentSubtype, Weekday } from "../../../enums/Enums"
 import { useState } from "react"
-import { ITemplateAppointment, TemplateAppointment } from "../models/TemplateAppointment"
+import { useStore } from "zustand"
+
 import ButtonGroup from "../../../../../components/forms/fields/ButtonGroup"
 import { TimeField } from "../../../../../components/forms/fields/TimeField"
+import ModalWithButton from "../../../../../components/modals/ModalWithButton"
+import { AppointmentType, Weekday } from "../../../enums/Enums"
 import { TemplateAppointmentsAPI } from "../api/API"
-import { useStore } from "zustand"
+import { ITemplateAppointment } from "../models/TemplateAppointment"
 import { useTemplateHomeState } from "../state/State"
 
 interface AppointmentFormProps {
@@ -70,7 +71,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
                 show={true}
                 labelText="Weekday" 
                 value={weekday}
-                onChange={(e, newWeekday) => setWeekday(newWeekday)}
+                onChange={(_, newWeekday) => setWeekday(newWeekday)}
                 buttons={[
                     { name: "Monday", value: Weekday.MONDAY },
                     { name: "Tuesday", value: Weekday.TUESDAY },
@@ -86,7 +87,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
                 show={true}
                 labelText="Type" 
                 value={type}
-                onChange={(e, newType) => {
+                onChange={(_, newType) => {
                     setType(newType)
                 }}
                 buttons={[

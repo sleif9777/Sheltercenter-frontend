@@ -1,9 +1,10 @@
-import { faEraser, faLock, faPencil, faTrash, faUnlock } from "@fortawesome/free-solid-svg-icons";
+import { faPencil } from "@fortawesome/free-solid-svg-icons";
+
 import { PhotoCard, StandardCard } from "../../../components/card/Card";
 import { CardActionButton, CardActionButtonProps } from "../../../components/card/CardActionButton";
 import { CardColor } from "../../../components/card/CardEnums";
-import { CardTableSection } from "../../../components/card/CardTableSection";
 import { CardItemListSection } from "../../../components/card/CardItemListSection";
+import { CardTableSection } from "../../../components/card/CardTableSection";
 import { TwoColumnListItem } from "../../../components/two_column_list/TwoColumnList";
 
 export function TestGrayCard() {
@@ -51,32 +52,6 @@ const TestActions: React.ReactElement<CardActionButtonProps>[] = [
         tooltipContent={"Edit"}
         tooltipId={"edit-ttp"}
     />
-    // {
-    //     icon: faEraser,
-    //     extendOnClick: () => {},
-    //     id: "remove-btn",
-    //     tooltipContent: "Remove",
-    //     tooltipId: "remove-ttp"
-    // },
-    // {
-    //     icon: faTrash,
-    //     extendOnClick: () => {},
-    //     id: "delete-btn",
-    //     tooltipContent: "Delete",
-    //     tooltipId: "delete-ttp"
-    // },
-    // {
-    //     icon: faLock,
-    //     extendOnClick: () => {},
-    //     id: "lock-btn",
-    //     toggle: {
-    //         default: false,
-    //         altIcon: faUnlock,
-    //         altTooltipContent: "Unlock",
-    //     },
-    //     tooltipContent: "Lock",
-    //     tooltipId: "lock-ttp"
-    // }
 ]
 
 const TestTopDetails: TwoColumnListItem[] = [

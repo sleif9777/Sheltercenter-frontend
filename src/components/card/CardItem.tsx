@@ -6,7 +6,7 @@ export interface CardItemProps extends TwoColumnListItem {
 }
 
 export function CardItem(props: CardItemProps) {
-    const { text, modal, link } = props
+    const { text } = props
 
     return <li>{text}</li>
 }

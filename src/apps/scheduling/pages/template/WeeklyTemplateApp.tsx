@@ -1,24 +1,15 @@
-import { useEffect, useState } from "react";
-
-import FullWidthPage from "../../../../layouts/FullWidthPage/FullWidthPage";
-import { AppointmentForm } from "./components/AppointmentForm";
-import { TemplateAppointment } from "./models/TemplateAppointment";
-import { CalendarMode, Weekday } from "../../enums/Enums";
-import { SimpleTimeslotDictionary, Timeslot, TimeslotDictionary } from "../../components/Timeslot";
-import ButtonGroup from "../../../../components/forms/fields/ButtonGroup";
+import { useEffect } from "react";
 import { useStore } from "zustand";
+
+import ButtonGroup from "../../../../components/forms/fields/ButtonGroup";
+import FullWidthPage from "../../../../layouts/FullWidthPage/FullWidthPage";
+import { Timeslot } from "../../components/Timeslot";
+import { CalendarMode, Weekday } from "../../enums/Enums";
+import { AppointmentForm } from "./components/AppointmentForm";
 import { useTemplateHomeState } from "./state/State";
 
 export function WeeklyTemplateApp() {
-    // const [timeslots, setTimeslots] = useState<TimeslotDictionary>()
-    // const [weekday, setWeekday] = useState<Weekday>(Weekday.MONDAY)
     const store = useStore(useTemplateHomeState)
-
-    // const fetchData = async (weekday: number) => {
-    //     setWeekday(weekday)
-    //     const blocks: SimpleTimeslotDictionary = await TemplateAppointment.fetchAppointmentsForWeekday(weekday)
-    //     setTimeslots(TemplateAppointment.setUpTimeslots(blocks))
-    // }
 
     useEffect(() => {
         store.setWeekday(store.weekday)
@@ -41,7 +32,7 @@ export function WeeklyTemplateApp() {
                 { name: "Saturday", value: Weekday.SATURDAY },
                 { name: "Sunday", value: Weekday.SUNDAY },
             ]} 
-            onChange={async (e, value) => {
+            onChange={async (_, value) => {
                 store.setWeekday(value)
             }} 
             labelText={""} 

@@ -1,12 +1,10 @@
+import { faPencil, faSave, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { TextField } from '@mui/material';
 import * as EmailValidator from 'email-validator';
 import { useState } from 'react';
-import { AdopterAPI } from '../../../api/API';
-import ModalWithButton from '../../../../../components/modals/ModalWithButton';
-import { TextField } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconDefinition, faP, faPencil, faSave } from '@fortawesome/free-solid-svg-icons';
-import { UserProfilesAPI } from '../../../../login/api/API';
 
+import { UserProfilesAPI } from '../../../../login/api/API';
 
 interface UpdateEmailFormProps {
     emailKey: string,

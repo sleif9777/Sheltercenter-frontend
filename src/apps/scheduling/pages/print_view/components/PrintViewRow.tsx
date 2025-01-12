@@ -1,13 +1,10 @@
+import { faDog, faWheelchair } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
+
+import { AppointmentType } from "../../../enums/Enums";
 import { Appointment } from "../../calendar/models/Appointment";
 import { Booking } from "../../calendar/models/Booking";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDog, faLock, faWheelchair } from "@fortawesome/free-solid-svg-icons";
-import { IPendingAdoption, PendingAdoption } from "../../../../pending_adoptions/models/PendingAdoption";
-import { AppointmentType } from "../../../enums/Enums";
-import { useEffect, useState } from "react";
-import { PendingAdoptionsAPI } from "../../../../pending_adoptions/api/API";
-import { AxiosResponse } from "axios";
 
 export interface PrintViewRowProps {
     appointment: Appointment,
@@ -15,7 +12,7 @@ export interface PrintViewRowProps {
 }
 
 export function PrintViewRow(props: PrintViewRowProps) {
-    const booking = props.booking, appointment = new Appointment(props.appointment)
+    const appointment = new Appointment(props.appointment)
 
     if (appointment.isAdminAppointment()) {
         return <PrintViewAdminRow appointment={appointment} />
@@ -58,24 +55,23 @@ export function PrintViewAppointmentRow(props: PrintViewRowProps) {
         <td>{moment(appointment.instant).tz("America/New_York").format("h:mm A")}</td>
         {AdopterInfoCell}
         {NotesCell()}
-        {/* <td>{booking?.adopter.getFullName()}</td> */}
     </tr>
 }
 
 export function PrintViewAdminRow(props: Omit<PrintViewRowProps, "booking">) {
     const { appointment } = props
-    const [adoption, setAdoption] = useState<PendingAdoption>()
+    // const [adoption, setAdoption] = useState<PendingAdoption>()
     
-    const fetchAdoptionData = async () => {
-        if (appointment.paperworkAdoptionID) {
-            const response: AxiosResponse<IPendingAdoption> = await new PendingAdoptionsAPI().getSingleItem(appointment.paperworkAdoptionID)
-            setAdoption(new PendingAdoption(response.data))
-        }
-    }
+    // const fetchAdoptionData = async () => {
+    //     if (appointment.paperworkAdoptionID) {
+    //         const response: AxiosResponse<IPendingAdoption> = await new PendingAdoptionsAPI().getSingleItem(appointment.paperworkAdoptionID)
+    //         setAdoption(new PendingAdoption(response.data))
+    //     }
+    // }
 
-    useEffect(() => {
-        fetchAdoptionData
-    }, [])
+    // useEffect(() => {
+    //     fetchAdoptionData
+    // }, [])
 
     const AdopterInfoCell = <td>
         <b>
