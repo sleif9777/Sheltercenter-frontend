@@ -26,7 +26,11 @@ export abstract class API {
 
     get(path: string) {
         return axios
-            .get(path)
+            .get(path, {
+                "headers": {
+                    "Access-Control-Allow-Origin": true
+                }
+            })
             .then(res => res)
             .catch(err => err)
     }
