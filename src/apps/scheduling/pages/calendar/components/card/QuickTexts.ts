@@ -1,5 +1,4 @@
 import { IQuickText } from "../../../../../messaging/QuickText";
-import { IAppointment } from "../../models/Appointment";
 import { IBooking } from "../../models/Booking";
 
 const BaseQuickText = (booking: IBooking, requestedToMeet: string, circumstance: string) => `Hi ${booking.adopter.firstName},\n\nWe wanted to check in and let you know that we saw you've requested to meet ${requestedToMeet}.\n\n${circumstance} However, we encourage you to still come to your appointment! There are always wonderful dogs waiting to meet you, and we find that keeping an open mind can lead to some amazing connections. Plus, we often have dogs who haven't had a chance to have their photos taken yet and aren't on our website, so you may meet someone unexpected.\n\nLooking forward to seeing you!\n\nKind regards,\nThe Adoptions Team\nSaving Grace Animals for Adoption`

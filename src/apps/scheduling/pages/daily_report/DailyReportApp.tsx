@@ -1,13 +1,14 @@
 import moment from "moment"
+import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { useStore } from "zustand"
-import { useSchedulingHomeState } from "../calendar/state/State"
-import { useEffect, useState } from "react"
+
 import FullWidthPage from "../../../../layouts/FullWidthPage/FullWidthPage"
 import { Appointment, IAppointment } from "../calendar/models/Appointment"
+import { useSchedulingHomeState } from "../calendar/state/State"
+import { DailyReportRow } from "./components/DailyReportRow"
 
 import "../print_view/ReportingPage.scss"
-import { DailyReportRow } from "./components/DailyReportRow"
 
 export default function DailyReportApp() {
     const { date } = useParams()

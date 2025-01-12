@@ -1,12 +1,12 @@
-import ModalWithButton from "../../../../../../components/modals/ModalWithButton"
+import { TextField } from "@mui/material"
 import { useState } from "react"
 import { useStore } from "zustand"
+
+import ModalWithButton from "../../../../../../components/modals/ModalWithButton"
+import { useSessionState } from "../../../../../../session/SessionState"
+import { AppointmentsAPI } from "../../api/AppointmentsAPI"
 import { Appointment } from "../../models/Appointment"
 import { useSchedulingHomeState } from "../../state/State"
-import { TextField } from "@mui/material"
-import ButtonGroup from "../../../../../../components/forms/fields/ButtonGroup"
-import { AppointmentsAPI } from "../../api/AppointmentsAPI"
-import { useSessionState } from "../../../../../../session/SessionState"
 
 interface CheckInFormProps {
     appointment: Appointment,

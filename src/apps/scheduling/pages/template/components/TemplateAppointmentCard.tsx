@@ -1,12 +1,13 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { StandardCard } from "../../../../../components/card/Card";
-import { CardColor } from "../../../../../components/card/CardEnums";
-import { TemplateAppointment } from "../models/TemplateAppointment";
-import { CardActionButton, CardActionButtonProps } from "../../../../../components/card/CardActionButton";
-import { TemplateAppointmentsAPI } from "../api/API";
-import { useStore } from "zustand";
-import { useTemplateHomeState } from "../state/State";
 import { useState } from "react";
+import { useStore } from "zustand";
+
+import { StandardCard } from "../../../../../components/card/Card";
+import { CardActionButton } from "../../../../../components/card/CardActionButton";
+import { CardColor } from "../../../../../components/card/CardEnums";
+import { TemplateAppointmentsAPI } from "../api/API";
+import { TemplateAppointment } from "../models/TemplateAppointment";
+import { useTemplateHomeState } from "../state/State";
 
 interface TemplateAppointmentCardProps {
     appointment: TemplateAppointment

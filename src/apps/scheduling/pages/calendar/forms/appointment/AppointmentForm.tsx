@@ -1,22 +1,23 @@
-import ModalWithButton from "../../../../../../components/modals/ModalWithButton"
-import { AppointmentType } from "../../../../enums/Enums"
+import { InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { AxiosResponse } from "axios"
+import moment from "moment"
 import { useEffect, useState } from "react"
-import ButtonGroup from "../../../../../../components/forms/fields/ButtonGroup"
-import { TimeField } from "../../../../../../components/forms/fields/TimeField"
 import { useStore } from "zustand"
+
+import ButtonGroup from "../../../../../../components/forms/fields/ButtonGroup"
+import { CheckboxField } from "../../../../../../components/forms/fields/CheckboxField"
+import { TimeField } from "../../../../../../components/forms/fields/TimeField"
+import ModalWithButton from "../../../../../../components/modals/ModalWithButton"
+import { SecurityLevel } from "../../../../../../session/SecurityLevel"
+import { useSessionState } from "../../../../../../session/SessionState"
+import { PendingAdoptionsAPI } from "../../../../../pending_adoptions/api/API"
+import { IPendingAdoption } from "../../../../../pending_adoptions/models/PendingAdoption"
+import { ChosenBoardContext } from "../../../../../pending_adoptions/state/State"
+import { AppointmentType } from "../../../../enums/Enums"
+import { isAdminAppointment, isAdoptionAppointment, isNonPaperworkAdminAppointment, isPaperworkAppointment } from "../../../../utils/AppointmentTypeUtils"
+import { AppointmentsAPI } from "../../api/AppointmentsAPI"
 import { IAppointment } from "../../models/Appointment"
 import { useSchedulingHomeState } from "../../state/State"
-import { CheckboxField } from "../../../../../../components/forms/fields/CheckboxField"
-import { AppointmentsAPI } from "../../api/AppointmentsAPI"
-import moment from "moment"
-import { IPendingAdoption } from "../../../../../pending_adoptions/models/PendingAdoption"
-import { PendingAdoptionsAPI } from "../../../../../pending_adoptions/api/API"
-import { AxiosResponse } from "axios"
-import { ChosenBoardContext } from "../../../../../pending_adoptions/state/State"
-import { InputLabel, Select, MenuItem, TextField } from "@mui/material"
-import { useSessionState } from "../../../../../../session/SessionState"
-import { SecurityLevel } from "../../../../../../session/SecurityLevel"
-import { isAdminAppointment, isAdoptionAppointment, isNonPaperworkAdminAppointment, isPaperworkAppointment } from "../../../../utils/AppointmentTypeUtils"
 
 interface AppointmentFormProps {
     defaults?: IAppointment,
@@ -186,7 +187,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
                         id="dog"
                         value={paperworkAdoption?.id}
                         label="Adoption"
-                        placeholder="Select an adoption"
+                        // placeholder="Select an adoption"
                         style={{ width: 400 }}
                         onChange={(e) => {
                             const newAdoption = paperworkAdoptionOptions.find(a => a.id == e.target.value)

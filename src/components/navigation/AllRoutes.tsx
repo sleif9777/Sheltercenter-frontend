@@ -1,14 +1,15 @@
 import { Route } from "react-router-dom";
+
 import AdopterDetailsApp from "../../apps/adopters/pages/detail/AdopterDetailsApp";
 import ManagerAdoptersApp from "../../apps/adopters/pages/manage/ManageAdoptersApp";
 import { UploadAdoptersApp } from "../../apps/adopters/pages/upload/UploadAdoptersApp";
 import { ChosenBoardApp } from "../../apps/pending_adoptions/ChosenBoardApp";
+import { PrivacyPolicyApp } from "../../apps/privacy/PrivacyPolicyApp";
 import CalendarApp from "../../apps/scheduling/pages/calendar/CalendarApp";
 import DailyReportApp from "../../apps/scheduling/pages/daily_report/DailyReportApp";
+import InProgressAppointmentsApp from "../../apps/scheduling/pages/in_progress_report/InProgressAppointmentsApp";
 import PrintViewApp from "../../apps/scheduling/pages/print_view/PrintViewApp";
 import { WeeklyTemplateApp } from "../../apps/scheduling/pages/template/WeeklyTemplateApp";
-import InProgressAppointmentsApp from "../../apps/scheduling/pages/in_progress_report/InProgressAppointmentsApp";
-import { PrivacyPolicyApp } from "../../apps/privacy/PrivacyPolicyApp";
 
 export const AllRoutes = <>
     <Route

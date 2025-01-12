@@ -8,7 +8,6 @@ import { NavigationApp } from './components/navigation/NavigationApp.tsx';
 import { useSessionState } from './session/SessionState.ts';
 
 import './App.scss'
-import '@fontsource-variable/inter';
 import '@fontsource-variable/inter/wght-italic.css';
 import "@fontsource/lato/300.css"
 import "@fontsource/lato/400.css"
