@@ -28,7 +28,7 @@ export default function ManagerAdoptersApp() {
     }, [])
 
     useEffect(() => {
-        if (filterText === "") {
+        if (filterText.length < 3) {
             setDisplayAdopters([])
         }
         setDisplayAdopters(
