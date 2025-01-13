@@ -136,8 +136,9 @@ export class Adopter implements IAdopter {
         if (filterText === "") { return false }
 
         filterText = filterText.toLowerCase()
-        return (this.getFullName().toLowerCase().includes(filterText)) ||
-            (this.primaryEmail.toLowerCase().includes(filterText))
+        return this.fullName.toLowerCase().startsWith(filterText) ||
+            this.lastName.toLowerCase().startsWith(filterText) ||
+            this.primaryEmail.toLowerCase().includes(filterText)
     }
 
     getHousingType() {
