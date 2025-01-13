@@ -31,7 +31,11 @@ export default function ManagerAdoptersApp() {
         if (filterText === "") {
             setDisplayAdopters([])
         }
-        setDisplayAdopters(allAdopters.filter(adopter => adopter.matchesSearch(filterText ?? "")))
+        setDisplayAdopters(
+            allAdopters
+                .filter(adopter => adopter.matchesSearch(filterText ?? ""))
+                .sort((a, b) => a.fullName.localeCompare(b.fullName))
+            )
     }, [filterText])
 
     return <FullWidthPage title={"Manage Adopters"}>
