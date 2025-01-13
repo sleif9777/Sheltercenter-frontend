@@ -29,9 +29,9 @@ export abstract class API {
             .get(path, {
                 "headers": {
                     "Content-Type": "application/json",
-                    "Access-Control-Allow-Headers": "Access-Control-Allow-Origin, Access-Control-Allow-Methods",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS, POST, PUT",
+                    "Access-Control-Allow-Headers": "Access-Control-Allow-Origin, Access-Control-Allow-Methods, Content-Type",
                 }
             })
             .then(res => res)
