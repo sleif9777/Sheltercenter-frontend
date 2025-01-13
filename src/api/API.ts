@@ -28,7 +28,8 @@ export abstract class API {
         return axios
             .get(path, {
                 "headers": {
-                    "Access-Control-Allow-Origin": true
+                    "Access-Control-Allow-Origin": "*",
+                    "Content-Type": "application/json"
                 }
             })
             .then(res => res)
