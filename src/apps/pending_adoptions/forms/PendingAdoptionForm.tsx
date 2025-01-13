@@ -100,9 +100,12 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
                         setAdopter(newAdopter)
                     }}
                 >
-                    {adopterOptions.map(adopter => <MenuItem value={adopter.ID}>
-                        {adopter.disambiguatedName}
-                    </MenuItem>)}
+                    {adopterOptions
+                        .sort((a, b) => a.fullName.localeCompare(b.fullName))
+                        .map(adopter => <MenuItem value={adopter.ID}>
+                            {adopter.disambiguatedName}
+                        </MenuItem>)
+                    }
                 </Select>
             </>
             <ButtonGroup
