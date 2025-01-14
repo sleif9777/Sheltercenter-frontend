@@ -63,7 +63,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
 
         const data = [
             { text: booking.adopter.primaryEmail ?? "" },
-            { text: booking.adopter.getPhoneNumber() ?? "" }
+            { text: booking.adopter.phoneNumber ?? "" }
         ]
 
         return <CardItemListSection 
