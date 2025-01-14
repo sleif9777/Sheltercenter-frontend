@@ -53,6 +53,9 @@ export function ChosenBoardApp() {
                         </td>
                         <td>
                             {a.getStatus()}
+                            {a.readyToRollInstant && !a.paperworkAppointment
+                                ? <><br />{moment(a.readyToRollInstant).format("MMMM D, YYYY h:mm A")}</>
+                                : null}
                             {a.paperworkAppointment 
                                 ? <><br />{moment(a.paperworkAppointment.instant).format("MMMM D, YYYY h:mm A")}</>
                                 : null}
