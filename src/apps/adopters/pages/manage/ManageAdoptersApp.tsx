@@ -50,7 +50,7 @@ export default function ManagerAdoptersApp() {
             />
         </div>
         <div>
-            <i>Only adopters with an active application are searchable.<br />Contact Sam if you need to access inactive adopters (over one year ago).</i>
+            <i>Only adopters with an active application are searchable.<br />Contact Sam if you need to access inactive adopters (over one year ago or before 10/1/2024).</i>
         </div>
         <div className="adopter-list">
             {displayAdopters
