@@ -12,6 +12,7 @@ import moment from "moment";
 import { useSessionState } from "../../../../../../session/SessionState";
 import { SecurityLevel } from "../../../../../../session/SecurityLevel";
 import { AppointmentCardActions } from "./AppointmentCardActions";
+import { isSurrenderAppointment } from "../../../../utils/AppointmentTypeUtils";
 
 export type AppointmentCardContext = "Timeslot" | "Current Appointment" | "Adopter Detail"
 
@@ -73,6 +74,16 @@ export function AppointmentCard(props: AppointmentCardProps) {
     }
 
     function NotesSection() {
+        if (isSurrenderAppointment(appointment.type)) {
+            return <CardTableSection 
+                data={[
+                    { label: "From Adoptions", content: appointment.appointmentNotes }
+                ]}
+                title="Notes"
+                showBorder={false}
+            />
+        }
+
         if (!booking || 
                 (!booking.adopter.adopterNotes && 
                 !booking.adopter.internalNotes && 
@@ -241,6 +252,12 @@ export function AppointmentCard(props: AppointmentCardProps) {
         </>
     }
 
+    const showBookingInfo = booking && !appointment.outcome
+    const showSurrenderNotes = !showBookingInfo &&
+            isSurrenderAppointment(appointment.type) &&
+            appointment.appointmentNotes &&
+            appointment.appointmentNotes.length > 0
+
     const description = <>
         { context == "Current Appointment" || context == "Adopter Detail"
             ? moment(appointment.instant).format("MMM D, h:mm A")
@@ -257,6 +274,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
         topDetails={topDetails}
     >
         {oneBookingDisclaimer}
-        {booking && !appointment.outcome ? <BookingInfo /> : null}
+        {showBookingInfo ? <BookingInfo /> : null}
+        {showSurrenderNotes ? <NotesSection /> : null}
     </StandardCard>
 }

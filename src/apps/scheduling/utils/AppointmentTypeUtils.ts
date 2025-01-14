@@ -20,3 +20,7 @@ export function isPaperworkAppointment(type: AppointmentType) {
 export function isNonPaperworkAdminAppointment(type: AppointmentType) {
     return isAdminAppointment(type) && !isPaperworkAppointment(type)
 }
+
+export function isSurrenderAppointment(type: AppointmentType) {
+    return type === AppointmentType.SURRENDER
+}

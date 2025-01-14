@@ -14,7 +14,7 @@ import { PendingAdoptionsAPI } from "../../../../../pending_adoptions/api/API"
 import { IPendingAdoption } from "../../../../../pending_adoptions/models/PendingAdoption"
 import { ChosenBoardContext } from "../../../../../pending_adoptions/state/State"
 import { AppointmentType } from "../../../../enums/Enums"
-import { isAdminAppointment, isAdoptionAppointment, isNonPaperworkAdminAppointment, isPaperworkAppointment } from "../../../../utils/AppointmentTypeUtils"
+import { isAdminAppointment, isAdoptionAppointment, isNonPaperworkAdminAppointment, isPaperworkAppointment, isSurrenderAppointment } from "../../../../utils/AppointmentTypeUtils"
 import { AppointmentsAPI } from "../../api/AppointmentsAPI"
 import { IAppointment } from "../../models/Appointment"
 import { useSchedulingHomeState } from "../../state/State"
@@ -47,12 +47,15 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
     // ADMIN APPOINTMENT ONLY FIELDS
     const [notes, setNotes] = useState<string>("")
+    const [surrenderedDog, setSurrenderedDog] = useState<string>("")
+    const [surrenderedDogFka, setSurrenderedDogFka] = useState<string>("")
     const [paperworkAdoption, setPaperworkAdoption] = useState<IPendingAdoption>()
     
-    // const [showSubtypeField, setShowSubtypeField] = useState<boolean>(false)
     const [showLockedField, setShowLockedField] = useState<boolean>(true)
     const [showPaperworkAdoptionField, setShowPaperworkAdoptionField] = useState<boolean>(false)
     const [showNotesField, setShowNotesField] = useState<boolean>(false)
+    const [showSurrenderedDogField, setShowSurrenderedDogField] = useState<boolean>(false)
+    const [showSurrenderedDogFkaField, setShowSurrenderedDogFkaField] = useState<boolean>(false)
 
     const [paperworkAdoptionOptions, setPaperworkAdoptionOptions] = useState<IPendingAdoption[]>([])
 
@@ -88,6 +91,10 @@ export function AppointmentForm(props: AppointmentFormProps) {
             return paperworkAdoption != undefined
         }
 
+        if (isSurrenderAppointment(type)) {
+            return notes.length > 0 && surrenderedDog.length > 0
+        }
+
         if (isAdminAppointment(type)) {
             return notes.length > 0
         }
@@ -102,11 +109,12 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
         const data: Omit<IAppointment, "id" | "heartwormPositive"> = {
             type: type!,
-            // subtype: subtype,
             locked: locked,
             instant: moment(instant!),
             paperworkAdoptionID: paperworkAdoption?.id,
             appointmentNotes: notes,
+            surrenderedDog: surrenderedDog,
+            surrenderedDogFka: surrenderedDogFka,
         }
 
         await new AppointmentsAPI().CreateAppointment(data)
@@ -154,14 +162,22 @@ export function AppointmentForm(props: AppointmentFormProps) {
                         setShowLockedField(true)
                         setLocked(false)
                         setShowNotesField(false)
+                        setShowSurrenderedDogField(false)
+                        setShowSurrenderedDogFkaField(false)
                         setNotes("")
+                        setSurrenderedDog("")
+                        setSurrenderedDogFka("")
                     } else {
                         setShowPaperworkAdoptionField(isPaperworkAppointment(newType))
                         setPaperworkAdoption(isPaperworkAppointment(newType) ? paperworkAdoption : undefined)
                         setShowLockedField(isAdoptionAppointment(newType))
                         setLocked(isAdoptionAppointment(newType) ? locked : false)
                         setShowNotesField(isNonPaperworkAdminAppointment(newType))
+                        setShowSurrenderedDogField(isSurrenderAppointment(newType))
+                        setShowSurrenderedDogFkaField(isSurrenderAppointment(newType))
                         setNotes(isNonPaperworkAdminAppointment(newType) ? notes : "")
+                        setSurrenderedDog(isSurrenderAppointment(newType) ? surrenderedDog : "")
+                        setSurrenderedDogFka(isSurrenderAppointment(newType) ? surrenderedDogFka : "")
                     }
                 }}
                 buttons={[
@@ -204,13 +220,35 @@ export function AppointmentForm(props: AppointmentFormProps) {
                     </Select><br />
                 </>
                 : null}
+            {showSurrenderedDogField && type
+                ? <TextField
+                    id="outlined-controlled"
+                    label={"Surrendered Dog"}
+                    margin="dense"
+                    style={{marginRight: 5}}
+                    value={surrenderedDog}
+                    error={type == AppointmentType.SURRENDER && surrenderedDog.length === 0}
+                    onChange={(e) => setSurrenderedDog(e.target.value)}
+                />
+                : null}<br />
+            {showSurrenderedDogFkaField && type
+                ? <TextField
+                    id="outlined-controlled"
+                    label={"FKA"}
+                    margin="dense"
+                    style={{marginRight: 5}}
+                    value={surrenderedDogFka}
+                    onChange={(e) => setSurrenderedDogFka(e.target.value)}
+                />
+                : null}<br />
             {showNotesField && type
                 ? <TextField
                     id="outlined-controlled"
-                    label={[AppointmentType.SURRENDER, AppointmentType.VISIT].includes(type) ? "Dog" : "Notes"}
+                    label={type == AppointmentType.VISIT ? "Dog" : "Notes"}
                     margin="dense"
                     style={{marginRight: 5}}
                     value={notes}
+                    fullWidth
                     error={isNonPaperworkAdminAppointment(type) && notes.length === 0}
                     onChange={(e) => setNotes(e.target.value)}
                 />

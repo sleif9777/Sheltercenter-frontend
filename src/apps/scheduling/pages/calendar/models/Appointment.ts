@@ -21,6 +21,8 @@ export interface IAppointment extends IAppointmentBase {
     paperworkAdoptionID?: number,
     heartwormPositive: boolean,
     appointmentNotes?: string,
+    surrenderedDog?: string,
+    surrenderedDogFka?: string,
 }
 
 export class Appointment extends AppointmentBase implements IAppointment {
@@ -38,6 +40,8 @@ export class Appointment extends AppointmentBase implements IAppointment {
     paperworkAdoptionID?: number
     heartwormPositive: boolean
     appointmentNotes?: string
+    surrenderedDog?: string
+    surrenderedDogFka?: string
 
     constructor(dto: IAppointment) {
         super(dto)
@@ -55,6 +59,8 @@ export class Appointment extends AppointmentBase implements IAppointment {
         this.paperworkAdoptionID = dto.paperworkAdoptionID
         this.heartwormPositive = dto.heartwormPositive
         this.appointmentNotes = dto.appointmentNotes
+        this.surrenderedDog = dto.surrenderedDog
+        this.surrenderedDogFka = dto.surrenderedDogFka
     }
 
     getType(): string {
@@ -119,6 +125,14 @@ export class Appointment extends AppointmentBase implements IAppointment {
             }
     
             return "OPEN"
+        }
+
+        if (this.type === AppointmentType.SURRENDER) {
+            if (this.surrenderedDogFka) {
+                return `${this.surrenderedDog} (fka ${this.surrenderedDogFka})`
+            }
+
+            return this.surrenderedDog ?? "UNKNOWN"
         }
 
         if (this.type === AppointmentType.PAPERWORK) {

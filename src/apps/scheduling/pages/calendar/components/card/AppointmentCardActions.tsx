@@ -16,6 +16,7 @@ import { MessagingModal } from "../../../../../messaging/MessagingModal"
 import { AppointmentCardQuickTexts } from "./QuickTexts"
 import { AdopterAPI } from "../../../../../adopters/api/API"
 import { AppointmentCardContext } from "./AppointmentCard"
+import { AppointmentType } from "../../../../enums/Enums"
 
 export function AppointmentCardActions(forAppt: IAppointment, context: AppointmentCardContext): StandardCardActions {
     const appointment = new Appointment(forAppt), booking = appointment.getCurrentBooking()
@@ -205,6 +206,10 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
     // NO ACTIONS IF NO SHOW OR IN THE PAST
     if (appointment.outcome == 4 || moment(appointment.instant).isBefore(moment(d))) {
         return []
+    }
+
+    if ([AppointmentType.SURRENDER, AppointmentType.VISIT].includes(appointment.type)) {
+        return [deleteButton()]
     }
 
     // ONLY CHECKOUT FORM IF CHECKED OUT
