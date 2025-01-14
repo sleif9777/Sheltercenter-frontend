@@ -114,6 +114,5 @@ export function ChosenBoardApp() {
                 })}
             </table>
         </FullWidthPage>
-    }
-    
+    }   
 }

@@ -141,15 +141,6 @@ export class Adopter implements IAdopter {
             this.primaryEmail.toLowerCase().includes(filterText)
     }
 
-    getHousingType() {
-        // HOUSE = 1
-        // CONDO = 2
-        // TOWNHOUSE = 3
-        // DORM = 4
-        // MOBILE_HOME = 5
-        
-    }
-
     getCityAndState() {
         if (!this.city || !this.state) {
             return undefined
