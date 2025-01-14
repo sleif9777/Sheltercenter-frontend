@@ -23,6 +23,7 @@ export function ChosenBoardApp() {
 
     function RowGroup(adoptions: IPendingAdoption[]) {
         const adoptionObjs = adoptions.map(a => new PendingAdoption(a))
+        adoptionObjs.sort((a, b) => a.dog.localeCompare(b.dog))
 
         if (adoptionObjs.length > 0) {
             return <>
