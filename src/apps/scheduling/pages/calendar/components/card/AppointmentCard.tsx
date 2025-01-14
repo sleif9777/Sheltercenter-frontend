@@ -1,4 +1,4 @@
-import { faDog, faLock, faWheelchair } from "@fortawesome/free-solid-svg-icons";
+import { faCat, faDog, faHorse, faLock, faWheelchair } from "@fortawesome/free-solid-svg-icons";
 import { StandardCard } from "../../../../../../components/card/Card";
 import { CardColor } from "../../../../../../components/card/CardEnums";
 import { Appointment } from "../../models/Appointment";
@@ -265,6 +265,8 @@ export function AppointmentCard(props: AppointmentCardProps) {
         {appointment.locked ? <FontAwesomeIcon icon={faLock} style={{ marginLeft: 5 }} /> : null}
         {booking?.adopter.mobility ? <FontAwesomeIcon icon={faWheelchair} style={{ marginLeft: 5 }} /> : null}
         {booking?.adopter.bringingDog ? <FontAwesomeIcon icon={faDog} style={{ marginLeft: 5 }} /> : null}
+        {booking?.adopter.catsInHome ? <FontAwesomeIcon icon={faCat} style={{ marginLeft: 5 }} /> : null}
+        {booking?.adopter.otherPetsInHome ? <FontAwesomeIcon icon={faHorse} style={{ marginLeft: 5 }} /> : null}
     </>
 
     return <StandardCard
