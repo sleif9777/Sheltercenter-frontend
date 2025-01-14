@@ -1,4 +1,4 @@
-import { create } from "zustand"
+import { create, useStore } from "zustand"
 import { SimpleTimeslotDictionary, TimeslotDictionary } from "../../../components/Timeslot";
 import { Appointment, IAppointment } from "../models/Appointment";
 import { Weekday } from "../../../enums/Enums";
@@ -25,6 +25,7 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
     viewDate: new Date(),
     closedDateID: null,
     refresh: async (newViewDate: Date, userID?: number) => {
+        const store = useStore(useSchedulingHomeState)
 
         const context: SchedulingHomeContext = await Appointment.fetchAppointmentsForDate(newViewDate, userID ?? 0)
         set(() => ({ 
@@ -37,10 +38,12 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
             userCurrentAppointment: context.userCurrentAppointment
         }))
 
-        const getAdoptions = await new AdopterAPI().GetAdoptersForBooking()
-        set(() => ({ 
-            adoptersSansAppointment: getAdoptions.data.adopters
-        }))
+        if (store.adoptersSansAppointment.length == 0) {
+            const getAdoptions = await new AdopterAPI().GetAdoptersForBooking()
+            set(() => ({ 
+                adoptersSansAppointment: getAdoptions.data.adopters
+            }))
+        }
     },
     emptyDates: [],
     timeslots: [],
