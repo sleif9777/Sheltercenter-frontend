@@ -195,9 +195,11 @@ export function AdopterBookingForm(props: BookingFormProps) {
                     setDefaults(newAdopter)
                 }}
             >
-                {adopterOptions.map(adopter => <MenuItem value={adopter.ID}>
-                    {adopter.disambiguatedName}
-                </MenuItem>)}
+                {adopterOptions
+                    .map(adopter => <MenuItem value={adopter.ID}>
+                        {adopter.disambiguatedName}
+                    </MenuItem>)
+                }
             </Select>
         </>
     }

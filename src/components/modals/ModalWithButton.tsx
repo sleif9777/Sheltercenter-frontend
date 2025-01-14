@@ -81,7 +81,6 @@ export default function ModalWithButton(props: ModalWithButtonProps) {
                 place="bottom-start"
             />
             : null}
-        
         <Modal
             open={open}
             onClose={handleClose}

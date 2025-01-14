@@ -3,7 +3,7 @@ import { Adopter, IAdopter } from "../../adopters/models/Adopter";
 import { Appointment, IAppointment } from "../../scheduling/pages/calendar/models/Appointment";
 import { PendingAdoptionsAPI } from "../api/API";
 import moment from "moment";
-import { PendingAdoptionCircumstance } from "../enums/Enums";
+import { PendingAdoptionCircumstance, PendingAdoptionStatus } from "../enums/Enums";
 
 export interface IPendingAdoptionUpdate {
     type: number,
@@ -15,7 +15,7 @@ export interface IPendingAdoption {
     dog: string,
     sourceAppointment?: IAppointment,
     paperworkAppointment?: IAppointment,
-    status: number,
+    status: PendingAdoptionStatus,
     adopter: IAdopter,
     circumstance: PendingAdoptionCircumstance,
     readyToRollInstant?: Date,
@@ -56,7 +56,7 @@ export class PendingAdoption {
         return response.data.adoptions
     }
 
-    getStatus() {
+    getStatus(forHeader: boolean = false) {
         switch (this.status) {
             case 0:
                 return "Chosen"
@@ -65,6 +65,10 @@ export class PendingAdoption {
             case 2:
                 return "Needs Well Check"
             case 3:
+                if (forHeader) {
+                    return "Ready to Roll"
+                }
+                
                 if (this.paperworkAppointment) {
                     const status = "Paperwork Scheduled"
                     const hwStatus = this.heartwormPositive ? "HW-Pos" : "HW-Neg"

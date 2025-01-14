@@ -1,27 +1,36 @@
 table.report {
-    // border: 1px solid blue;
     width: 100%;
 
     th {
-        font-weight: 700;
         font-size: medium;
+        font-weight: 700;
+        padding: 5px;
         text-align: left;
         text-decoration: underline;
-        padding: 5px;
     }
     
     td {
-        // border: 1px solid red;
-        text-align: left;
         padding: 5px;
-    }
-    
-    tr:not(.no-border) {
-        border-bottom: 1px solid var(--teal);
+        text-align: left;
     }
 
     .small-detail {
-        font-style: italic;
         font-size: x-small;
+        font-style: italic;
     }
+
+    tr {
+        &.group-subheader > td {
+            background-color: var(--light-pink);
+            color: var(--pink);
+            font-size: large;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        &:not(.no-border) {
+            border-bottom: 1px solid var(--teal);
+        }
+    }
+
 }

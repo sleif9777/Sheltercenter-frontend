@@ -194,9 +194,12 @@ export function AppointmentForm(props: AppointmentFormProps) {
                             setPaperworkAdoption(newAdoption)
                         }}
                     >
-                        {paperworkAdoptionOptions.map(a => <MenuItem value={a.id}>
-                            {a.dog} ({a.adopter.fullName})
-                        </MenuItem>)}
+                        {paperworkAdoptionOptions
+                            .sort((a, b) => a.dog.localeCompare(b.dog))
+                            .map(a => <MenuItem value={a.id}>
+                                {a.dog} ({a.adopter.fullName})
+                            </MenuItem>)
+                        }
                     </Select><br />
                 </>
                 : null}
