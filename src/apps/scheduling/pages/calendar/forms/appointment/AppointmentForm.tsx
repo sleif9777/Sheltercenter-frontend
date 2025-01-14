@@ -22,10 +22,11 @@ import { useSchedulingHomeState } from "../../state/State"
 interface AppointmentFormProps {
     defaults?: IAppointment,
     extendOnSubmit?: () => any,
+    buttonClassOverride?: string,
 }
 
 export function AppointmentForm(props: AppointmentFormProps) {
-    const { defaults, extendOnSubmit } = props
+    const { defaults, extendOnSubmit, buttonClassOverride } = props
     const store = useStore(useSchedulingHomeState)
     const session = useStore(useSessionState)
 
@@ -128,7 +129,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
     }
 
     return <ModalWithButton 
-        buttonClass={"submit-button"} 
+        buttonClass={"submit-button" + (buttonClassOverride ?? "")} 
         buttonId={"add-appointment"} 
         canSubmit={() => validate()}
         extendOnSubmit={() => handleSubmit()}

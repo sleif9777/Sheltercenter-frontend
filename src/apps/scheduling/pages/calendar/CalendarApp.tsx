@@ -59,6 +59,10 @@ export default function CalendarApp() {
         </button>
     }
 
+    function AddAppointmentButton() {
+        <AppointmentForm buttonClassOverride="large-button"/>
+    }
+
     function UndoMarkClosedButton() {
         return <button 
             className="large-button" 
@@ -127,6 +131,7 @@ export default function CalendarApp() {
             if (session.securityLevel > SecurityLevel.GREETER) {
                 return <>
                     <CopyFromTemplateButton /><br />
+                    <AddAppointmentButton /><br />
                     <MarkAsClosedDateButton />
                 </>
             } else {
