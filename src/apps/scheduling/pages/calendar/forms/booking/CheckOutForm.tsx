@@ -55,7 +55,7 @@ export function CheckOutForm(props: CheckOutFormProps) {
 
         await new AppointmentsAPI().CheckOutAppointment(data)
 
-        store.refresh(store.viewDate, session.userID!)
+        store.refresh(store.viewDate, false, session.userID!)
 
         if (extendOnSubmit) {
             extendOnSubmit()

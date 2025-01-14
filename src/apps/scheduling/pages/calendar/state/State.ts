@@ -1,4 +1,4 @@
-import { create, useStore } from "zustand"
+import { create } from "zustand"
 import { SimpleTimeslotDictionary, TimeslotDictionary } from "../../../components/Timeslot";
 import { Appointment, IAppointment } from "../models/Appointment";
 import { Weekday } from "../../../enums/Enums";
