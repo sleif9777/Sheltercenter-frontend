@@ -73,7 +73,7 @@ export default function AdopterDetailsApp() {
         rightContent={rightContent()} 
         title={adopter.getFullName()} 
         subtitle={
-            [adopter.primaryEmail, adopter.getPhoneNumber(), getStatus()]
+            [adopter.primaryEmail, adopter.phoneNumber, getStatus()]
                 .filter(i => i != "")
                 .join(" | ")
         }

@@ -149,14 +149,6 @@ export class Adopter implements IAdopter {
         return `${this.city}, ${this.state}`
     }
 
-    getPhoneNumber() {
-        if (!this.phoneNumber) {
-            return ""
-        }
-
-        return `(${this.phoneNumber.slice(0, 3)}) ${this.phoneNumber.slice(3, 6)}-${this.phoneNumber.slice(6, 10)}`
-    }
-
     activityLevelStr = () => {
         if (!this.activityLevel) {
             return undefined
