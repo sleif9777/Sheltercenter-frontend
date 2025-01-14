@@ -60,7 +60,7 @@ export default function CalendarApp() {
     }
 
     function AddAppointmentButton() {
-        <AppointmentForm buttonClassOverride="large-button"/>
+        return <AppointmentForm buttonClassOverride="large-button"/>
     }
 
     function UndoMarkClosedButton() {
