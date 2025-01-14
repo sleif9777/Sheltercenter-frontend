@@ -129,7 +129,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
     }
 
     return <ModalWithButton 
-        buttonClass={"submit-button" + (buttonClassOverride ?? "")} 
+        buttonClass={"submit-button " + (buttonClassOverride ?? "")} 
         buttonId={"add-appointment"} 
         canSubmit={() => validate()}
         extendOnSubmit={() => handleSubmit()}
