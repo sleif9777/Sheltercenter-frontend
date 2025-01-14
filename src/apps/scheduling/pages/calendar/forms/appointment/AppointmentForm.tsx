@@ -119,7 +119,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
         await new AppointmentsAPI().CreateAppointment(data)
 
-        store.refresh(store.viewDate, session.userID!)
+        store.refresh(store.viewDate, false, session.userID!)
 
         resetForm()
 

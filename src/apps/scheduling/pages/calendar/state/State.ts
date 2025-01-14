@@ -17,16 +17,14 @@ export interface SchedulingHomeContext {
 }
 
 interface SchedulingHomeState extends Omit<SchedulingHomeContext, "appointments"> {
-    refresh: (newViewDate: Date, userID?: number) => void,
+    refresh: (newViewDate: Date, refreshAdopters: boolean, userID?: number) => void,
     timeslots: TimeslotDictionary
 }
 
 export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
     viewDate: new Date(),
     closedDateID: null,
-    refresh: async (newViewDate: Date, userID?: number) => {
-        const store = useStore(useSchedulingHomeState)
-
+    refresh: async (newViewDate: Date, refreshAdopters: boolean = false, userID?: number) => {
         const context: SchedulingHomeContext = await Appointment.fetchAppointmentsForDate(newViewDate, userID ?? 0)
         set(() => ({ 
             viewDate: newViewDate, 
@@ -38,7 +36,7 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
             userCurrentAppointment: context.userCurrentAppointment
         }))
 
-        if (store.adoptersSansAppointment.length == 0) {
+        if (refreshAdopters) {
             const getAdoptions = await new AdopterAPI().GetAdoptersForBooking()
             set(() => ({ 
                 adoptersSansAppointment: getAdoptions.data.adopters

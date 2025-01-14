@@ -171,7 +171,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
         if (response.status === 203) {
             setErrorMsg("Appointment no longer available. Refresh and try again.")
         } else {
-            store.refresh(store.viewDate, session.userID!)
+            store.refresh(store.viewDate, false, session.userID!)
     
             if (extendOnSubmit) {
                 extendOnSubmit()
