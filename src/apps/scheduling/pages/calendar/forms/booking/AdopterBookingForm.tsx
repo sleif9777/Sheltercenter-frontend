@@ -106,8 +106,9 @@ export function AdopterBookingForm(props: BookingFormProps) {
     const handleOpen = async () => {
         if (adopterOptions.length === 0) {
             const API = new AdopterAPI()
-            const response = await API.GetAdoptersForBooking()
-            const newAdopters: IAdopter[] = response.data.adopters
+            // const response = await API.GetAdoptersForBooking()
+            // const newAdopters: IAdopter[] = response.data.adopters
+            const newAdopters: IAdopter[] = store.adoptersSansAppointment
 
             if (appointment.getCurrentBooking() && appointment.getCurrentBooking()?.adopter) {
                 const bookedAdopterID = appointment.getCurrentBooking()?.adopter.ID

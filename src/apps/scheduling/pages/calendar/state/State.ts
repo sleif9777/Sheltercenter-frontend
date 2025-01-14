@@ -2,6 +2,8 @@ import { create } from "zustand"
 import { SimpleTimeslotDictionary, TimeslotDictionary } from "../../../components/Timeslot";
 import { Appointment, IAppointment } from "../models/Appointment";
 import { Weekday } from "../../../enums/Enums";
+import { IAdopter } from "../../../../adopters/models/Adopter";
+import { AdopterAPI } from "../../../../adopters/api/API";
 
 export interface SchedulingHomeContext {
     viewDate: Date,
@@ -10,7 +12,8 @@ export interface SchedulingHomeContext {
     closedDateID: number | null,
     weekday: Weekday,
     emptyDates: Date[],
-    userCurrentAppointment?: IAppointment
+    userCurrentAppointment?: IAppointment,
+    adoptersSansAppointment: IAdopter[],
 }
 
 interface SchedulingHomeState extends Omit<SchedulingHomeContext, "appointments"> {
@@ -32,11 +35,17 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
             emptyDates: context.emptyDates,
             missingOutcomes: context.missingOutcomes ?? [],
             userCurrentAppointment: context.userCurrentAppointment
-        })
-    )},
+        }))
+
+        const getAdoptions = await new AdopterAPI().GetAdoptersForBooking()
+        set(() => ({ 
+            adoptersSansAppointment: getAdoptions.data.adopters
+        }))
+    },
     emptyDates: [],
     timeslots: [],
     weekday: (new Date().getDay() == 0 ? 6 : new Date().getDay() - 1),
     missingOutcomes: [],
-    userCurrentAppointment: undefined
+    userCurrentAppointment: undefined,
+    adoptersSansAppointment: []
 }));
