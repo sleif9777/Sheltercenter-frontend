@@ -45,7 +45,16 @@ export function AppointmentCard(props: AppointmentCardProps) {
     }
 
     if (appointment.checkInTime) {
-        topDetails.push({ text: `Checked in ${moment(appointment.checkInTime).format("h:MM A")} (${appointment.counselor})` })
+        console.log(appointment.checkInTime)
+        const checkInTime = moment(appointment.checkInTime)
+        
+        const formatted: string = (checkInTime.hours() % 12) + 
+            ":" +
+            (checkInTime.minutes()) + 
+            (checkInTime.hours() < 12 ? "AM" : "PM")
+
+
+        topDetails.push({ text: `Checked in ${formatted} (${appointment.counselor})` })
     }
 
     if (appointment.checkOutTime) {

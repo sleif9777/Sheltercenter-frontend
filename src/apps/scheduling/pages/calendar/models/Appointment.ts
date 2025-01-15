@@ -15,6 +15,7 @@ export interface IAppointment extends IAppointmentBase {
     clothingDescription?: string
     counselor?: string
     outcome?: number,
+    chosenDog?: string,
     sourceAdoptionDog?: string,
     sourceAdoptionID?: number,
     paperworkAdoptionDog?: string,
@@ -34,6 +35,7 @@ export class Appointment extends AppointmentBase implements IAppointment {
     clothingDescription?: string
     counselor?: string
     outcome?: number
+    chosenDog?: string
     sourceAdoptionDog?: string
     sourceAdoptionID?: number
     paperworkAdoptionDog?: string
@@ -45,6 +47,7 @@ export class Appointment extends AppointmentBase implements IAppointment {
 
     constructor(dto: IAppointment) {
         super(dto)
+        console.log(dto)
         this.id = dto.id
         this.locked = dto.locked
         this.bookings = dto.bookings?.map(b => new Booking(b)) ?? []
@@ -53,6 +56,7 @@ export class Appointment extends AppointmentBase implements IAppointment {
         this.clothingDescription = dto.clothingDescription
         this.counselor = dto.counselor
         this.outcome = dto.outcome
+        this.chosenDog = dto.chosenDog
         this.sourceAdoptionDog = dto.sourceAdoptionDog
         this.sourceAdoptionID = dto.sourceAdoptionID
         this.paperworkAdoptionDog = dto.paperworkAdoptionDog
@@ -176,7 +180,7 @@ export class Appointment extends AppointmentBase implements IAppointment {
         }
 
         if (this.outcome < 3) {
-            return outcomeString?.toLocaleUpperCase() + ": " + this.sourceAdoptionDog
+            return outcomeString?.toLocaleUpperCase() + ": " + this.chosenDog
         }
 
         return outcomeString.toLocaleUpperCase()

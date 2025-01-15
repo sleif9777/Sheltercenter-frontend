@@ -27,7 +27,6 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
     // MESSAGING BUTTON
     function messageButton() {
         if (booking && session.adminUser) {
-            console.log(booking)
             return <MessagingModal 
                 recipient={booking.adopter} 
                 subject={`A message about your upcoming appointment: ${booking.adopter.fullName.toLocaleUpperCase()}`} 
@@ -178,8 +177,8 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
 
     // CHECK OUT
     function checkOutForm() {
-        if (!session.adopterUser && 
-                moment(appointment.instant).isAfter(moment(d))) {
+        if (!session.adopterUser) {
+            console.log(appointment)
             return <CheckOutForm 
                 appointment={appointment} 
                 btnClass="grey-card-link"
@@ -193,7 +192,6 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
     // CHECK IN
     function checkInForm() {
         if (!session.adopterUser &&
-                moment(appointment.instant).isAfter(moment(d)) &&
                 !appointment.checkInTime) {
             return <CheckInForm 
                 appointment={appointment} 
