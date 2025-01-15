@@ -32,7 +32,7 @@ export function EmptyDatesAlert(props: EmptyDatesAlertProps) {
                 data={emptyDates.map(date => {return { text: moment(date).format("dddd, MMMM D, YYYY") }})}
                 itemRender={(i) => {
                     return <>
-                        <a onClick={() => store.refresh(moment(i.text).tz("America/New_York").toDate(), false, session.userID!)}>
+                        <a onClick={() => store.refresh(moment(i.text).tz("America/New_York").toDate(), [], session.userID!)}>
                             {i.text}
                         </a><br/>
                     </>

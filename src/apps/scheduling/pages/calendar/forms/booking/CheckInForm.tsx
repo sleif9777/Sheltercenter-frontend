@@ -45,7 +45,7 @@ export function CheckInForm(props: CheckInFormProps) {
 
         await new AppointmentsAPI().CheckInAppointment(data)
 
-        store.refresh(store.viewDate, false, session.userID!)
+        store.refresh(store.viewDate, [], session.userID!)
 
         if (extendOnSubmit) {
             extendOnSubmit()

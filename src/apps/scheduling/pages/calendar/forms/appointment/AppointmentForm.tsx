@@ -59,14 +59,12 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
     const [paperworkAdoptionOptions, setPaperworkAdoptionOptions] = useState<IPendingAdoption[]>([])
 
-    const fetchAdopterOptions = async () => {
-        const response: AxiosResponse<ChosenBoardContext> = await new PendingAdoptionsAPI().GetAllPendingAdoptionsAwaitingPaperwork()
-        setPaperworkAdoptionOptions(response.data.adoptions)
-    }
-
     useEffect(() => {
-        fetchAdopterOptions()
+        if (paperworkAdoptionOptions.length === 0) {
+            setPaperworkAdoptionOptions(store.adoptionsSansPaperwork)
+        }
     }, [])
+
 
     const resetForm = () => {
         if (defaults) {
@@ -119,7 +117,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
         await new AppointmentsAPI().CreateAppointment(data)
 
-        store.refresh(store.viewDate, false, session.userID!)
+        store.refresh(store.viewDate, [], session.userID!)
 
         resetForm()
 

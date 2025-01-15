@@ -4,6 +4,8 @@ import { Appointment, IAppointment } from "../models/Appointment";
 import { Weekday } from "../../../enums/Enums";
 import { IAdopter } from "../../../../adopters/models/Adopter";
 import { AdopterAPI } from "../../../../adopters/api/API";
+import { PendingAdoptionsAPI } from "../../../../pending_adoptions/api/API";
+import { IPendingAdoption } from "../../../../pending_adoptions/models/PendingAdoption";
 
 export interface SchedulingHomeContext {
     viewDate: Date,
@@ -14,17 +16,18 @@ export interface SchedulingHomeContext {
     emptyDates: Date[],
     userCurrentAppointment?: IAppointment,
     adoptersSansAppointment: IAdopter[],
+    adoptionsSansPaperwork: IPendingAdoption[]
 }
 
 interface SchedulingHomeState extends Omit<SchedulingHomeContext, "appointments"> {
-    refresh: (newViewDate: Date, refreshAdopters: boolean, userID?: number) => void,
+    refresh: (newViewDate: Date, refreshObjs: ("adopters" | "adoptions")[], userID?: number) => void,
     timeslots: TimeslotDictionary
 }
 
 export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
     viewDate: new Date(),
     closedDateID: null,
-    refresh: async (newViewDate: Date, refreshAdopters: boolean = false, userID?: number) => {
+    refresh: async (newViewDate: Date, refreshObjs: ("adopters" | "adoptions")[], userID?: number) => {
         const context: SchedulingHomeContext = await Appointment.fetchAppointmentsForDate(newViewDate, userID ?? 0)
         set(() => ({ 
             viewDate: newViewDate, 
@@ -36,10 +39,18 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
             userCurrentAppointment: context.userCurrentAppointment
         }))
 
-        if (refreshAdopters) {
-            const getAdoptions = await new AdopterAPI().GetAdoptersForBooking()
+        if (refreshObjs.includes("adopters")) {
+            const getAdopters = await new AdopterAPI().GetAdoptersForBooking()
             set(() => ({ 
-                adoptersSansAppointment: getAdoptions.data.adopters
+                adoptersSansAppointment: getAdopters.data.adopters
+            }))
+        }
+
+        if (refreshObjs.includes("adoptions")) {
+            console.log("HIT")
+            const getAdoptions = await new PendingAdoptionsAPI().GetAllPendingAdoptionsAwaitingPaperwork()
+            set(() => ({ 
+                adoptionsSansPaperwork: getAdoptions.data.adoptions
             }))
         }
     },
@@ -48,5 +59,6 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
     weekday: (new Date().getDay() == 0 ? 6 : new Date().getDay() - 1),
     missingOutcomes: [],
     userCurrentAppointment: undefined,
-    adoptersSansAppointment: []
+    adoptersSansAppointment: [],
+    adoptionsSansPaperwork: []
 }));

@@ -27,6 +27,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
     // MESSAGING BUTTON
     function messageButton() {
         if (booking && session.adminUser) {
+            console.log(booking)
             return <MessagingModal 
                 recipient={booking.adopter} 
                 subject={`A message about your upcoming appointment: ${booking.adopter.fullName.toLocaleUpperCase()}`} 
@@ -59,7 +60,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
                     }
 
                     await new AppointmentsAPI().SoftDeleteAppointment(appointment.id) 
-                    schedule.refresh(schedule.viewDate, false, session.userID!)
+                    schedule.refresh(schedule.viewDate, [], session.userID!)
                 }}
                 youWantTo="delete this appointment"
                 submitBtnLabel={"Delete"}
@@ -81,7 +82,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
             return <AreYouSure 
                 extendOnSubmit={async () => {
                     await new AppointmentsAPI().MarkNoShow(appointment.id) 
-                    schedule.refresh(schedule.viewDate, false, session.userID!)
+                    schedule.refresh(schedule.viewDate, [], session.userID!)
                 }}
                 youWantTo="mark this appointment as a no-show"
                 submitBtnLabel={"Yes"}
@@ -126,7 +127,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
                     if (context === "Adopter Detail") {
                         window.location.reload()
                     } else {
-                        schedule.refresh(schedule.viewDate, false, session.userID!)
+                        schedule.refresh(schedule.viewDate, [], session.userID!)
                     }
                 }}
                 youWantTo="cancel this appointment"
@@ -149,7 +150,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
             return <CardActionButton 
                 extendOnClick={async () => {
                     await new AppointmentsAPI().ToggleLock(appointment.id)
-                    schedule.refresh(schedule.viewDate, false, session.userID!)
+                    schedule.refresh(schedule.viewDate, [], session.userID!)
                 }}
                 icon={appointment.locked ? faUnlock : faLock}
                 id={`lock-appt-${appointment.id}`}

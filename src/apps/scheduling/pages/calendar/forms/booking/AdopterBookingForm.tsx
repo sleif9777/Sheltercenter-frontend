@@ -106,9 +106,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
     const handleOpen = async () => {
         if (adopterOptions.length === 0) {
             const API = new AdopterAPI()
-            // const response = await API.GetAdoptersForBooking()
-            // const newAdopters: IAdopter[] = response.data.adopters
-            const newAdopters: IAdopter[] = store.adoptersSansAppointment
+            const newAdopters: IAdopter[] = session.adopterUser ? [] : store.adoptersSansAppointment
 
             if (appointment.getCurrentBooking() && appointment.getCurrentBooking()?.adopter) {
                 const bookedAdopterID = appointment.getCurrentBooking()?.adopter.ID
@@ -171,7 +169,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
         if (response.status === 203) {
             setErrorMsg("Appointment no longer available. Refresh and try again.")
         } else {
-            store.refresh(store.viewDate, false, session.userID!)
+            store.refresh(store.viewDate, ["adoptions"], session.userID!)
     
             if (extendOnSubmit) {
                 extendOnSubmit()

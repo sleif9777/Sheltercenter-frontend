@@ -16,7 +16,7 @@ export default function PrintViewApp() {
     const viewDate = moment(date)
     
     useEffect(() => {
-        store.refresh(viewDate.toDate(), false)
+        store.refresh(viewDate.toDate(), [])
     }, [])
 
     var appointments: Appointment[] = []

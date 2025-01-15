@@ -16,7 +16,7 @@ export default function DailyReportApp() {
     const viewDate = (date == ":date") ? moment(new Date()) : moment(date)
     
     useEffect(() => {
-        store.refresh(viewDate.toDate(), false)
+        store.refresh(viewDate.toDate(), [])
     }, [])
 
     var appointments: Appointment[] = []

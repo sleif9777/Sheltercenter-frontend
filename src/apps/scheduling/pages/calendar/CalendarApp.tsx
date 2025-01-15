@@ -30,7 +30,7 @@ export default function CalendarApp() {
 
     // Render the component
     useEffect(() => {
-        store.refresh(store.viewDate, true, session.userID!)
+        store.refresh(store.viewDate, ["adopters", "adoptions"], session.userID!)
     }, [])
 
     if (session.userID == undefined) { return <></> }
@@ -40,7 +40,7 @@ export default function CalendarApp() {
             className="large-button" 
             onClick={async () => {
                 await new AppointmentsAPI().CreateBatchForDate(store.viewDate)
-                store.refresh(store.viewDate, false, session.userID!)
+                store.refresh(store.viewDate, [], session.userID!)
             }}
         >
             Copy from {weekday} Template
@@ -52,7 +52,7 @@ export default function CalendarApp() {
             className="large-button" 
             onClick={async () => {
                 await new ClosedDatesAPI().MarkDateAsClosed(store.viewDate)
-                store.refresh(store.viewDate, false, session.userID!)
+                store.refresh(store.viewDate, [], session.userID!)
             }}
         >
             Mark Date as Closed
@@ -72,7 +72,7 @@ export default function CalendarApp() {
                 }
 
                 await new ClosedDatesAPI().delete(store.closedDateID)
-                store.refresh(store.viewDate, false, session.userID!)
+                store.refresh(store.viewDate, [], session.userID!)
             }}
         >
             Undo Closed Date
@@ -189,7 +189,7 @@ function ReturnToTodayButton() {
     const store = useStore(useSchedulingHomeState)
     const session = useStore(useSessionState)
     const handleSubmit = async () => {
-        store.refresh(new Date(), false, session.userID!)
+        store.refresh(new Date(), [], session.userID!)
     }
 
     return <ToolbarButton
@@ -211,7 +211,7 @@ function JumpToDateModal() {
         text="Jump to Date"
         canSubmit={() => jumpToDateValue != undefined}
         extendOnSubmit={async () => {
-            store.refresh(jumpToDateValue, false, session.userID!)
+            store.refresh(jumpToDateValue, [], session.userID!)
         }}
         extendOnClose={resetForm}
         modalTitle={"Jump to Date"}
@@ -253,7 +253,7 @@ function LockAllButton() {
         <AreYouSure 
             extendOnSubmit={async () => {
                 await toggleLockForAll(false, store.viewDate)
-                store.refresh(store.viewDate, false, session.userID!)
+                store.refresh(store.viewDate, [], session.userID!)
             }}
             youWantTo="lock all appointments for this date"
             submitBtnLabel={"Yes"}
@@ -274,7 +274,7 @@ function UnlockAllButton() {
         <AreYouSure 
             extendOnSubmit={async () => {
                 await toggleLockForAll(true, store.viewDate)
-                store.refresh(store.viewDate, false, session.userID!)
+                store.refresh(store.viewDate, [], session.userID!)
             }}
             youWantTo="unlock all appointments for this date"
             submitBtnLabel={"Yes"}

@@ -38,7 +38,7 @@ export function SchedulingHomeTitle() {
         const newDate = new Date(store.viewDate)
         newDate.setDate(store.viewDate.getDate() + daysToAdd)
 
-        store.refresh(newDate, false, session.userID)
+        store.refresh(newDate, [], session.userID)
     }
 
     return <>
