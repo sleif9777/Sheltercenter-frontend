@@ -92,7 +92,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
         }
 
         if (isSurrenderAppointment(type)) {
-            return notes.length > 0 && surrenderedDog.length > 0
+            return surrenderedDog.length > 0
         }
 
         if (isAdminAppointment(type)) {
