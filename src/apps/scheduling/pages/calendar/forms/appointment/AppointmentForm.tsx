@@ -249,7 +249,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
                     style={{marginRight: 5}}
                     value={notes}
                     fullWidth
-                    error={isNonPaperworkAdminAppointment(type) && notes.length === 0}
+                    error={isNonPaperworkAdminAppointment(type) && !isSurrenderAppointment(type) && notes.length === 0}
                     onChange={(e) => setNotes(e.target.value)}
                 />
                 : null}
