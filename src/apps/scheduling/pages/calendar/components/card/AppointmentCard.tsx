@@ -45,7 +45,6 @@ export function AppointmentCard(props: AppointmentCardProps) {
     }
 
     if (appointment.checkInTime) {
-        console.log(appointment.checkInTime)
         const checkInTime = moment(appointment.checkInTime)
         
         const formatted: string = (checkInTime.hours() % 12) + 

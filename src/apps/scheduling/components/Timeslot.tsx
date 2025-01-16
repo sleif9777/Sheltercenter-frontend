@@ -36,10 +36,10 @@ export function Timeslot(props: TimeslotProps) {
                     return mapped.filter(a => {
                         return (a.getCurrentBooking() && 
                             a.getCurrentBooking()?.adopter.userID == session.userID) ||
-                            !a.getCurrentBooking()
-                })
+                            (!a.getCurrentBooking() && a.isAdoptionAppointment())
+                    })
                 default:
-                    return mapped
+                    return mapped.sort((a, b) => a.id > b.id ? 1 : -1)
             }
         }
 

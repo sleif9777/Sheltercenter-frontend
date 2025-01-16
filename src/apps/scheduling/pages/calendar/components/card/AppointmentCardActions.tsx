@@ -178,7 +178,6 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
     // CHECK OUT
     function checkOutForm() {
         if (!session.adopterUser) {
-            console.log(appointment)
             return <CheckOutForm 
                 appointment={appointment} 
                 btnClass="grey-card-link"

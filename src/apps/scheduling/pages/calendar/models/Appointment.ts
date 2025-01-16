@@ -47,7 +47,6 @@ export class Appointment extends AppointmentBase implements IAppointment {
 
     constructor(dto: IAppointment) {
         super(dto)
-        console.log(dto)
         this.id = dto.id
         this.locked = dto.locked
         this.bookings = dto.bookings?.map(b => new Booking(b)) ?? []

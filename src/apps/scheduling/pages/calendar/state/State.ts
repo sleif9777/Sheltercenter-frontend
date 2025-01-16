@@ -47,7 +47,6 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
         }
 
         if (refreshObjs.includes("adoptions")) {
-            console.log("HIT")
             const getAdoptions = await new PendingAdoptionsAPI().GetAllPendingAdoptionsAwaitingPaperwork()
             set(() => ({ 
                 adoptionsSansPaperwork: getAdoptions.data.adoptions
