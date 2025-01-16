@@ -28,4 +28,13 @@ export class AdopterAPI extends API {
         const path = this.buildCommandPath("MessageAdopter")
         return this.post(path, data)
     }
+
+    ResendApproval(adopterID: number) {
+        const data = {
+            adopterID: adopterID
+        }
+
+        const path = this.buildCommandPath("ResendApproval")
+        return this.post(path, data)
+    }
 }

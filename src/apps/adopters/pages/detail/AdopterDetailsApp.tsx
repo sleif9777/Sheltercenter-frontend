@@ -11,6 +11,7 @@ import { AdopterAPI } from "../../api/API";
 import { AdopterApprovalStatus } from "../../enums/AdopterEnums";
 import { Adopter, IAdopter } from "../../models/Adopter";
 import { AdopterForm } from "../../shared_components/AdopterForm";
+import { Message } from "../../../../components/message/Message";
 
 interface AdopterDetailsAppContext {
     adopter: IAdopter,
@@ -21,6 +22,7 @@ interface AdopterDetailsAppContext {
 export default function AdopterDetailsApp() {
 
     const { id } = useParams()
+    const [approvalSent, setApprovalSent] = useState<boolean | null>(null)
 
     const fetchData = async () => {
         if (id) {
@@ -56,16 +58,20 @@ export default function AdopterDetailsApp() {
         }
     }
 
+    function ResendApprovalButton(props: { adopter: IAdopter }): JSX.Element {
+        return <button className="submit-button" style={{ margin: 5 }} onClick={() => new AdopterAPI().ResendApproval(props.adopter.ID)}>
+            Resend Approval
+        </button>
+    }
+
     const leftContent = <AdopterForm defaults={adopter} extendOnSubmit={fetchData} context="Manage" />
 
     const rightContent = () => {
-        if (appointment) {
-            return <>
-                <AppointmentCard appointment={new Appointment(appointment)} context={"Adopter Detail"} />        
-            </>
-        }
-
-        return <></>
+        return <>
+            <Message level={"Success"} showMessage={approvalSent === true} message={"Approval resent."} />
+            <ResendApprovalButton adopter={adopter} />
+            {appointment ? <AppointmentCard appointment={new Appointment(appointment)} context={"Adopter Detail"} /> : <></>}
+        </>
     }
 
     return <TwoColumnPage 
