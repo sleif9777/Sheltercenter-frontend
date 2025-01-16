@@ -62,9 +62,9 @@ export default function AdopterDetailsApp() {
         return <button 
             className="submit-button" 
             style={{ margin: 5 }} 
-            onClick={() => {
+            onClick={async () => {
                 try {
-                    new AdopterAPI().ResendApproval(props.adopter.ID)
+                    await new AdopterAPI().ResendApproval(props.adopter.ID)
                     setApprovalSent(true)
                 } catch {
                     setApprovalSent(false)
