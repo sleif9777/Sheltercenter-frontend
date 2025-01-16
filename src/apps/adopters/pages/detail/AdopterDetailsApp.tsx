@@ -59,7 +59,18 @@ export default function AdopterDetailsApp() {
     }
 
     function ResendApprovalButton(props: { adopter: IAdopter }): JSX.Element {
-        return <button className="submit-button" style={{ margin: 5 }} onClick={() => new AdopterAPI().ResendApproval(props.adopter.ID)}>
+        return <button 
+            className="submit-button" 
+            style={{ margin: 5 }} 
+            onClick={() => {
+                try {
+                    new AdopterAPI().ResendApproval(props.adopter.ID)
+                    setApprovalSent(true)
+                } catch {
+                    setApprovalSent(false)
+                }
+            }}
+        >
             Resend Approval
         </button>
     }
