@@ -212,7 +212,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
 
     // ONLY CHECKOUT FORM IF CHECKED OUT
     if (appointment.checkOutTime) {
-        return [messageButton(), checkOutForm()].reverse()
+        return [messageButton(), printButton(), checkOutForm()].reverse()
     }
 
     if (context == "Adopter Detail") {
