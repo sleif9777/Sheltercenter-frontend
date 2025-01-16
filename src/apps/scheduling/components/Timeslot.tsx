@@ -81,7 +81,6 @@ export function Timeslot(props: TimeslotProps) {
         </table>
         <ul style={{columns: 2}}>
             {filterAppointmentsToShow()
-                .sort(TemplateAppointment.compare)
                 .map((a) => {
                     return renderCardUsingMode(a)
                 })}
