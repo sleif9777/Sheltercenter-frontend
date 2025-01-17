@@ -36,7 +36,6 @@ export const useSessionState = create<SessionState>()(
             attemptLogIn: async (email, otp) => {
                 const context: AxiosResponse<SessionContext> = await new UserProfilesAPI().AuthenticateOTP(email, otp)
 
-                console.log(context)
                 set(() => ({
                     isAuthenticated: context.data.isAuthenticated,
                     accessToken: context.data.accessToken,
