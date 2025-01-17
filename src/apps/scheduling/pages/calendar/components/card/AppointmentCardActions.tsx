@@ -27,6 +27,10 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
     // MESSAGING BUTTON
     function messageButton() {
         if (booking && session.adminUser) {
+            const signature = (session.userFName && session.userLName)
+                ? `${session.userFName} ${session.userLName}`
+                : "The Adoptions Team"
+
             return <MessagingModal 
                 recipient={booking.adopter} 
                 subject={`A message about your upcoming appointment: ${booking.adopter.fullName.toLocaleUpperCase()}`} 
@@ -37,7 +41,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
                         subject: subject
                     })
                 }} 
-                quickTexts={AppointmentCardQuickTexts(booking)} 
+                quickTexts={AppointmentCardQuickTexts(booking, signature)} 
                 buttonClass={`message-appt-${appointment.id}`}
                 buttonId={`message-appt-${appointment.id}`}
                 launchBtnLabel={<FontAwesomeIcon icon={faEnvelope} />} 

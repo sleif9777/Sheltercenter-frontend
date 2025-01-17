@@ -5,17 +5,27 @@ import ButtonGroup from "../../components/forms/fields/ButtonGroup"
 import ModalWithButton, { ModalWithButtonProps } from "../../components/modals/ModalWithButton"
 import { IAdopter } from "../adopters/models/Adopter"
 import { IQuickText } from "./QuickText"
+import { useStore } from "zustand"
+import { useSessionState } from "../../session/SessionState"
 
 interface MessagingModalProps extends Omit<ModalWithButtonProps, "extendOnSubmit"> {
     recipient: IAdopter,
     subject: string,
     extendOnSubmit: (message: string, subject: string) => void,
-    quickTexts: IQuickText[]
+    quickTexts: IQuickText[],
 }
 
 export function MessagingModal(props: MessagingModalProps) {
-    const { subject, extendOnSubmit, quickTexts } = props
-    const [message, setMessage] = useState<string>("")
+    const { recipient, subject, extendOnSubmit, quickTexts } = props    
+    const session = useStore(useSessionState)
+
+    const signature = (session.userFName && session.userLName)
+        ? `${session.userFName} ${session.userLName}`
+        : "The Adoptions Team"
+
+    const defaultText = `Hi ${recipient.firstName},\n\n\n\nKind regards,\n${signature}\nSaving Grace Animals for Adoption`
+
+    const [message, setMessage] = useState<string>(defaultText)
 
     const validate = () => {
         return message.length > 0
