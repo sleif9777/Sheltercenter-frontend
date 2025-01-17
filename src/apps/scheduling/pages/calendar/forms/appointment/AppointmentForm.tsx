@@ -1,6 +1,6 @@
 import { InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import moment from "moment"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useStore } from "zustand"
 
 import ButtonGroup from "../../../../../../components/forms/fields/ButtonGroup"
@@ -223,27 +223,6 @@ export function AppointmentForm(props: AppointmentFormProps) {
             /><br />
             {showPaperworkAdoptionField 
                 ? <PaperworkField />
-                // ? <>
-                //     <InputLabel id="dog">Dog</InputLabel>
-                //     <Select
-                //         id="dog"
-                //         value={paperworkAdoption?.id}
-                //         label="Adoption"
-                //         // placeholder="Select an adoption"
-                //         style={{ width: 400 }}
-                //         onChange={(e) => {
-                //             const newAdoption = paperworkAdoptionOptions.find(a => a.id == e.target.value)
-                //             setPaperworkAdoption(newAdoption)
-                //         }}
-                //     >
-                //         {paperworkAdoptionOptions
-                //             .sort((a, b) => a.dog.localeCompare(b.dog))
-                //             .map(a => <MenuItem value={a.id}>
-                //                 {a.dog} ({a.adopter.fullName})
-                //             </MenuItem>)
-                //         }
-                //     </Select><br />
-                // </>
                 : null}
             {showSurrenderedDogField && type
                 ? <>

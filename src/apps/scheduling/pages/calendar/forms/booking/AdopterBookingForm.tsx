@@ -12,7 +12,7 @@ import ModalWithButton from "../../../../../../components/modals/ModalWithButton
 import { SecurityLevel } from "../../../../../../session/SecurityLevel"
 import { useSessionState } from "../../../../../../session/SessionState"
 import { AdopterAPI } from "../../../../../adopters/api/API"
-import { Adopter, IAdopter } from "../../../../../adopters/models/Adopter"
+import { IAdopter } from "../../../../../adopters/models/Adopter"
 import { AppointmentType } from "../../../../enums/Enums"
 import { AppointmentsAPI } from "../../api/AppointmentsAPI"
 import { Appointment } from "../../models/Appointment"
@@ -104,53 +104,6 @@ export function AdopterBookingForm(props: BookingFormProps) {
     }
 
     const handleOpen = async () => {
-        // if (adopterOptions.length === 0) {
-        //     const API = new AdopterAPI()
-        //     const newAdopters: IAdopter[] = session.adopterUser ? [] : store.adoptersSansAppointment
-        //     const booking = appointment.getCurrentBooking()
-        //     var loadAdopter: number | undefined
-
-        //     if (session.adopterUser) {
-        //         loadAdopter = session.adopterID
-        //     } else if (booking) {
-        //         loadAdopter = booking.adopter.ID
-        //     }
-
-        //     if (loadAdopter) {
-        //         const bookedAdopter: AxiosResponse<IAdopter> = await API.GetAdopter(loadAdopter)
-        //         newAdopters.push(bookedAdopter.data)
-        //     }
-
-        //     var adopterObjs = newAdopters
-        //         .map(adopter => new Adopter(adopter))
-        //         .sort((a, b) => {
-        //             return a.fullName > b.fullName ? 1 : -1
-        //         })
-
-        //     setAdopterItems(adopterObjs)
-
-        //     if (loadAdopter) {
-        //         setDefaults(adopterObjs.find(a => a.ID == loadAdopter))
-        //     }
-
-        //     // if (session.securityLevel == SecurityLevel.ADOPTER) {
-        //     //     // const loggedInAdopter: AxiosResponse<IAdopter> = await API.GetAdopter
-        //     // } else {
-        //     //     // IF THE APPT IS BOOKED, GET THAT ADOPTER AND ADD TO LONG LIST OF OPTIONS
-        //     //     if (booking && !session.adopterUser) {
-                    
-        //     //     }
-                
-        //     //     var adopterObjs = newAdopters.map(adopter => new Adopter(adopter))
-        //     //     adopterObjs = adopterObjs.sort((a, b) => {
-        //     //         return a.fullName > b.fullName ? 1 : -1
-        //     //     })
-
-        //     //     setDefaults(adopterObjs.find(a => a.userID == session.userID))
-        //     //     setAdopterItems(adopterObjs)
-        //     // }
-        // }
-
         setDefaults(booking?.adopter ?? undefined)
     }
 
