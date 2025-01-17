@@ -1,6 +1,5 @@
 import moment from "moment";
-import { AppointmentType, CalendarMode, PaperworkAppointmentSubtype } from "../enums/Enums";
-import { SimpleTimeslotDictionary, TimeslotDictionary } from "../components/Timeslot";
+import { AppointmentType, PaperworkAppointmentSubtype } from "../enums/Enums";
 
 export interface IAppointmentBase {
     id?: number;
@@ -53,18 +52,5 @@ export abstract class AppointmentBase implements IAppointmentBase {
 
     static compare(a: IAppointmentBase, b: IAppointmentBase): number {
         return (a.instant > b.instant) ? 0 : 1
-    }
-
-    static setUpTimeslots(blocks: SimpleTimeslotDictionary): TimeslotDictionary {
-        const newTimeslots: TimeslotDictionary = []
-        for (const time in blocks) {
-            newTimeslots.push({
-                appointments: blocks[time],
-                mode: CalendarMode.TEMPLATE,
-                instant: blocks[time][0].instant,
-            })
-        }
-
-        return newTimeslots.sort((a, b) => (a.instant > b.instant) ? 1 : -1)
     }
 }

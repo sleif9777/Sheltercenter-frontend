@@ -16,7 +16,7 @@ export interface TimeslotProps<T extends IAppointmentBase> extends ITimeslot<T> 
     mode: CalendarMode,
 }
 
-export type SimpleTimeslotDictionary = { [key: string]: IAppointmentBase[] }
+export type SimpleTimeslotDictionary<T extends IAppointmentBase> = { [key: string]: T[] }
 
 export type TimeslotDictionary<T extends IAppointmentBase> = TimeslotProps<T>[]
 

@@ -6,10 +6,11 @@ import { IAdopter } from "../../../../adopters/models/Adopter";
 import { AdopterAPI } from "../../../../adopters/api/API";
 import { PendingAdoptionsAPI } from "../../../../pending_adoptions/api/API";
 import { IPendingAdoption } from "../../../../pending_adoptions/models/PendingAdoption";
+import { TimeslotConstructor } from "../../../models/Timeslot";
 
 export interface SchedulingHomeContext {
     viewDate: Date,
-    appointments: SimpleTimeslotDictionary,
+    appointments: SimpleTimeslotDictionary<IAppointment>,
     missingOutcomes: IAppointment[]
     closedDateID: number | null,
     weekday: Weekday,
@@ -38,11 +39,11 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
         }
 
         const context: SchedulingHomeContext = await Appointment.fetchAppointmentsForDate(newViewDate, userID ?? 0)
-        console.log(context)
 
         set(() => ({ 
             viewDate: newViewDate, 
-            timeslots: Appointment.setUpTimeslots(context.appointments ?? {}), 
+            timeslots: new TimeslotConstructor<IAppointment>().setUpTimeslots(context.appointments ?? {}),
+            // timeslots: Timeslot().setUpTimeslots(context.appointments ?? {}), 
             closedDateID: context.closedDateID,
             weekday: (newViewDate.getDay() == 0 ? 6 : newViewDate.getDay() - 1),
             emptyDates: context.emptyDates,
