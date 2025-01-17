@@ -11,6 +11,8 @@ export interface SessionContext {
     refreshToken?: string,
     message?: string,
     userID?: number,
+    userFName?: string,
+    userLName?: string,
     securityLevel?: SecurityLevel,
 }
 
@@ -39,6 +41,8 @@ export const useSessionState = create<SessionState>()(
                     refreshToken: context.data.refreshToken,
                     message: context.data.message,
                     userID: context.data.userID,
+                    userFName: context.data.userFName,
+                    userLName: context.data.userLName,
                     adminUser: (context.data.securityLevel != undefined && 
                         context.data.securityLevel >= SecurityLevel.ADMIN),
                     adopterUser: context.data.securityLevel === SecurityLevel.ADOPTER,
@@ -60,31 +64,6 @@ export const useSessionState = create<SessionState>()(
         }),
         {
             name: 'auth-storage',
-            // storage: createJSONStorage(() => sessionStorage),
         },
     ),
 )
-
-// export const useSessionState = create<SessionState>((set) => ({
-
-//     isAuthenticated: false,
-//     attemptLogIn: async (email, otp) => {
-//         const context: AxiosResponse<SessionContext> = await new UserProfilesAPI().AuthenticateOTP(email, otp)
-
-//         set(() => ({
-//             isAuthenticated: context.data.isAuthenticated,
-//             accessToken: context.data.accessToken,
-//             refreshToken: context.data.refreshToken,
-//             message: context.data.message,
-//             userID: context.data.userID,
-//             adminUser: (context.data.securityLevel != undefined && 
-//                 context.data.securityLevel >= SecurityLevel.ADMIN),
-//             adopterUser: context.data.securityLevel === SecurityLevel.ADOPTER,
-//             greeterUser: context.data.securityLevel === SecurityLevel.GREETER,
-//             securityLevel: context.data.securityLevel,
-//         }))
-//     },
-//     adminUser: false,
-//     adopterUser: false,
-//     greeterUser: false,
-// }));
