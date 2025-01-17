@@ -1,22 +1,23 @@
+import { faArrowRightFromBracket, faArrowRightToBracket, faEnvelope, faGhost, faLock, faPencil, faPrint, faTrash, faUnlock, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import moment from "moment"
 import { useStore } from "zustand"
+
+import { StandardCardActions } from "../../../../../../components/card/Card"
+import { CardActionButton } from "../../../../../../components/card/CardActionButton"
 import { AreYouSure } from "../../../../../../components/modals/AreYouSure"
+import { useSessionState } from "../../../../../../session/SessionState"
+import { AdopterAPI } from "../../../../../adopters/api/API"
+import { MessagingModal } from "../../../../../messaging/MessagingModal"
+import { AppointmentType } from "../../../../enums/Enums"
+import { AppointmentsAPI } from "../../api/AppointmentsAPI"
+import { AdopterBookingForm } from "../../forms/booking/AdopterBookingForm"
+import { CheckInForm } from "../../forms/booking/CheckInForm"
+import { CheckOutForm } from "../../forms/booking/CheckOutForm"
 import { Appointment, IAppointment } from "../../models/Appointment"
 import { useSchedulingHomeState } from "../../state/State"
-import { AppointmentsAPI } from "../../api/AppointmentsAPI"
-import { useSessionState } from "../../../../../../session/SessionState"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faArrowRightFromBracket, faArrowRightToBracket, faEnvelope, faEraser, faGhost, faLock, faPencil, faPrint, faTrash, faUnlock, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons"
-import { CardActionButton } from "../../../../../../components/card/CardActionButton"
-import { AdopterBookingForm } from "../../forms/booking/AdopterBookingForm"
-import { CheckOutForm } from "../../forms/booking/CheckOutForm"
-import moment from "moment"
-import { CheckInForm } from "../../forms/booking/CheckInForm"
-import { StandardCardActions } from "../../../../../../components/card/Card"
-import { MessagingModal } from "../../../../../messaging/MessagingModal"
-import { AppointmentCardQuickTexts } from "./QuickTexts"
-import { AdopterAPI } from "../../../../../adopters/api/API"
 import { AppointmentCardContext } from "./AppointmentCard"
-import { AppointmentType } from "../../../../enums/Enums"
+import { AppointmentCardQuickTexts } from "./QuickTexts"
 
 export function AppointmentCardActions(forAppt: IAppointment, context: AppointmentCardContext): StandardCardActions {
     const appointment = new Appointment(forAppt), booking = appointment.getCurrentBooking()
@@ -122,7 +123,14 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
 
     // CANCEL BUTTON
     function cancelButton() {
-        if (booking && session.adminUser && !appointment.checkOutTime) {
+        var isUsersCurrentAppt = false
+        if (schedule.userCurrentAppointment) {
+            isUsersCurrentAppt = appointment.id == schedule.userCurrentAppointment.id
+        }
+
+        if (booking && 
+            !appointment.checkOutTime &&
+            (isUsersCurrentAppt || session.adminUser)) {
             return <AreYouSure 
                 extendOnSubmit={async () => {
                     await new AppointmentsAPI().CancelAppointment(appointment.id) 
@@ -137,7 +145,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
                 submitBtnLabel={"Cancel"}
                 buttonClass={`cancel-appt-${appointment.id}`}
                 buttonId={`cancel-appt-${appointment.id}`}
-                launchBtnLabel={<FontAwesomeIcon icon={faEraser} />}
+                launchBtnLabel={<FontAwesomeIcon icon={faTrash} />}
                 cancelBtnLabel="Go Back"
                 modalTitle="Cancel Appointment"
                 tooltipText="Cancel"

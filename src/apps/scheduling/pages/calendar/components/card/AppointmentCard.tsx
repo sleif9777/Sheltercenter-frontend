@@ -1,18 +1,19 @@
 import { faCat, faDog, faHorse, faLock, faWheelchair } from "@fortawesome/free-solid-svg-icons";
-import { StandardCard } from "../../../../../../components/card/Card";
-import { CardColor } from "../../../../../../components/card/CardEnums";
-import { Appointment } from "../../models/Appointment";
-import { useStore } from "zustand";
-import { useSchedulingHomeState } from "../../state/State";
-import { TwoColumnListItem } from "../../../../../../components/two_column_list/TwoColumnList";
-import { CardTableSection } from "../../../../../../components/card/CardTableSection";
-import { CardItemListSection } from "../../../../../../components/card/CardItemListSection";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
-import { useSessionState } from "../../../../../../session/SessionState";
+import { useStore } from "zustand";
+
+import { StandardCard } from "../../../../../../components/card/Card";
+import { CardColor } from "../../../../../../components/card/CardEnums";
+import { CardItemListSection } from "../../../../../../components/card/CardItemListSection";
+import { CardTableSection } from "../../../../../../components/card/CardTableSection";
+import { TwoColumnListItem } from "../../../../../../components/two_column_list/TwoColumnList";
 import { SecurityLevel } from "../../../../../../session/SecurityLevel";
-import { AppointmentCardActions } from "./AppointmentCardActions";
+import { useSessionState } from "../../../../../../session/SessionState";
 import { isSurrenderAppointment } from "../../../../utils/AppointmentTypeUtils";
+import { Appointment } from "../../models/Appointment";
+import { useSchedulingHomeState } from "../../state/State";
+import { AppointmentCardActions } from "./AppointmentCardActions";
 
 export type AppointmentCardContext = "Timeslot" | "Current Appointment" | "Adopter Detail"
 
@@ -268,7 +269,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
 
     const description = <>
         { context == "Current Appointment" || context == "Adopter Detail"
-            ? moment(appointment.instant).format("MMM D, h:mm A")
+            ? moment(appointment.instant).tz("America/New_York").format("MMM D, h:mm A")
             : appointment.getAppointmentDescription() }
         {appointment.locked ? <FontAwesomeIcon icon={faLock} style={{ marginLeft: 5 }} /> : null}
         {booking?.adopter.mobility ? <FontAwesomeIcon icon={faWheelchair} style={{ marginLeft: 5 }} /> : null}

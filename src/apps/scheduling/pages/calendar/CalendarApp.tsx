@@ -1,27 +1,28 @@
-import { useEffect, useState } from "react"
-import FullWidthPage from "../../../../layouts/FullWidthPage/FullWidthPage"
-import { ToolbarButton, ToolbarLink, ToolbarModal } from "../../../../layouts/Toolbar/Toolbar"
-import { DateTimeStrings } from "../../../../utils/DateAndTimeStrings"
-import { AppointmentsAPI } from "./api/AppointmentsAPI"
-import { Timeslot, fullyBookedDay } from "../../components/Timeslot"
-import { CalendarMode, Weekday } from "../../enums/Enums"
-import { useSchedulingHomeState } from "./state/State"
-import { SchedulingHomeTitle } from "./components/SchedulingHomeTitle"
-import { useStore } from "zustand"
-import { DateField } from "../../../../components/forms/fields/DateField"
-import PlaceholderText from "../../../../layouts/PlaceholderText/PlaceholderText"
 import { faPaw, faShieldDog, faShopLock } from "@fortawesome/free-solid-svg-icons"
-import { ClosedDatesAPI } from "./api/ClosedDatesAPI"
-import { AppointmentForm } from "./forms/appointment/AppointmentForm"
-import { EmptyDatesAlert } from "./components/alerts/EmptyDatesAlert"
-import moment from "moment"
-import { MissingOutcomesAlert } from "./components/alerts/MissingOutcomesAlert"
-import { useSessionState } from "../../../../session/SessionState"
-import { SecurityLevel } from "../../../../session/SecurityLevel"
-import { AppointmentCard } from "./components/card/AppointmentCard"
-import { Appointment } from "./models/Appointment"
-import { AreYouSure } from "../../../../components/modals/AreYouSure"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import moment from "moment"
+import { useEffect, useState } from "react"
+import { useStore } from "zustand"
+
+import { DateField } from "../../../../components/forms/fields/DateField"
+import { AreYouSure } from "../../../../components/modals/AreYouSure"
+import FullWidthPage from "../../../../layouts/FullWidthPage/FullWidthPage"
+import PlaceholderText from "../../../../layouts/PlaceholderText/PlaceholderText"
+import { ToolbarButton, ToolbarLink, ToolbarModal } from "../../../../layouts/Toolbar/Toolbar"
+import { SecurityLevel } from "../../../../session/SecurityLevel"
+import { useSessionState } from "../../../../session/SessionState"
+import { DateTimeStrings } from "../../../../utils/DateAndTimeStrings"
+import { fullyBookedDay, Timeslot } from "../../components/Timeslot"
+import { CalendarMode, Weekday } from "../../enums/Enums"
+import { AppointmentsAPI } from "./api/AppointmentsAPI"
+import { ClosedDatesAPI } from "./api/ClosedDatesAPI"
+import { EmptyDatesAlert } from "./components/alerts/EmptyDatesAlert"
+import { MissingOutcomesAlert } from "./components/alerts/MissingOutcomesAlert"
+import { AppointmentCard } from "./components/card/AppointmentCard"
+import { SchedulingHomeTitle } from "./components/SchedulingHomeTitle"
+import { AppointmentForm } from "./forms/appointment/AppointmentForm"
+import { Appointment } from "./models/Appointment"
+import { useSchedulingHomeState } from "./state/State"
 
 export default function CalendarApp() {
     const store = useStore(useSchedulingHomeState)
@@ -39,7 +40,7 @@ export default function CalendarApp() {
         } else {
             dataToLoad = ["adopters", "adoptions"]
         }
-
+        
         store.refresh(store.viewDate, dataToLoad, session.userID!)
     }, [])
 
@@ -159,7 +160,7 @@ export default function CalendarApp() {
         }
 
         // Show placeholder if all appointments booked
-        if (session.adopterUser && fullyBookedDay(store.timeslots)) {
+        if (session.adopterUser && fullyBookedDay(store.timeslots, session.userID)) {
             return <PlaceholderText iconDef={faShieldDog} text={"All appointments on this date are booked."} />
         }
 

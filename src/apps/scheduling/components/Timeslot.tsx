@@ -1,16 +1,18 @@
 import moment from "moment"
+import { useState } from "react"
+import { useStore } from "zustand"
+
+import { SecurityLevel } from "../../../session/SecurityLevel"
+import { useSessionState } from "../../../session/SessionState"
 import { CalendarMode } from "../enums/Enums"
 import { IAppointmentBase } from "../models/AppointmentBase"
-import { ITemplateAppointment, TemplateAppointment } from "../pages/template/models/TemplateAppointment"
-import { TemplateAppointmentCard } from "../pages/template/components/TemplateAppointmentCard"
+import { ITimeslot } from "../models/Timeslot"
 import { AppointmentCard } from "../pages/calendar/components/card/AppointmentCard"
 import { Appointment, IAppointment } from "../pages/calendar/models/Appointment"
-import { useState } from "react"
+import { TemplateAppointmentCard } from "../pages/template/components/TemplateAppointmentCard"
+import { ITemplateAppointment, TemplateAppointment } from "../pages/template/models/TemplateAppointment"
+
 import "../styles/Timeslot.scss"
-import { ITimeslot } from "../models/Timeslot"
-import { useStore } from "zustand"
-import { useSessionState } from "../../../session/SessionState"
-import { SecurityLevel } from "../../../session/SecurityLevel"
 
 export interface TimeslotProps<T extends IAppointmentBase> extends ITimeslot<T> {
     mode: CalendarMode,
@@ -20,15 +22,17 @@ export type SimpleTimeslotDictionary<T extends IAppointmentBase> = { [key: strin
 
 export type TimeslotDictionary<T extends IAppointmentBase> = TimeslotProps<T>[]
 
-export function fullyBookedSlot(ts: TimeslotProps<IAppointment>) {
+export function fullyBookedSlot(ts: TimeslotProps<IAppointment>, userID?: number) {
     return ts.appointments
         .map(a => new Appointment(a))
-        .filter(a => a.getCurrentBooking() == null)
+        .filter(a => a.getCurrentBooking() == null || 
+            (userID && a.getCurrentBooking() && 
+                a.getCurrentBooking()?.adopter.ID != userID))
         .length === 0
 }
 
-export function fullyBookedDay(day: TimeslotDictionary<IAppointment>) {
-    return day.filter(ts => !fullyBookedSlot(ts)).length === 0
+export function fullyBookedDay(day: TimeslotDictionary<IAppointment>, userID?: number) {
+    return day.filter(ts => !fullyBookedSlot(ts, userID)).length === 0
 }
 
 export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointment>) {
@@ -41,7 +45,6 @@ export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointmen
             return appointments.map(a => new TemplateAppointment(a as ITemplateAppointment))
         } else if (mode == CalendarMode.SCHEDULING) {
             const mapped = appointments.map(a => new Appointment(a as IAppointment))
-
             switch (session.securityLevel) {
                 case SecurityLevel.ADOPTER:
                     return mapped.filter(a => {
