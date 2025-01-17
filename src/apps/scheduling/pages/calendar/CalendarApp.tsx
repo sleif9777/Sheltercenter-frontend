@@ -117,7 +117,7 @@ export default function CalendarApp() {
             return <></>
         }
 
-        if (session.adopterUser && store.userExceptions) {
+        if (session.adopterUser && store.userExceptions.length > 0) {
             return <>
                 <PlaceholderText iconDef={faShieldDog} text={"Congrats on your adoption!"} />
                 <p>
