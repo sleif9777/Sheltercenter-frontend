@@ -1,7 +1,14 @@
+@media print {
+    .navbar {
+        border: 5px solid greenyellow;
+        display: none;
+        width: 0%;
+    }
+}
+
 .navbar {
     border-right: 1px solid var(--light-gray);
     height: 100%;
-    // background-color: var(--light-gray);
     overflow-y: scroll;
     position: fixed;
     left: 0;

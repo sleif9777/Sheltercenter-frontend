@@ -39,3 +39,10 @@
         }
     }
 }
+
+@media print {
+    .full-width-page {
+        left: 0%;
+        width: 100%;
+    }
+}

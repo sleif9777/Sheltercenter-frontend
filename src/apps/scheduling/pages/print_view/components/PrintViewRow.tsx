@@ -55,6 +55,10 @@ export function PrintViewAppointmentRow(props: PrintViewRowProps) {
         <td>{moment(appointment.instant).tz("America/New_York").format("h:mm A")}</td>
         {AdopterInfoCell}
         {NotesCell()}
+        <td className="print-col-line"></td>
+        <td className="print-col-line"></td>
+        <td className="print-col-line"></td>
+        <td className="print-col-line"></td>
     </tr>
 }
 
@@ -89,9 +93,10 @@ export function PrintViewAdminRow(props: Omit<PrintViewRowProps, "booking">) {
         <td>{moment(appointment.instant).tz("America/New_York").format("h:mm A")}</td>
         {AdopterInfoCell}
         {NotesCell()}
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td className="print-col-line"></td>
+        <td className="print-col-line"></td>
+        <td className="print-col-line"></td>
+        <td className="print-col-line"></td>
+        <td className="print-col-line"></td>
     </tr>
 }
