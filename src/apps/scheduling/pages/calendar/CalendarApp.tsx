@@ -3,7 +3,7 @@ import FullWidthPage from "../../../../layouts/FullWidthPage/FullWidthPage"
 import { ToolbarButton, ToolbarLink, ToolbarModal } from "../../../../layouts/Toolbar/Toolbar"
 import { DateTimeStrings } from "../../../../utils/DateAndTimeStrings"
 import { AppointmentsAPI } from "./api/AppointmentsAPI"
-import { Timeslot } from "../../components/Timeslot"
+import { Timeslot, fullyBookedDay } from "../../components/Timeslot"
 import { CalendarMode, Weekday } from "../../enums/Enums"
 import { useSchedulingHomeState } from "./state/State"
 import { SchedulingHomeTitle } from "./components/SchedulingHomeTitle"
@@ -117,6 +117,15 @@ export default function CalendarApp() {
             return <></>
         }
 
+        if (session.adopterUser && store.userExceptions) {
+            return <>
+                <PlaceholderText iconDef={faShieldDog} text={"Congrats on your adoption!"} />
+                <p>
+                    If you would like to start a new adoption, or need further assistance, email adoptions@savinggracenc.org.
+                </p>
+            </>
+        }
+
         if (store.weekday == Weekday.SUNDAY) {
             return <PlaceholderText iconDef={faShopLock} text={"Sundays are closed by default."} />
         } 
@@ -147,6 +156,11 @@ export default function CalendarApp() {
             } else {
                 return <PlaceholderText iconDef={faShieldDog} text={"No appointments published for this date."} />
             }
+        }
+
+        // Show placeholder if all appointments booked
+        if (session.adopterUser && fullyBookedDay(store.timeslots)) {
+            return <PlaceholderText iconDef={faShieldDog} text={"All appointments on this date are booked."} />
         }
 
         return <>

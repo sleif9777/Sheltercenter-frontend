@@ -12,15 +12,26 @@ import { useStore } from "zustand"
 import { useSessionState } from "../../../session/SessionState"
 import { SecurityLevel } from "../../../session/SecurityLevel"
 
-export interface TimeslotProps extends ITimeslot {
+export interface TimeslotProps<T extends IAppointmentBase> extends ITimeslot<T> {
     mode: CalendarMode,
 }
 
 export type SimpleTimeslotDictionary = { [key: string]: IAppointmentBase[] }
 
-export type TimeslotDictionary = TimeslotProps[]
+export type TimeslotDictionary<T extends IAppointmentBase> = TimeslotProps<T>[]
 
-export function Timeslot(props: TimeslotProps) {
+export function fullyBookedSlot(ts: TimeslotProps<IAppointment>) {
+    return ts.appointments
+        .map(a => new Appointment(a))
+        .filter(a => a.getCurrentBooking() == null)
+        .length === 0
+}
+
+export function fullyBookedDay(day: TimeslotDictionary<IAppointment>) {
+    return day.filter(ts => !fullyBookedSlot(ts)).length === 0
+}
+
+export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointment>) {
     const session = useStore(useSessionState)
     var { appointments, mode, instant } = props
     const [label, setLabel] = useState<string>()

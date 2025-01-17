@@ -15,6 +15,7 @@ export interface SchedulingHomeContext {
     weekday: Weekday,
     emptyDates: Date[],
     userCurrentAppointment?: IAppointment,
+    userExceptions: ("adoptionCompleted" | "requestedAccess" | "requestedSurrender")[]
     adoptersSansAppointment: IAdopter[],
     adoptionsSansPaperwork: IPendingAdoption[],
     adopterOptions?: IAdopter[]
@@ -22,7 +23,7 @@ export interface SchedulingHomeContext {
 
 interface SchedulingHomeState extends Omit<SchedulingHomeContext, "appointments"> {
     refresh: (newViewDate: Date, refreshObjs: ("adopters" | "adoptions")[], userID?: number) => void,
-    timeslots: TimeslotDictionary
+    timeslots: TimeslotDictionary<IAppointment>
 }
 
 export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
@@ -37,7 +38,8 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
         }
 
         const context: SchedulingHomeContext = await Appointment.fetchAppointmentsForDate(newViewDate, userID ?? 0)
-        
+        console.log(context)
+
         set(() => ({ 
             viewDate: newViewDate, 
             timeslots: Appointment.setUpTimeslots(context.appointments ?? {}), 
@@ -45,7 +47,8 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
             weekday: (newViewDate.getDay() == 0 ? 6 : newViewDate.getDay() - 1),
             emptyDates: context.emptyDates,
             missingOutcomes: context.missingOutcomes ?? [],
-            userCurrentAppointment: context.userCurrentAppointment
+            userCurrentAppointment: context.userCurrentAppointment,
+            userExceptions: context.userExceptions,
         }))
 
         // TODO: Make a loading overlay and move this higher
@@ -62,5 +65,6 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
     missingOutcomes: [],
     userCurrentAppointment: undefined,
     adoptersSansAppointment: [],
-    adoptionsSansPaperwork: []
+    adoptionsSansPaperwork: [],
+    userExceptions: []
 }));
