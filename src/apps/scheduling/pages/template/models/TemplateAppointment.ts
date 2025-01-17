@@ -30,7 +30,7 @@ export class TemplateAppointment extends AppointmentBase implements ITemplateApp
     }
 
     static async fetchAppointmentsForWeekday(weekday: Weekday) {
-        const response: AxiosResponse<SimpleTimeslotDictionary> = await new TemplateAppointmentsAPI().GetAllTemplateAppointments(weekday)
+        const response: AxiosResponse<SimpleTimeslotDictionary<ITemplateAppointment>> = await new TemplateAppointmentsAPI().GetAllTemplateAppointments(weekday)
         return response.data
     }
 }
