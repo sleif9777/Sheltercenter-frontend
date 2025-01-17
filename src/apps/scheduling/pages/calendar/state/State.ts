@@ -31,13 +31,6 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
     viewDate: new Date(),
     closedDateID: null,
     refresh: async (newViewDate: Date, refreshObjs: ("adopters" | "adoptions")[], userID?: number) => {
-        if (refreshObjs.includes("adoptions")) {
-            const getAdoptions = await new PendingAdoptionsAPI().GetAllPendingAdoptionsAwaitingPaperwork()
-            set(() => ({ 
-                adoptionsSansPaperwork: getAdoptions.data.adoptions
-            }))
-        }
-
         const context: SchedulingHomeContext = await Appointment.fetchAppointmentsForDate(newViewDate, userID ?? 0)
 
         set(() => ({ 
@@ -57,6 +50,13 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
             const getAdopters = await new AdopterAPI().GetAdoptersForBooking()
             set(() => ({ 
                 adoptersSansAppointment: getAdopters.data.adopters
+            }))
+        }
+
+        if (refreshObjs.includes("adoptions")) {
+            const getAdoptions = await new PendingAdoptionsAPI().GetAllPendingAdoptionsAwaitingPaperwork()
+            set(() => ({ 
+                adoptionsSansPaperwork: getAdoptions.data.adoptions
             }))
         }
     },
