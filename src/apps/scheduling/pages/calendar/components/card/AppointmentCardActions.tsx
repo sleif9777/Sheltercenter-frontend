@@ -203,7 +203,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
     }
 
     // NO ACTIONS IF NO SHOW OR IN THE PAST
-    if (appointment.outcome == 4 || moment(appointment.instant).isBefore(moment(d))) {
+    if (moment(appointment.instant).isBefore(moment(d)) && !session.adminUser) {
         return []
     }
 
@@ -212,7 +212,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
     }
 
     // ONLY CHECKOUT FORM IF CHECKED OUT
-    if (appointment.checkOutTime) {
+    if (appointment.outcome == 4 || appointment.checkOutTime) {
         return [messageButton(), printButton(), checkOutForm()].reverse()
     }
 
