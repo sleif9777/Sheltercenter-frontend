@@ -37,7 +37,6 @@ export default function CalendarApp() {
         } else if (session.greeterUser) {
             dataToLoad = ["adopters"]
         } else {
-            console.log("HIT")
             dataToLoad = ["adopters", "adoptions"]
         }
 

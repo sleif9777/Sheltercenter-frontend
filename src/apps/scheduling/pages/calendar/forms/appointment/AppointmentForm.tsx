@@ -56,14 +56,6 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
     const [paperworkAdoptionOptions, setPaperworkAdoptionOptions] = useState<IPendingAdoption[]>([])
 
-    // useEffect(() => {
-    //     if (paperworkAdoptionOptions.length === 0) {
-    //         console.log(store)
-    //         setPaperworkAdoptionOptions(store.adoptionsSansPaperwork)
-    //     }
-    // }, [store.adoptersSansAppointment])
-
-
     const resetForm = () => {
         if (defaults) {
             setType(defaults.type)
