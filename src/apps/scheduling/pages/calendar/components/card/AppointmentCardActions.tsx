@@ -165,7 +165,8 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
     function bookingForm() {
         if (session.adminUser || 
                 (session.greeterUser && !appointment.getCurrentBooking()) ||
-                session.adopterUser && session.userID == booking?.adopter.userID) {
+                (session.adopterUser && 
+                    (session.userID == booking?.adopter.userID || !booking))) {
             return <AdopterBookingForm 
                 appointment={appointment} 
                 launchBtnLabel={<FontAwesomeIcon icon={booking ? faPencil : faWandMagicSparkles} />} 

@@ -30,8 +30,8 @@ export function AdopterBookingForm(props: BookingFormProps) {
     const session = useStore(useSessionState)
     const booking = appointment.getCurrentBooking()
 
-    const [adopter, setAdopter] = useState<Adopter>()
-    const [adopterOptions, setAdopterItems] = useState<Adopter[]>([]) // TODO: rename one or the other
+    const [adopter, setAdopter] = useState<IAdopter>()
+    const [adopterOptions, setAdopterItems] = useState<IAdopter[]>([]) // TODO: rename one or the other
 
     const [adopterNotes, setAdopterNotes] = useState<string>("")
     const [internalNotes, setInternalNotes] = useState<string>("")
@@ -57,7 +57,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
 
     const [errorMsg, setErrorMsg] = useState<string>("")
 
-    const setDefaults = (newAdopter?: Adopter) => {
+    const setDefaults = (newAdopter?: IAdopter) => {
         if (newAdopter) {
             setAdopter(newAdopter)
             setAdopterNotes(newAdopter.adopterNotes ?? "")
@@ -104,33 +104,83 @@ export function AdopterBookingForm(props: BookingFormProps) {
     }
 
     const handleOpen = async () => {
-        if (adopterOptions.length === 0) {
-            const API = new AdopterAPI()
-            const newAdopters: IAdopter[] = session.adopterUser ? [] : store.adoptersSansAppointment
+        // if (adopterOptions.length === 0) {
+        //     const API = new AdopterAPI()
+        //     const newAdopters: IAdopter[] = session.adopterUser ? [] : store.adoptersSansAppointment
+        //     const booking = appointment.getCurrentBooking()
+        //     var loadAdopter: number | undefined
 
-            if (appointment.getCurrentBooking() && appointment.getCurrentBooking()?.adopter) {
-                const bookedAdopterID = appointment.getCurrentBooking()?.adopter.ID
+        //     if (session.adopterUser) {
+        //         loadAdopter = session.adopterID
+        //     } else if (booking) {
+        //         loadAdopter = booking.adopter.ID
+        //     }
 
-                if (bookedAdopterID) {
-                    const bookedAdopter: AxiosResponse<IAdopter> = await API.GetAdopter(bookedAdopterID)
-                    newAdopters.push(bookedAdopter.data)
-                }
-            }
-            
-            var adopterObjs = newAdopters.map(adopter => new Adopter(adopter))
-            adopterObjs = adopterObjs.sort((a, b) => {
-                return a.fullName > b.fullName ? 1 : -1
-            })
-            
-            setAdopterItems(adopterObjs)
+        //     if (loadAdopter) {
+        //         const bookedAdopter: AxiosResponse<IAdopter> = await API.GetAdopter(loadAdopter)
+        //         newAdopters.push(bookedAdopter.data)
+        //     }
 
-            if (session.securityLevel == SecurityLevel.ADOPTER) {
-                setDefaults(adopterObjs.find(a => a.userID == session.userID))
-                return
-            }
-        }
+        //     var adopterObjs = newAdopters
+        //         .map(adopter => new Adopter(adopter))
+        //         .sort((a, b) => {
+        //             return a.fullName > b.fullName ? 1 : -1
+        //         })
+
+        //     setAdopterItems(adopterObjs)
+
+        //     if (loadAdopter) {
+        //         setDefaults(adopterObjs.find(a => a.ID == loadAdopter))
+        //     }
+
+        //     // if (session.securityLevel == SecurityLevel.ADOPTER) {
+        //     //     // const loggedInAdopter: AxiosResponse<IAdopter> = await API.GetAdopter
+        //     // } else {
+        //     //     // IF THE APPT IS BOOKED, GET THAT ADOPTER AND ADD TO LONG LIST OF OPTIONS
+        //     //     if (booking && !session.adopterUser) {
+                    
+        //     //     }
+                
+        //     //     var adopterObjs = newAdopters.map(adopter => new Adopter(adopter))
+        //     //     adopterObjs = adopterObjs.sort((a, b) => {
+        //     //         return a.fullName > b.fullName ? 1 : -1
+        //     //     })
+
+        //     //     setDefaults(adopterObjs.find(a => a.userID == session.userID))
+        //     //     setAdopterItems(adopterObjs)
+        //     // }
+        // }
 
         setDefaults(booking?.adopter ?? undefined)
+    }
+
+    async function loadAdopterOptions() {
+        const API = new AdopterAPI()
+        const newAdopters: IAdopter[] = session.adopterUser ? [] : store.adoptersSansAppointment
+        const booking = appointment.getCurrentBooking()
+        var loadAdopter: number | undefined
+
+        if (session.adopterUser) {
+            loadAdopter = session.adopterID
+        } else if (booking) {
+            loadAdopter = booking.adopter.ID
+        }
+
+        if (loadAdopter) {
+            const bookedAdopter: AxiosResponse<IAdopter> = await API.GetAdopter(loadAdopter)
+            newAdopters.push(bookedAdopter.data)
+        }
+
+        var adopterObjs = newAdopters
+            .sort((a, b) => {
+                return a.fullName > b.fullName ? 1 : -1
+            })
+
+        setAdopterItems(adopterObjs) 
+        
+        if (loadAdopter) {
+            setDefaults(adopterObjs.find(a => a.ID === loadAdopter))
+        }
     }
 
     const handleSubmit = async () => {
@@ -178,14 +228,18 @@ export function AdopterBookingForm(props: BookingFormProps) {
 
     }
 
-    function AdopterField() {
+    function AdopterField(props: {options: IAdopter[]}) {
+        if (props.options.length < 1) {
+            loadAdopterOptions()
+        }
+
         return <>
-        <InputLabel id="adopter">Adopter <Required /></InputLabel>
+            <InputLabel id="adopter">Adopter <Required /></InputLabel>
             <Select
                 id="adopter"
                 value={adopter?.ID}
                 label="Adopter"
-                disabled={booking != null || session.securityLevel == SecurityLevel.ADOPTER}
+                disabled={booking != null || session.adopterUser}
                 // placeholder="Select an adopter"
                 fullWidth
                 onChange={(e) => {
@@ -452,7 +506,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
             <table>
                 <tr>
                     <td className="two-column">
-                        <AdopterField />
+                        <AdopterField options={adopterOptions} />
                         <ActivityLevelField />
                         <HasFenceField />
                     </td>

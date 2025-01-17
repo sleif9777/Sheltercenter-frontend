@@ -13,6 +13,7 @@ export interface SessionContext {
     userID?: number,
     userFName?: string,
     userLName?: string,
+    adopterID?: number,
     securityLevel?: SecurityLevel,
 }
 
@@ -35,6 +36,7 @@ export const useSessionState = create<SessionState>()(
             attemptLogIn: async (email, otp) => {
                 const context: AxiosResponse<SessionContext> = await new UserProfilesAPI().AuthenticateOTP(email, otp)
 
+                console.log(context)
                 set(() => ({
                     isAuthenticated: context.data.isAuthenticated,
                     accessToken: context.data.accessToken,
@@ -43,6 +45,7 @@ export const useSessionState = create<SessionState>()(
                     userID: context.data.userID,
                     userFName: context.data.userFName,
                     userLName: context.data.userLName,
+                    adopterID: context.data.adopterID,
                     adminUser: (context.data.securityLevel != undefined && 
                         context.data.securityLevel >= SecurityLevel.ADMIN),
                     adopterUser: context.data.securityLevel === SecurityLevel.ADOPTER,

@@ -56,11 +56,12 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
     const [paperworkAdoptionOptions, setPaperworkAdoptionOptions] = useState<IPendingAdoption[]>([])
 
-    useEffect(() => {
-        if (paperworkAdoptionOptions.length === 0) {
-            setPaperworkAdoptionOptions(store.adoptionsSansPaperwork)
-        }
-    }, [])
+    // useEffect(() => {
+    //     if (paperworkAdoptionOptions.length === 0) {
+    //         console.log(store)
+    //         setPaperworkAdoptionOptions(store.adoptionsSansPaperwork)
+    //     }
+    // }, [store.adoptersSansAppointment])
 
 
     const resetForm = () => {
@@ -131,6 +132,34 @@ export function AppointmentForm(props: AppointmentFormProps) {
         return <></>
     }
 
+    function PaperworkField() {
+        if (paperworkAdoptionOptions.length === 0) {
+            setPaperworkAdoptionOptions(store.adoptionsSansPaperwork)
+        }
+
+        return <>
+            <InputLabel id="dog">Dog</InputLabel>
+            <Select
+                id="dog"
+                value={paperworkAdoption?.id}
+                label="Adoption"
+                // placeholder="Select an adoption"
+                style={{ width: 400 }}
+                onChange={(e) => {
+                    const newAdoption = paperworkAdoptionOptions.find(a => a.id == e.target.value)
+                    setPaperworkAdoption(newAdoption)
+                }}
+            >
+                {paperworkAdoptionOptions
+                    .sort((a, b) => a.dog.localeCompare(b.dog))
+                    .map(a => <MenuItem value={a.id}>
+                        {a.dog} ({a.adopter.fullName})
+                    </MenuItem>)
+                }
+            </Select><br />
+        </>
+    }
+
     return <ModalWithButton 
         buttonClass={"submit-button " + (buttonClassOverride ?? "")} 
         buttonId={"add-appointment"} 
@@ -193,49 +222,54 @@ export function AppointmentForm(props: AppointmentFormProps) {
                 defaultValue={store.viewDate}
             /><br />
             {showPaperworkAdoptionField 
-                ? <>
-                    <InputLabel id="dog">Dog</InputLabel>
-                    <Select
-                        id="dog"
-                        value={paperworkAdoption?.id}
-                        label="Adoption"
-                        // placeholder="Select an adoption"
-                        style={{ width: 400 }}
-                        onChange={(e) => {
-                            const newAdoption = paperworkAdoptionOptions.find(a => a.id == e.target.value)
-                            setPaperworkAdoption(newAdoption)
-                        }}
-                    >
-                        {paperworkAdoptionOptions
-                            .sort((a, b) => a.dog.localeCompare(b.dog))
-                            .map(a => <MenuItem value={a.id}>
-                                {a.dog} ({a.adopter.fullName})
-                            </MenuItem>)
-                        }
-                    </Select><br />
-                </>
+                ? <PaperworkField />
+                // ? <>
+                //     <InputLabel id="dog">Dog</InputLabel>
+                //     <Select
+                //         id="dog"
+                //         value={paperworkAdoption?.id}
+                //         label="Adoption"
+                //         // placeholder="Select an adoption"
+                //         style={{ width: 400 }}
+                //         onChange={(e) => {
+                //             const newAdoption = paperworkAdoptionOptions.find(a => a.id == e.target.value)
+                //             setPaperworkAdoption(newAdoption)
+                //         }}
+                //     >
+                //         {paperworkAdoptionOptions
+                //             .sort((a, b) => a.dog.localeCompare(b.dog))
+                //             .map(a => <MenuItem value={a.id}>
+                //                 {a.dog} ({a.adopter.fullName})
+                //             </MenuItem>)
+                //         }
+                //     </Select><br />
+                // </>
                 : null}
             {showSurrenderedDogField && type
-                ? <TextField
-                    id="outlined-controlled"
-                    label={"Surrendered Dog"}
-                    margin="dense"
-                    style={{marginRight: 5}}
-                    value={surrenderedDog}
-                    error={type == AppointmentType.SURRENDER && surrenderedDog.length === 0}
-                    onChange={(e) => setSurrenderedDog(e.target.value)}
-                />
-                : null}<br />
+                ? <>
+                    <TextField
+                        id="outlined-controlled"
+                        label={"Surrendered Dog"}
+                        margin="dense"
+                        style={{marginRight: 5}}
+                        value={surrenderedDog}
+                        error={type == AppointmentType.SURRENDER && surrenderedDog.length === 0}
+                        onChange={(e) => setSurrenderedDog(e.target.value)}
+                    /><br />
+                </> 
+                : null}
             {showSurrenderedDogFkaField && type
-                ? <TextField
-                    id="outlined-controlled"
-                    label={"FKA"}
-                    margin="dense"
-                    style={{marginRight: 5}}
-                    value={surrenderedDogFka}
-                    onChange={(e) => setSurrenderedDogFka(e.target.value)}
-                />
-                : null}<br />
+                ? <>
+                    <TextField
+                        id="outlined-controlled"
+                        label={"FKA"}
+                        margin="dense"
+                        style={{marginRight: 5}}
+                        value={surrenderedDogFka}
+                        onChange={(e) => setSurrenderedDogFka(e.target.value)}
+                    /><br />
+                </> 
+                : null}
             {showNotesField && type
                 ? <TextField
                     id="outlined-controlled"

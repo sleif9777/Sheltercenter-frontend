@@ -30,7 +30,18 @@ export default function CalendarApp() {
 
     // Render the component
     useEffect(() => {
-        store.refresh(store.viewDate, ["adopters", "adoptions"], session.userID!)
+        var dataToLoad: ("adopters" | "adoptions")[]
+
+        if (session.adopterUser) {
+            dataToLoad = []
+        } else if (session.greeterUser) {
+            dataToLoad = ["adopters"]
+        } else {
+            console.log("HIT")
+            dataToLoad = ["adopters", "adoptions"]
+        }
+
+        store.refresh(store.viewDate, dataToLoad, session.userID!)
     }, [])
 
     if (session.userID == undefined) { return <></> }
