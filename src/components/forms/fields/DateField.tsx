@@ -4,6 +4,7 @@ import { DatePicker } from "rsuite";
 import { FieldProps } from "./FieldProps";
 
 import 'rsuite/dist/rsuite.min.css';
+import './DateField.scss'
 
 interface DateFieldProps extends FieldProps {
     placeholder?: Date,
@@ -21,7 +22,8 @@ export function DateField(props: DateFieldProps) {
             size="lg" 
             id={id}
             defaultValue={defaultValue}
-            placeholder={moment(placeholder).format("YYYY-MM-DD")} 
+            placeholder={moment(placeholder).format("MM/DD/yyyy")} 
+            format="MM/dd/yyyy"
             className="modal-date-picker" 
             onChange={(date) => changeDate(date)}
         />
