@@ -12,24 +12,32 @@ import { AdopterApprovalStatus } from "../../enums/AdopterEnums";
 import { Adopter, IAdopter } from "../../models/Adopter";
 import { AdopterForm } from "../../shared_components/AdopterForm";
 import { Message } from "../../../../components/message/Message";
+import { BookingHistory, BookingHistoryCard } from "./components/BookingHistoryCard";
 
 interface AdopterDetailsAppContext {
     adopter: IAdopter,
     currentAppointment?: IAppointment,
-    bookings: IBooking[]
+    bookingHistory: BookingHistory
 }
 
 export default function AdopterDetailsApp() {
 
     const { id } = useParams()
     const [approvalSent, setApprovalSent] = useState<boolean | null>(null)
+    const [bookingHistory, setBookingHistory] = useState<BookingHistory>({ 
+        adopted: 0,
+        completed: 0,
+        noShow: 0,
+        noDecision: 0 
+    })
 
     const fetchData = async () => {
         if (id) {
             const response: AxiosResponse<AdopterDetailsAppContext> = await new AdopterAPI().GetAdopterDetail(parseInt(id))
+            console.log(response)
             setAdopter(new Adopter(response.data.adopter))
             setAppointment(response.data.currentAppointment)
-            // setBookings(response.data.bookings)
+            setBookingHistory(response.data.bookingHistory)
         }
     }
 
@@ -82,6 +90,7 @@ export default function AdopterDetailsApp() {
             <Message level={"Success"} showMessage={approvalSent === true} message={"Approval resent."} />
             <ResendApprovalButton adopter={adopter} />
             {appointment ? <AppointmentCard appointment={new Appointment(appointment)} context={"Adopter Detail"} /> : <></>}
+            <BookingHistoryCard history={bookingHistory} />
         </>
     }
 
