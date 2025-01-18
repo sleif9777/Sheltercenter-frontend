@@ -6,7 +6,6 @@ import { useParams } from "react-router-dom";
 import TwoColumnPage from "../../../../layouts/TwoColumnPage/TwoColumnPage";
 import { AppointmentCard } from "../../../scheduling/pages/calendar/components/card/AppointmentCard";
 import { Appointment, IAppointment } from "../../../scheduling/pages/calendar/models/Appointment";
-import { IBooking } from "../../../scheduling/pages/calendar/models/Booking";
 import { AdopterAPI } from "../../api/API";
 import { AdopterApprovalStatus } from "../../enums/AdopterEnums";
 import { Adopter, IAdopter } from "../../models/Adopter";
