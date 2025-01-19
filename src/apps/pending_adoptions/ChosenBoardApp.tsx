@@ -8,7 +8,7 @@ import { PendingAdoptionForm } from "./forms/PendingAdoptionForm";
 import moment from "moment";
 import { MessagingModal } from "../messaging/MessagingModal";
 import { PendingAdoptionsAPI } from "./api/API";
-import { ChosenBoardQuickTexts } from "./QuickTexts";
+import { ChosenBoardUpdateQuickTexts } from "./QuickTexts";
 
 import "../scheduling/pages/print_view/ReportingPage.scss"
 import "./ChosenBoardApp.scss"
@@ -80,7 +80,7 @@ export function ChosenBoardApp() {
                                 launchBtnLabel={"Send Update"}
                                 buttonId={`send-update`}
                                 modalTitle="Send Update"
-                                quickTexts={ChosenBoardQuickTexts(a)}
+                                quickTexts={ChosenBoardUpdateQuickTexts(a)}
                                 extendOnSubmit={async (message, subject) => {
                                     await new PendingAdoptionsAPI().CreateUpdate(
                                         a.id,
@@ -89,6 +89,7 @@ export function ChosenBoardApp() {
                                     )
                                     store.refresh()
                                 }}
+                                allowOnlyQuickTexts={false}
                             />
                         </td>
                         <td>

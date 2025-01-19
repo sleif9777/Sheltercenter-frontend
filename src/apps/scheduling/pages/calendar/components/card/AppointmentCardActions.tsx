@@ -48,6 +48,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
                 launchBtnLabel={<FontAwesomeIcon icon={faEnvelope} />} 
                 modalTitle={"Send Message"}  
                 tooltipText="Send Message"
+                allowOnlyQuickTexts={false}
             />
         }
 

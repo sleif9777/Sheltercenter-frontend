@@ -8,6 +8,9 @@ import { PendingAdoption } from "../models/PendingAdoption";
 import { useChosenBoardState } from "../state/State";
 
 import "../ChosenBoardApp.scss"
+import { MessagingModal } from "../../messaging/MessagingModal";
+import { ChosenBoardR2RQuickText } from "../QuickTexts";
+import { IQuickText } from "../../messaging/QuickText";
 
 interface ChosenBoardActionProps {
     adoption: PendingAdoption
@@ -16,53 +19,78 @@ interface ChosenBoardActionProps {
 export function ChosenBoardActions(props: ChosenBoardActionProps) {
     const { adoption } = props
 
-    return <>
-        <ChosenBoardActionButton 
+    function NeedsVettingButton() {
+        return <ChosenBoardActionButton 
             actionName="needs-vetting"
             adoption={adoption}
             icon={faUserDoctor}
             newStatus={1}
             tooltipContent="Needs Vetting"
         />
-        <ChosenBoardActionButton 
+    }
+
+    function NeedsWellCheckButton() {
+        return <ChosenBoardActionButton 
             actionName="needs-well-check"
             adoption={adoption}
             icon={faThermometer}
             newStatus={2}
             tooltipContent="Needs Well Check"
         />
-        <ChosenBoardActionButton 
-            actionName="ready-hwneg-"
-            adoption={adoption}
-            heartworm={false}
-            icon={faVirusSlash}
-            // TODO: Make this launch a HW modal
-            newStatus={3}
-            tooltipContent="Ready - HW Negative"
-        />
-        <ChosenBoardActionButton 
-            actionName="ready-hwpos-"
-            adoption={adoption}
-            heartworm={true}
-            icon={faVirus}
-            // TODO: Make this launch a HW modal
-            newStatus={3}
-            tooltipContent="Ready - HW Positive"
-        />
-        <ChosenBoardActionButton 
+    }
+
+    function CompleteButton() {
+        return <ChosenBoardActionButton 
             actionName="complete"
             adoption={adoption}
             icon={faCheckCircle}
             newStatus={4}
             tooltipContent="Complete"
         />
-        <ChosenBoardActionButton 
+    }
+
+    function CancelButton() {
+        return <ChosenBoardActionButton 
             actionName="cancel"
             adoption={adoption}
             icon={faEraser}
             newStatus={5}
             tooltipContent="Cancel"
         />
+    }
+
+    function R2RHWPosButton() {
+        return <ChosenBoardMessageButton 
+        // actionName, adoption, heartworm, icon, newStatus, tooltipContent
+            actionName="ready-hwpos-"
+            adoption={adoption}
+            heartworm={true}
+            icon={faVirus}
+            newStatus={3}
+            quickTexts={ChosenBoardR2RQuickText(adoption, true)}
+            tooltipContent="Ready - HW Positive"
+        />
+    }
+
+    function R2RHWNegButton() {
+        return <ChosenBoardMessageButton 
+            actionName="ready-hwneg-"
+            adoption={adoption}
+            heartworm={false}
+            icon={faVirusSlash}
+            newStatus={3}
+            quickTexts={ChosenBoardR2RQuickText(adoption, false)}
+            tooltipContent="Ready - HW Negative"
+        />
+    }
+
+    return <>
+        <NeedsVettingButton />
+        <NeedsWellCheckButton />
+        <R2RHWNegButton />
+        <R2RHWPosButton />
+        <CompleteButton />
+        <CancelButton />
     </>
 }
 
@@ -97,4 +125,29 @@ function ChosenBoardActionButton(props: ChosenBoardActionButtonProps) {
             place="bottom-start"
         />
     </>
+}
+
+interface ChosenBoardMessageButtonProps extends ChosenBoardActionButtonProps {
+    quickTexts: IQuickText[]
+}
+
+function ChosenBoardMessageButton(props: ChosenBoardMessageButtonProps) {
+    const { actionName, adoption, heartworm, icon, newStatus, quickTexts, tooltipContent } = props
+    const store = useStore(useChosenBoardState)
+
+    return <MessagingModal 
+        recipient={adoption.adopter} 
+        subject={adoption.dog + " is ready to go home!"} 
+        extendOnSubmit={async (message: string, _: string) => {
+            await new PendingAdoptionsAPI().MarkStatus(adoption.id, newStatus, heartworm, message)
+            store.refresh()
+        }}
+        quickTexts={quickTexts} 
+        buttonClass="chosen-board-action" 
+        buttonId={actionName + "-adoption-" + adoption.id} 
+        launchBtnLabel={<FontAwesomeIcon icon={icon} />} 
+        modalTitle="Ready to Roll!"
+        tooltipText={tooltipContent}
+        allowOnlyQuickTexts
+    />
 }

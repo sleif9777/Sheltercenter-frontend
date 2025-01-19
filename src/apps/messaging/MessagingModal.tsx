@@ -7,16 +7,18 @@ import { IAdopter } from "../adopters/models/Adopter"
 import { IQuickText } from "./QuickText"
 import { useStore } from "zustand"
 import { useSessionState } from "../../session/SessionState"
+import { Message } from "../../components/message/Message"
 
 interface MessagingModalProps extends Omit<ModalWithButtonProps, "extendOnSubmit"> {
     recipient: IAdopter,
     subject: string,
     extendOnSubmit: (message: string, subject: string) => void,
     quickTexts: IQuickText[],
+    allowOnlyQuickTexts: boolean,
 }
 
 export function MessagingModal(props: MessagingModalProps) {
-    const { recipient, subject, extendOnSubmit, quickTexts } = props    
+    const { recipient, subject, extendOnSubmit, quickTexts, allowOnlyQuickTexts } = props    
     const session = useStore(useSessionState)
 
     const signature = (session.userFName && session.userLName)
@@ -25,10 +27,10 @@ export function MessagingModal(props: MessagingModalProps) {
 
     const defaultText = `Hi ${recipient.firstName},\n\n\n\nKind regards,\n${signature}\nSaving Grace Animals for Adoption`
 
-    const [message, setMessage] = useState<string>(defaultText)
+    const [message, setMessage] = useState<string>(allowOnlyQuickTexts ? "" : defaultText)
 
     const validate = () => {
-        return message.length > 0
+        return message.length > 0 || allowOnlyQuickTexts
     }
 
     async function handleSubmit() {
@@ -44,12 +46,14 @@ export function MessagingModal(props: MessagingModalProps) {
             canSubmit={() => validate()}
             extendOnSubmit={() => handleSubmit()}
         >
+        <Message level={"Default"} showMessage={message == ""} message={"If no template is selected, the system default message will be used."} />
         <div className="form-content">
             <label htmlFor="message-body">Message</label>
             <TextareaAutosize 
                 minRows={10}
                 maxRows={15}
                 id="message-body"
+                hidden={message == ""}
                 value={message}
                 onChange={(e) => {
                     setMessage(e.target.value)
@@ -67,5 +71,5 @@ export function MessagingModal(props: MessagingModalProps) {
             labelText={""} 
             id={"quicktexts"}            
         />
-</ModalWithButton>
+    </ModalWithButton>
 }

@@ -16,11 +16,12 @@ export class PendingAdoptionsAPI extends API {
         return this.get(path)
     }
 
-    MarkStatus(id: number, status: number, heartworm: boolean = false) {
+    MarkStatus(id: number, status: number, heartworm: boolean = false, message?: string) {
         const data = {
             id: id,
             heartworm: heartworm,
-            status: status
+            status: status,
+            message: message ?? ""
         }
 
         const path = this.buildCommandPath("MarkStatus")
