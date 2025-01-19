@@ -176,10 +176,6 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
 
     // BOOKING FORM
     function bookingForm() {
-        console.log(appointment.id, 
-            session.userID == booking?.adopter.userID, 
-            !booking && !schedule.userCurrentAppointment
-        )
         let canView = false
 
         if (session.adminUser) {

@@ -25,9 +25,10 @@ export type TimeslotDictionary<T extends IAppointmentBase> = TimeslotProps<T>[]
 export function fullyBookedSlot(ts: TimeslotProps<IAppointment>, userID?: number) {
     return ts.appointments
         .map(a => new Appointment(a))
-        .filter(a => a.getCurrentBooking() == null || 
+        .filter(a => (a.isAdoptionAppointment() &&
+            a.getCurrentBooking() == null || 
             (userID && a.getCurrentBooking() && 
-                a.getCurrentBooking()?.adopter.ID != userID))
+                a.getCurrentBooking()?.adopter.ID == userID)))
         .length === 0
 }
 

@@ -33,7 +33,6 @@ export default function AdopterDetailsApp() {
     const fetchData = async () => {
         if (id) {
             const response: AxiosResponse<AdopterDetailsAppContext> = await new AdopterAPI().GetAdopterDetail(parseInt(id))
-            console.log(response)
             setAdopter(new Adopter(response.data.adopter))
             setAppointment(response.data.currentAppointment)
             setBookingHistory(response.data.bookingHistory)
