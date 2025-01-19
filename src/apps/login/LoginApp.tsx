@@ -36,7 +36,7 @@ export function LoginApp() {
                 margin="dense"
                 value={email}
                 error={email.length > 0 && !EmailValidator.validate(email)}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toLocaleLowerCase())}
             />
         </div>
         {
