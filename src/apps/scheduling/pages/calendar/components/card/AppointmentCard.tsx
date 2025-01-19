@@ -6,7 +6,7 @@ import { useStore } from "zustand";
 import { StandardCard } from "../../../../../../components/card/Card";
 import { CardColor } from "../../../../../../components/card/CardEnums";
 import { CardItemListSection } from "../../../../../../components/card/CardItemListSection";
-import { CardTableSection } from "../../../../../../components/card/CardTableSection";
+import { CardTableSection, DataRow } from "../../../../../../components/card/CardTableSection";
 import { TwoColumnListItem } from "../../../../../../components/two_column_list/TwoColumnList";
 import { SecurityLevel } from "../../../../../../session/SecurityLevel";
 import { useSessionState } from "../../../../../../session/SessionState";
@@ -100,12 +100,17 @@ export function AppointmentCard(props: AppointmentCardProps) {
             return
         }
 
+        let data: DataRow[] = []
+
+        if (!session.adopterUser) {
+            data.push({ label: "From Adoptions", content: booking.adopter.internalNotes })
+        }
+
+        data.push({ label: "From Shelterluv", content: booking.adopter.applicationComments })
+        data.push({ label: `From ${booking.adopter.firstName}`, content: booking.adopter.adopterNotes })
+
         return <CardTableSection 
-            data={[
-                { label: "From Adoptions", content: booking.adopter.internalNotes },
-                { label: "From Shelterluv", content: booking.adopter.applicationComments },
-                { label: `From ${booking.adopter.firstName}`, content: booking.adopter.adopterNotes },
-            ]}
+            data={data}
             title="Notes"
             showBorder={true}
         />

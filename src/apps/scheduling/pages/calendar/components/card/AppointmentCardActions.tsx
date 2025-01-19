@@ -176,10 +176,26 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
 
     // BOOKING FORM
     function bookingForm() {
-        if (session.adminUser || 
-                (session.greeterUser && !appointment.getCurrentBooking()) ||
-                (session.adopterUser && 
-                    (session.userID == booking?.adopter.userID || !booking))) {
+        console.log(appointment.id, 
+            session.userID == booking?.adopter.userID, 
+            !booking && !schedule.userCurrentAppointment
+        )
+        let canView = false
+
+        if (session.adminUser) {
+            canView = true
+        }
+
+        if (session.greeterUser) {
+            canView = !appointment.getCurrentBooking()
+        }
+
+        if (session.adopterUser) {
+            canView = ((session.userID == booking?.adopter.userID) || // is their current appointment
+                !booking && !schedule.userCurrentAppointment) // is unbooked and appointment is open
+        }
+
+        if (canView) {
             return <AdopterBookingForm 
                 appointment={appointment} 
                 launchBtnLabel={<FontAwesomeIcon icon={booking ? faPencil : faWandMagicSparkles} />} 
