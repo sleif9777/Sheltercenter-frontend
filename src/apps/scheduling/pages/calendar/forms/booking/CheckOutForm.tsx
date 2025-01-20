@@ -98,7 +98,7 @@ export function CheckOutForm(props: CheckOutFormProps) {
         launchBtnLabel={launchBtnLabel}
         buttonId={`checkout-appt-${appointment.id}`}
         modalTitle="Check Out"
-        tooltipText="Check Out"
+        tooltipText={appointment.outcome ? "Edit Decision" : "Check Out"}
     >
         <div className="form-content">
             <ButtonGroup 

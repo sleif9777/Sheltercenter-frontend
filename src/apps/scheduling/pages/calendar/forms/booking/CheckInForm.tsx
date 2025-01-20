@@ -19,17 +19,16 @@ export function CheckInForm(props: CheckInFormProps) {
     const store = useStore(useSchedulingHomeState)
     const session = useStore(useSessionState)
 
-    const [clothingDescription, setClothingDescription] = useState<string>() // TODO: ENUM
-    const [counselor, setCounselor] = useState<string>()
+    const [clothingDescription, setClothingDescription] = useState<string>(appointment.clothingDescription ?? "") // TODO: ENUM
+    const [counselor, setCounselor] = useState<string>(appointment.counselor ?? "")
 
     const setDefaults = () => {
-        setClothingDescription(undefined)
-        setCounselor(undefined)
+        setClothingDescription(appointment.clothingDescription ?? "")
+        setCounselor(appointment.counselor ?? "")
     }
 
     const validate = () => {
-        return clothingDescription != undefined && 
-            counselor != undefined
+        return clothingDescription != undefined
     }
 
     const handleSubmit = async () => {
@@ -52,7 +51,7 @@ export function CheckInForm(props: CheckInFormProps) {
         }
     }
 
-    if (!appointment.getCurrentBooking() || appointment.checkInTime) {
+    if (!appointment.getCurrentBooking()) {
         return <></>
     }
 
@@ -65,7 +64,7 @@ export function CheckInForm(props: CheckInFormProps) {
         launchBtnLabel={launchBtnLabel}
         buttonId={`checkin-appt-${appointment.id}`}
         modalTitle="Check In"
-        tooltipText="Check In"
+        tooltipText={appointment.checkInTime ? "Edit Clothing/Counselor" : "Check In"}
         submitBtnLabel="Check In"
     >
         <div className="form-content">
@@ -88,19 +87,12 @@ export function CheckInForm(props: CheckInFormProps) {
             />
             <TextField
                 id="outlined-controlled"
-                label="Counselor"
+                label="Counselor (Optional)"
                 margin="dense"
                 maxRows={4}
                 fullWidth
                 style={{marginRight: 5}}
                 value={counselor}
-                error={
-                    counselor != undefined && 
-                    (
-                        counselor.length == 0 || 
-                        counselor.length > 200
-                    )
-                }
                 onChange={(e) => setCounselor(e.target.value)}
             />
         </div>

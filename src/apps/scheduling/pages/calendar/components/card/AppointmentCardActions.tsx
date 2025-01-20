@@ -83,7 +83,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
 
     // GHOST BUTTON
     function ghostButton() {
-        if (booking && !session.adopterUser) {
+        if (booking && !session.adopterUser && !appointment.checkInTime && !appointment.checkOutTime) {
             return <AreYouSure 
                 extendOnSubmit={async () => {
                     await new AppointmentsAPI().MarkNoShow(appointment.id) 
@@ -130,7 +130,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
         }
 
         if (booking && 
-            !appointment.checkOutTime &&
+            !appointment.checkInTime &&
             (isUsersCurrentAppt || session.adminUser)) {
             return <AreYouSure 
                 extendOnSubmit={async () => {
@@ -158,7 +158,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
 
     // LOCK BUTTON
     function lockButton() {
-        if (session.adminUser && !appointment.checkOutTime) {
+        if (session.adminUser && !appointment.checkInTime) {
             return <CardActionButton 
                 extendOnClick={async () => {
                     await new AppointmentsAPI().ToggleLock(appointment.id)
@@ -179,7 +179,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
         let canView = false
 
         if (session.adminUser) {
-            canView = true
+            canView = !appointment.checkInTime
         }
 
         if (session.greeterUser) {
@@ -207,7 +207,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
             return <CheckOutForm 
                 appointment={appointment} 
                 btnClass="grey-card-link"
-                launchBtnLabel={<FontAwesomeIcon icon={appointment.checkOutTime ? faPencil : faArrowRightFromBracket} />} 
+                launchBtnLabel={<FontAwesomeIcon icon={appointment.checkOutTime || appointment.outcome === 4 ? faPencil : faArrowRightFromBracket} />} 
             />
         }
 
@@ -217,10 +217,10 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
     // CHECK IN
     function checkInForm() {
         if (!session.adopterUser &&
-                !appointment.checkInTime) {
+                !appointment.checkOutTime) {
             return <CheckInForm 
                 appointment={appointment} 
-                launchBtnLabel={<FontAwesomeIcon icon={faArrowRightToBracket} />} 
+                launchBtnLabel={<FontAwesomeIcon icon={appointment.checkInTime ? faPencil : faArrowRightToBracket} />} 
             />
         }
 
