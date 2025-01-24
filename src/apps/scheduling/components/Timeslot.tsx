@@ -16,6 +16,7 @@ import "../styles/Timeslot.scss"
 
 export interface TimeslotProps<T extends IAppointmentBase> extends ITimeslot<T> {
     mode: CalendarMode,
+    index?: string,
 }
 
 export type SimpleTimeslotDictionary<T extends IAppointmentBase> = { [key: string]: T[] }
@@ -38,7 +39,7 @@ export function fullyBookedDay(day: TimeslotDictionary<IAppointment>, userID?: n
 
 export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointment>) {
     const session = useStore(useSessionState)
-    var { appointments, mode, instant } = props
+    var { appointments, mode, instant, index } = props
     const [label, setLabel] = useState<string>()
 
     const filterAppointmentsToShow: () => Appointment[] | TemplateAppointment[] = () => {
@@ -48,11 +49,12 @@ export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointmen
             const mapped = appointments.map(a => new Appointment(a as IAppointment))
             switch (session.securityLevel) {
                 case SecurityLevel.ADOPTER:
-                    return mapped.filter(a => {
-                        return (a.getCurrentBooking() && 
-                            a.getCurrentBooking()?.adopter.userID == session.userID) ||
-                            (!a.getCurrentBooking() && a.isAdoptionAppointment())
-                    })
+                    return mapped.filter(a => a.showToAdopter(session.userID ?? 0))
+                // return mapped.filter(a => {
+                    //     return (a.getCurrentBooking() && 
+                    //         a.getCurrentBooking()?.adopter.userID == session.userID) ||
+                    //         (!a.getCurrentBooking() && a.isAdoptionAppointment())
+                    // })
                 default:
                     return mapped.sort((a, b) => a.id > b.id ? 1 : -1)
             }
@@ -83,7 +85,7 @@ export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointmen
         return <></>
     }
 
-    return <div className="timeslot">
+    return <div className="timeslot" id={index ? `timeslot-${index}`: ""}>
         <table>
             <tr>
                 <td className="description">

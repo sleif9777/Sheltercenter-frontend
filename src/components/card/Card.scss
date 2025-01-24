@@ -21,6 +21,16 @@
         .border {
             border-bottom: 1px solid var(--teal);
         }
+
+        a {
+            color: var(--teal);
+
+            &:hover {
+                color: var(--medium-blue);
+                cursor: pointer;
+                text-decoration: none;
+            }
+        }
     }
 
     &.gray {
@@ -69,7 +79,7 @@
         color: var(--maroon);
 
         &.alert {
-            width: fit-content;
+            width: auto;
 
             .description {
                 width: 80%;
@@ -149,6 +159,7 @@
         padding-left: 2px;
         text-align: left;
         text-transform: uppercase;
+        white-space: no-wrap;
         width: 55%;
     }
 

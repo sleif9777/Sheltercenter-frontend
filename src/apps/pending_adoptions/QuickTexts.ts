@@ -33,7 +33,6 @@ export function ChosenBoardR2RQuickText(adoption: IPendingAdoption, heartworm: b
         
         type BusinessHours = { [key: string]: { open: number, close: number } }
 
-        // Define the business hours for each day
         const businessHours: BusinessHours = {
             'Mon': { open: 12, close: 18 },
             'Tue': { open: 12, close: 18 },
@@ -43,22 +42,18 @@ export function ChosenBoardR2RQuickText(adoption: IPendingAdoption, heartworm: b
             'Sat': { open: 12, close: 15 },
         }
     
-        // Helper function to format time in "HH:mm A" (e.g., "12:00 PM")
         function formatTime(hour: number): string {
-            return moment({ hour }).format("hh:mm A")
+            return moment({ hour }).format("h:mm A")
         }
     
-        // Get the current day and time
-        const currentDay = now.format('ddd') // e.g., "Mon", "Tue"
+        const currentDay = now.format('ddd')
         
         let todayClose: string
         let nextBusDay: string
         let openHour: string
         let closeHour: string
         
-        // Determine today's closing time
         if (currentDay === 'Sun') {
-            // If it's Sunday, we're closed all day
             return {
                 todayClose: 'Closed today',
                 nextBusDay: 'on Monday',

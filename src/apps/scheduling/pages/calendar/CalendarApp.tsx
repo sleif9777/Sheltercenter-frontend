@@ -23,6 +23,8 @@ import { SchedulingHomeTitle } from "./components/SchedulingHomeTitle"
 import { AppointmentForm } from "./forms/appointment/AppointmentForm"
 import { Appointment } from "./models/Appointment"
 import { useSchedulingHomeState } from "./state/State"
+import { JumpToTimeslots } from "./components/alerts/JumpToTimeslots"
+import { AdopterFlagsAlert } from "./components/alerts/AdopterFlagsAlert"
 
 export default function CalendarApp() {
     const store = useStore(useSchedulingHomeState)
@@ -101,12 +103,16 @@ export default function CalendarApp() {
                 }
                 return []
             case SecurityLevel.GREETER:
-                return [] // TODO: Short notices, internal notes
+                return [
+                    <JumpToTimeslots />
+                ] // TODO: Short notices, internal notes
             case SecurityLevel.ADMIN:
             case SecurityLevel.SUPERUSER:
                 return [
-                    <EmptyDatesAlert emptyDates={store.emptyDates} />,
-                    <MissingOutcomesAlert />
+                    <EmptyDatesAlert />,
+                    <MissingOutcomesAlert />,
+                    <JumpToTimeslots />,
+                    <AdopterFlagsAlert />
                 ]
             default:
                 return []
@@ -166,10 +172,11 @@ export default function CalendarApp() {
 
         return <>
             <AppointmentForm />
-            {store.timeslots.map(timeslot => <Timeslot 
+            {store.timeslots.map((timeslot, index) => <Timeslot 
                 appointments={timeslot.appointments} 
                 mode={CalendarMode.SCHEDULING} 
                 instant={timeslot.instant} 
+                index={index.toString()}
             />)}
         </>
     }
@@ -197,7 +204,7 @@ export default function CalendarApp() {
         title={<SchedulingHomeTitle />} 
         toolbarItems={toolbarItems()}  
     >
-        <ul style={{columnCount: alerts().length}}>
+        <ul style={{columnCount: 3}}>
             {alerts().map(a => <li>{a}</li>)}
         </ul>
         {getContent()}

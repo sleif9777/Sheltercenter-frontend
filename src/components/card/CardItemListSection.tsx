@@ -16,7 +16,7 @@ export function CardItemListSection(props: CardListItemSectionProps) {
         <TwoColumnList 
             data={data} 
             itemRender={item => {
-                return <CardItem text={item.text} />
+                return <CardItem text={item.text} link={item.elementID} />
             }} 
         />
     </table>

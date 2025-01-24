@@ -48,7 +48,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
     if (appointment.checkInTime) {
         const checkInTime = moment(appointment.checkInTime)
         
-        const formatted: string = checkInTime.tz("America/New_York").format("h:MM A")
+        const formatted: string = checkInTime.tz("America/New_York").format("h:mm A")
 
         let checkInDetails: string = `Checked in ${formatted}`
 
@@ -61,7 +61,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
     }
 
     if (appointment.checkOutTime) {
-        topDetails.push({ text: `Checked out ${moment(appointment.checkOutTime).format("h:MM A")}` })
+        topDetails.push({ text: `Checked out ${moment(appointment.checkOutTime).format("h:mm A")}` })
     }
     
     if (appointment.outcome != undefined) {

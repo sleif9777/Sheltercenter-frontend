@@ -153,6 +153,18 @@ export class Appointment extends AppointmentBase implements IAppointment {
         return this.bookings.find(b => b.status == 0) || this.bookings.find(b => b.status >= 3) || null
     }
 
+    showToAdopter(userID: number): boolean {
+        const booking = this.getCurrentBooking()
+
+        if (booking != null) {
+            return booking.adopter.userID == userID
+        } else if (this.isAdoptionAppointment()) {
+            return moment(this.instant).diff(moment(), "hours") >= 2
+        }
+
+        return false
+    }
+
     getOutcome() {
         if (this.outcome == undefined) {
             return ""

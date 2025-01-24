@@ -7,6 +7,7 @@ import { CardSectionBase } from "../../../../../../components/card/CardSectionBa
 import { CheckOutForm } from "../../forms/booking/CheckOutForm"
 import { Appointment } from "../../models/Appointment"
 import { useSchedulingHomeState } from "../../state/State"
+import { faPersonCircleQuestion } from "@fortawesome/free-solid-svg-icons"
 
 export function MissingOutcomesAlert() {
     const store = useStore(useSchedulingHomeState)
@@ -16,9 +17,10 @@ export function MissingOutcomesAlert() {
             className="alert"
             color={CardColor.RED}
             description={"Missing Outcomes"} 
+            topIcon={faPersonCircleQuestion}
         >
             <CardSectionBase showBorder={false}>
-                <span>Enter a decision for:</span>
+                <b>Enter a decision for:</b>
                 <ul>
                     {store.missingOutcomes?.map(a => {
                         const appt = new Appointment(a)

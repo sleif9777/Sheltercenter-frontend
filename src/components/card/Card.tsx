@@ -1,9 +1,11 @@
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core"
 import { ModalWithButtonProps } from "../modals/ModalWithButton"
 import { TwoColumnList, TwoColumnListItem } from "../two_column_list/TwoColumnList"
 import "./Card.scss"
 import { CardActionButtonProps } from "./CardActionButton"
 import { CardColor } from "./CardEnums"
 import { CardItem } from "./CardItem"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 export type StandardCardActions = React.ReactElement<CardActionButtonProps | ModalWithButtonProps>[]
 
@@ -14,6 +16,7 @@ interface StandardCardProps {
     children?: JSX.Element | null | (JSX.Element | null)[],
     description?: string | JSX.Element,
     topDetails?: TwoColumnListItem[],
+    topIcon?: IconDefinition
 }
 
 interface PhotoCardProps extends StandardCardProps {
@@ -28,6 +31,7 @@ export function StandardCard(props: StandardCardProps) {
         children, 
         description, 
         topDetails, 
+        topIcon,
     } = props
 
     const childrenAsArray = Array.isArray(children) ? children : [children]
@@ -37,7 +41,7 @@ export function StandardCard(props: StandardCardProps) {
         <table className={renderableChildren.length > 0 ? "border" : ""}>
             <tr>
                 <td className="description">
-                    {description}
+                    {topIcon ? <FontAwesomeIcon icon={topIcon} /> : <></>} {description}
                 </td>
                 <td className="actions">
                     {actions?.map(action => action)}
