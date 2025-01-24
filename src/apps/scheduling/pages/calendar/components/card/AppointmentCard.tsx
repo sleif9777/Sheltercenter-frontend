@@ -269,7 +269,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
         </>
     }
 
-    const showBookingInfo = booking && !appointment.outcome
+    const showBookingInfo = booking && appointment.outcome != undefined
     const showSurrenderNotes = !showBookingInfo &&
             isSurrenderAppointment(appointment.type) &&
             appointment.appointmentNotes &&
