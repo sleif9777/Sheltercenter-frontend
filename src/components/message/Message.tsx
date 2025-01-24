@@ -34,23 +34,6 @@ export function Message(props: MessageProps) {
 
     var iconDef: IconDefinition = icon ?? getIcon()
 
-    if (!iconDef) {
-        switch (level) {
-            case "Error":
-            case "Inline-Error":
-                iconDef = faExclamationCircle
-                break
-            case "Warning":
-                iconDef = faExclamationTriangle
-                break
-            case "Success":
-                iconDef = faCheckCircle
-                break
-            default:
-                iconDef = faShieldDog
-        }
-    }
-
     return <div className={`${(level ?? "Default").toLowerCase()} message`}>
         <FontAwesomeIcon icon={iconDef} /> {message}
     </div>
