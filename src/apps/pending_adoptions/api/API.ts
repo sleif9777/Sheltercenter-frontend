@@ -33,6 +33,11 @@ export class PendingAdoptionsAPI extends API {
         return this.post(path, data)
     }
 
+    ChangeDog(data: { newDog: string, adoptionID: number }) {
+        const path = this.buildCommandPath("ChangeDog")
+        return this.post(path, data)
+    }
+
     CreateUpdate(id: number, message: string, subject: string) {
         const data = {
             adoptionID: id,

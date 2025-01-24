@@ -4,7 +4,10 @@
 
 .chosen-board-action {
     color: var(--pink);
-    font-size: x-large;
+
+    &:not(.retain-size) {
+        font-size: x-large;
+    }
     
     &:hover {
         color: var(--teal);

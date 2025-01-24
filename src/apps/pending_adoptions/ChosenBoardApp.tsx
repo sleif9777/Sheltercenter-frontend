@@ -13,6 +13,7 @@ import { ChosenBoardUpdateQuickTexts } from "./QuickTexts";
 import "../scheduling/pages/print_view/ReportingPage.scss"
 import "./ChosenBoardApp.scss"
 import { PendingAdoptionStatus } from "./enums/Enums";
+import { ChangeDogForm } from "./forms/ChangeDogForm";
 
 export function ChosenBoardApp() {
     const store = useStore(useChosenBoardState)
@@ -37,7 +38,7 @@ export function ChosenBoardApp() {
                 {adoptionObjs.map(a => {
                     return <tr>
                         <td>
-                            <span className="dog-name">{a.dog.toLocaleUpperCase()}</span><br />
+                            <span className="dog-name">{a.dog.toLocaleUpperCase()}</span> <ChangeDogForm adoption={a} extendOnSubmit={() => store.refresh()} /><br />
                             <span className="small-detail">({a.adopter.fullName.toLocaleUpperCase()})</span>
                         </td>
                         <td>

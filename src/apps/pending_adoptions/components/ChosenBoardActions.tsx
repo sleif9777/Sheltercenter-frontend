@@ -11,6 +11,7 @@ import "../ChosenBoardApp.scss"
 import { MessagingModal } from "../../messaging/MessagingModal";
 import { ChosenBoardR2RQuickText } from "../QuickTexts";
 import { IQuickText } from "../../messaging/QuickText";
+import { AreYouSure } from "../../../components/modals/AreYouSure";
 
 interface ChosenBoardActionProps {
     adoption: PendingAdoption
@@ -43,9 +44,12 @@ export function ChosenBoardActions(props: ChosenBoardActionProps) {
         return <ChosenBoardActionButton 
             actionName="complete"
             adoption={adoption}
+            areYouSure
             icon={faCheckCircle}
+            modalTitle="Complete Adoption"
             newStatus={4}
             tooltipContent="Complete"
+            youWantTo="complete this adoption"
         />
     }
 
@@ -53,9 +57,12 @@ export function ChosenBoardActions(props: ChosenBoardActionProps) {
         return <ChosenBoardActionButton 
             actionName="cancel"
             adoption={adoption}
+            areYouSure
             icon={faEraser}
+            modalTitle="Cancel Adoption"
             newStatus={5}
             tooltipContent="Cancel"
+            youWantTo="cancel this adoption"
         />
     }
 
@@ -96,25 +103,46 @@ export function ChosenBoardActions(props: ChosenBoardActionProps) {
 
 interface ChosenBoardActionButtonProps extends ChosenBoardActionProps {
     actionName: string,
+    areYouSure?: boolean,
     heartworm?: boolean
     icon: IconDefinition,
+    modalTitle?: string,
     newStatus: number,
     tooltipContent: string,
+    youWantTo?: string,
 }
 
 function ChosenBoardActionButton(props: ChosenBoardActionButtonProps) {
-    const { actionName, adoption, heartworm, icon, newStatus, tooltipContent } = props
+    const { actionName, adoption, areYouSure, heartworm, icon, modalTitle, newStatus, tooltipContent, youWantTo } = props
     const store = useStore(useChosenBoardState)
+
+    const onClick = async () => {
+        await new PendingAdoptionsAPI().MarkStatus(adoption.id, newStatus, heartworm)
+        store.refresh()
+    }
+
+    if (areYouSure && youWantTo && modalTitle) {
+        return <AreYouSure 
+            youWantTo={youWantTo} 
+            buttonClass={"chosen-board-action"} 
+            buttonId={actionName + "-adoption-" + adoption.id} 
+            launchBtnLabel={<FontAwesomeIcon icon={icon} />} 
+            modalTitle={modalTitle}
+            tooltipText={tooltipContent}
+            extendOnSubmit={onClick}        
+        />
+    }
 
     return <>
         <button 
             className="chosen-board-action"
             data-tooltip-id={actionName + "-adoption-" + adoption.id + "-ttp"}
             id={actionName + "-adoption-" + adoption.id}
-            onClick={async () => {
-                await new PendingAdoptionsAPI().MarkStatus(adoption.id, newStatus, heartworm)
-                store.refresh()
-            }}
+            onClick={onClick}
+            // onClick={async () => {
+            //     await new PendingAdoptionsAPI().MarkStatus(adoption.id, newStatus, heartworm)
+            //     store.refresh()
+            // }}
         >
             <FontAwesomeIcon icon={icon} />
         </button>
