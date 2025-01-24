@@ -4,7 +4,8 @@ import { PendingAdoptionsAPI } from "../api/API";
 import { AxiosResponse } from "axios";
 
 export interface ChosenBoardContext {
-    adoptions: PendingAdoption[]
+    adoptions: PendingAdoption[],
+    currentlyRefreshing: boolean,
 }
 
 interface ChosenBoardState extends ChosenBoardContext {
@@ -13,10 +14,15 @@ interface ChosenBoardState extends ChosenBoardContext {
 
 export const useChosenBoardState = create<ChosenBoardState>((set) => ({
     adoptions: [],
+    currentlyRefreshing: false,
     refresh: async () => {
+        set(() => ({
+            currentlyRefreshing: true
+        }))
         const context: AxiosResponse<ChosenBoardContext> = await new PendingAdoptionsAPI().GetAllPendingAdoptions()
         set(() => ({ 
-            adoptions: context.data.adoptions
+            adoptions: context.data.adoptions,
+            currentlyRefreshing: false,
         })
     )}
 }));

@@ -14,6 +14,8 @@ import "../scheduling/pages/print_view/ReportingPage.scss"
 import "./ChosenBoardApp.scss"
 import { PendingAdoptionStatus } from "./enums/Enums";
 import { ChangeDogForm } from "./forms/ChangeDogForm";
+import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 export function ChosenBoardApp() {
     const store = useStore(useChosenBoardState)
@@ -119,6 +121,7 @@ export function ChosenBoardApp() {
                     return RowGroup(store.adoptions.filter(a => a.status == status))
                 })}
             </table>
+            {store.currentlyRefreshing ? <PlaceholderText iconDef={faSpinner} text={"Loading adoptions..."} /> : <></>}
         </FullWidthPage>
     }   
 }
