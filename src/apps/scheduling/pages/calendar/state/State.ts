@@ -30,14 +30,16 @@ export interface SchedulingHomeContext {
 
 interface SchedulingHomeState extends Omit<SchedulingHomeContext, "appointments"> {
     timeslots: TimeslotDictionary<IAppointment>
-    
+    currentlyRefreshing: boolean,
+
     refresh: (newViewDate: Date, refreshObjs: ("adopters" | "adoptions")[], userID?: number) => void,
 }
 
 export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
     viewDate: new Date(),
     weekday: (new Date().getDay() == 0 ? 6 : new Date().getDay() - 1),
-    
+    currentlyRefreshing: false,
+
     timeslots: [],
     closedDateID: null,
 
@@ -52,8 +54,11 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
     userExceptions: [],
 
     refresh: async (newViewDate: Date, refreshObjs: ("adopters" | "adoptions")[], userID?: number) => {
+        set(() => ({
+            currentlyRefreshing: true
+        }))
+
         const context: SchedulingHomeContext = await Appointment.fetchAppointmentsForDate(newViewDate, userID ?? 0)
-        console.log(context)
 
         set(() => ({ 
             viewDate: newViewDate, 
@@ -84,5 +89,9 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
                 adoptionsSansPaperwork: getAdoptions.data.adoptions
             }))
         }
+
+        set(() => ({
+            currentlyRefreshing: false
+        }))
     },
 }));

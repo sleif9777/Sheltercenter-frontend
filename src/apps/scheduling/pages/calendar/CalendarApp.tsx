@@ -1,4 +1,4 @@
-import { faPaw, faShieldDog, faShopLock } from "@fortawesome/free-solid-svg-icons"
+import { faPaw, faShieldDog, faShopLock, faSpinner } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import moment from "moment"
 import { useEffect, useState } from "react"
@@ -122,6 +122,12 @@ export default function CalendarApp() {
     const getContent = () => {
         if (session.securityLevel == undefined) {
             return <></>
+        }
+
+        if (store.currentlyRefreshing) {
+            return <>
+                <PlaceholderText iconDef={faSpinner} text={"Loading appointments..."} />
+            </>
         }
 
         if (session.adopterUser && store.userExceptions.length > 0) {
