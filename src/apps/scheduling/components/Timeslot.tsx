@@ -50,11 +50,6 @@ export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointmen
             switch (session.securityLevel) {
                 case SecurityLevel.ADOPTER:
                     return mapped.filter(a => a.showToAdopter(session.userID ?? 0))
-                // return mapped.filter(a => {
-                    //     return (a.getCurrentBooking() && 
-                    //         a.getCurrentBooking()?.adopter.userID == session.userID) ||
-                    //         (!a.getCurrentBooking() && a.isAdoptionAppointment())
-                    // })
                 default:
                     return mapped.sort((a, b) => a.id > b.id ? 1 : -1)
             }

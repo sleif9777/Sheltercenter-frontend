@@ -16,7 +16,7 @@ export function JumpToTimeslots() {
             text: moment(t.instant)
                 .tz("America/New_York")
                 .format("h:mm A"), 
-            elementID: `#timeslot-${i}` 
+            link: `#timeslot-${i}` 
         }
     })
 

@@ -13,7 +13,6 @@ export interface TwoColumnListItem {
     onClick?: () => void,
     link?: string, // Mutually exclusive with modal
     modal?: JSX.Element, // Mutually exclusive with link
-    elementID?: string,
 }
 
 export function TwoColumnList(props: TwoColumnListProps) {
