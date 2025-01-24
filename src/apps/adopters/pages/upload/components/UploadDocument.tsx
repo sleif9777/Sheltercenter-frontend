@@ -4,11 +4,13 @@ import { SubmissionButton } from "../../../../../components/forms/SubmissionButt
 import { Message, MessageLevel } from "../../../../../components/message/Message"
 import { IAdopter } from "../../../models/Adopter"
 import { UserProfilesAPI } from "../../../../login/api/API"
+import { faSpinner } from "@fortawesome/free-solid-svg-icons"
 
 export function UploadDocument() {
     const [importFile, setImportFile] = useState<File>()
     const [errorMsg, setErrorMsg] = useState<string>("")
 	const [showErrorMsg, setShowErrorMsg] = useState<boolean>(false)
+    const [showProgressMsg, setShowProgressMsg] = useState<boolean>(false)
     const [postUploadMsg, setPostUploadMsg] = useState<string>("")
     const [showPostUploadMsg, setShowPostUploadMsg] = useState<boolean>(false)
     const [aversionsMsg, setAversionsMsg] = useState<JSX.Element>()
@@ -16,6 +18,8 @@ export function UploadDocument() {
 
 	const doSpreadsheetImportBatch = async () => {
         if (!importFile) { return }
+
+        setShowProgressMsg(true)
 
         const response: AxiosResponse = await new UserProfilesAPI().SpreadsheetImportBatch(importFile)
         const { successes, updates, failures, aversions }: { 
@@ -39,6 +43,7 @@ export function UploadDocument() {
         }
 
         setPostUploadMsg(messageComponents.join(", "))
+        setShowProgressMsg(false)
         setShowPostUploadMsg(true)
 
         if ((failures > 0 || aversions.length > 0) && (successes + updates) == 0) {
@@ -125,6 +130,7 @@ export function UploadDocument() {
             disabled={!importFile || !validFileType(importFile)} 
             extendOnSubmit={doSpreadsheetImportBatch} 
         />
+        <Message level="Default" message={"Upload in progress..."} showMessage={showProgressMsg} icon={faSpinner} />
         <Message level={postUploadMsgLevel} message={postUploadMsg} showMessage={showPostUploadMsg} />
         {aversionsMsg}
     </>

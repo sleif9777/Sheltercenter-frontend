@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { TextField } from "@mui/material"
-import { faDog } from "@fortawesome/free-solid-svg-icons"
+import { faDog, faSpinner } from "@fortawesome/free-solid-svg-icons"
 import { AxiosResponse } from "axios"
 import LinkToAdopterPage from "./components/LinkToAdopterPage"
 import { IAdopter, Adopter } from "../../models/Adopter"
@@ -37,6 +37,14 @@ export default function ManagerAdoptersApp() {
                 .sort((a, b) => a.fullName.localeCompare(b.fullName))
             )
     }, [filterText])
+
+    if (allAdopters.length == 0) {
+        return <FullWidthPage title={"Manage Adopters"}>
+            <div>
+                <PlaceholderText iconDef={faSpinner} text="Loading adopters..." />
+            </div>
+        </FullWidthPage>
+    }
 
     return <FullWidthPage title={"Manage Adopters"}>
         <div>
