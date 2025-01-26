@@ -1,16 +1,17 @@
-import { ToggleButton, ToggleButtonGroup } from "@mui/material"
 import { FieldProps } from "./FieldProps"
+import { CheckboxField } from "./CheckboxField"
+import "./ButtonGroup.scss"
 
 interface ButtonGroupProps extends Omit<FieldProps, "onChange"> {
-    disabled?: boolean
-    show: boolean
+    show: boolean,
+    singleColumn?: boolean,
     value: number | undefined,
     buttons: { name: string, value: number }[]
     onChange: (event: React.MouseEvent<HTMLElement, MouseEvent>, newValue: number | undefined) => void
 }
 
 export default function ButtonGroup(props: ButtonGroupProps) {
-    const { id, show, labelText, value, buttons, onChange, disabled } = props
+    const { id, show, labelText, value, buttons, singleColumn, onChange } = props
 
     if (!show) {
         return
@@ -18,18 +19,15 @@ export default function ButtonGroup(props: ButtonGroupProps) {
 
     return <div >
         <label className="modal-form" htmlFor={id}>{labelText}</label>
-        <ToggleButtonGroup 
-            exclusive
-            onChange={(e: React.MouseEvent<HTMLElement, MouseEvent>, newValue: number) => onChange(e, newValue)}
-            value={value}
-            disabled={disabled}
-            id={id}
-        >
+        <ul id="options" className={singleColumn ? "single-column" : ""}>
             {buttons.map((button, i) => {
-                return <ToggleButton key={i} value={button.value}>
-                    {button.name}
-                </ToggleButton>
+                return <li><CheckboxField 
+                    toggleValue={(e: React.MouseEvent<HTMLElement, MouseEvent>) => onChange(e, button.value)} 
+                    checkByDefault={button.value === value} 
+                    labelText={button.name} 
+                    id={id + "-button-" + i}                
+                /></li>
             })}
-        </ToggleButtonGroup>
+        </ul>
     </div>
 }

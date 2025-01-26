@@ -1,0 +1,11 @@
+#options {
+    padding-left: 0px !important;
+
+    &:not(.single-column) {
+        columns: 2;
+    }
+    
+    li {
+        list-style-type: none;
+    }
+}

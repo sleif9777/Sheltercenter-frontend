@@ -95,6 +95,7 @@ export function CheckOutForm(props: CheckOutFormProps) {
         extendOnSubmit={() => handleSubmit()}
         extendOnClose={() => setDefaults()}
         extendOnOpen={() => setDefaults()}
+        height="50%"
         launchBtnLabel={launchBtnLabel}
         buttonId={`checkout-appt-${appointment.id}`}
         modalTitle="Check Out"

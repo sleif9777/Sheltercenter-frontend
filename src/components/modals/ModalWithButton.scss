@@ -4,9 +4,8 @@
     box-shadow: 24px;
     font-family: 'Lato', Helvetica, Arial, Lucida, sans-serif;
     left: 50%;
-    height: 90%;
-    min-width: 300px;
-    overflow: hidden;
+    min-width: 350px;
+    overflow: auto;
     padding: 10px;
     position: relative;
     top: 50%;
@@ -44,7 +43,7 @@
         height: 50px;
         top: 5px;
         // left: 0;
-        width: 98%;
+        width: 95%;
         // width: /calc(100% - 10px);
         overflow: hidden;
     }
@@ -55,7 +54,7 @@
         position: absolute;
         top: 50px;
         bottom: 50px;
-        width: 98%;
+        width: 95%;
         margin: 5px;
     }
 
@@ -65,7 +64,7 @@
         position: absolute;
         height: 50px;
         bottom: 0px;
-        width: 98%;
+        width: 95%;
     }
 
     button {

@@ -70,6 +70,7 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
     }
 
     return <ModalWithButton 
+            height={"50%"}
             buttonClass={"submit-button"} 
             canSubmit={() => validate()}
             extendOnSubmit={() => handleSubmit()}

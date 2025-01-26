@@ -62,6 +62,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
         canSubmit={() => validate()}
         extendOnSubmit={() => handleSubmit()}
         extendOnClose={() => resetForm()}
+        height="70%"
         launchBtnLabel={"Add Appointment"} 
         modalTitle={"Add Appointment"}
     >

@@ -3,11 +3,10 @@ import { FieldProps } from "./FieldProps"
 import "./CheckboxField.scss"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconDefinition, faPaw } from "@fortawesome/free-solid-svg-icons"
-import { faSquare } from "@fortawesome/free-regular-svg-icons"
 import { useState } from "react"
 
 interface CheckboxFieldProps extends FieldProps {
-    toggleValue: () => void
+    toggleValue: (() => void) | ((e: React.MouseEvent<HTMLElement, MouseEvent>) => void)
     checkByDefault: boolean
     customIcon?: IconDefinition
 }
@@ -18,8 +17,8 @@ export function CheckboxField(props: CheckboxFieldProps) {
 
     return <div 
         className={`checkbox`}
-        onClick={() => {
-            toggleValue()
+        onClick={(e) => {
+            toggleValue(e)
             setIsSelected(!isSelected)
         }}
     >
@@ -30,15 +29,17 @@ export function CheckboxField(props: CheckboxFieldProps) {
         >
             <input 
                 type="checkbox" 
+                id={id}
                 checked={checkByDefault} 
                 style={{
                     display: "none",
                     marginLeft: 4,
                     verticalAlign: "middle"
                 }}
+                onChange={() => {}}
             />
             <span className="label">
-                <FontAwesomeIcon className="icon" icon={isSelected ? (customIcon ?? faPaw) : faSquare} />
+                <FontAwesomeIcon className="icon" icon={customIcon ?? faPaw} />
                 {labelText}
             </span>
         </label>

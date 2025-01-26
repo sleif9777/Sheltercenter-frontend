@@ -32,8 +32,6 @@ export default function CalendarApp() {
     const weekday = DateTimeStrings.getWeekday(store.weekday).toLocaleUpperCase()
     const session = useStore(useSessionState)
 
-    const [alertsCollapsed, setAlertsCollapsed] = useState<boolean>(false)
-
     // Render the component
     useEffect(() => {
         var dataToLoad: ("adopters" | "adoptions")[]
@@ -127,7 +125,7 @@ export default function CalendarApp() {
             return <></>
         }
 
-        if (store.currentlyRefreshing) {
+        if (store.currentlyRefreshingAppointments) {
             return <>
                 <PlaceholderText iconDef={faSpinner} text={"Loading appointments..."} />
             </>
@@ -213,7 +211,11 @@ export default function CalendarApp() {
             <Collapsible 
                 items={alerts()} 
                 buttonLabel="Show Alerts" 
-                disableButton={store.currentlyRefreshing}
+                disableButton={
+                    store.currentlyRefreshingAppointments || 
+                    store.currentlyRefreshingAdoptions || 
+                    store.currentlyRefreshingAdopters
+                }
                 className="mobile-only"
             />
             <div className="desktop-only">

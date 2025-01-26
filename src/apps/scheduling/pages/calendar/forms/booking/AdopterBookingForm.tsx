@@ -5,7 +5,6 @@ import { useStore } from "zustand"
 
 import ButtonGroup from "../../../../../../components/forms/fields/ButtonGroup"
 import { CheckboxField } from "../../../../../../components/forms/fields/CheckboxField"
-import { NumberField } from "../../../../../../components/forms/fields/NumberField"
 import { Required } from "../../../../../../components/forms/Required"
 import { Message } from "../../../../../../components/message/Message"
 import ModalWithButton from "../../../../../../components/modals/ModalWithButton"
@@ -369,83 +368,6 @@ export function AdopterBookingForm(props: BookingFormProps) {
         />
     }
 
-    function WeightPreferenceFields() {
-        const [message, setMessage] = useState<string>("")
-
-        const warningMessage = <Message 
-            level="Warning"
-            message={message}
-            showMessage={message?.length > 0}
-        />
-
-        return <div>
-            Leave either field blank to indicate no min/max weight
-            <label 
-                className="modal-form" 
-                htmlFor="min-weight"
-                style={{verticalAlign: "middle"}}
-            >
-                Min Weight
-                <input 
-                    type="number" 
-                    id="min-weight"
-                    value={minWeightPreference}
-                    onChange={(e) => setMinWeightPreference(e.target.valueAsNumber)} 
-                    style={{
-                        marginLeft: 4,
-                        verticalAlign: "middle"
-                    }}
-                />
-            </label>
-            <label 
-                className="modal-form" 
-                htmlFor="max-weight"
-                style={{verticalAlign: "middle"}}
-            >
-                Max Weight
-                <input 
-                    type="number" 
-                    id="max-weight"
-                    value={maxWeightPreference}
-                    onChange={(e) => {
-                        setMaxWeightPreference(e.target.valueAsNumber)
-
-                        if (maxWeightPreference != undefined && 
-                            maxWeightPreference <= 20 && 
-                            appointment.type != AppointmentType.FUN_SIZE) {
-                        setMessage("Dogs under 20 lbs. require a fun-size appointment (usually Fridays and Saturdays)")
-                    }
-                    }} 
-                    style={{
-                        marginLeft: 4,
-                        verticalAlign: "middle"
-                    }}
-                />
-            </label>
-            {/* <NumberField 
-                labelText="Min Weight"
-                id="min-weight"
-                onChange={(e) => setMinWeightPreference(e.target.valueAsNumber)}
-                defaultValue={minWeightPreference}
-            /> */}
-            {/* <NumberField 
-                labelText="Max Weight"
-                id="max-weight"
-                onChange={(e) => {
-                    setMaxWeightPreference(e.target.valueAsNumber)
-
-                    if (maxWeightPreference != undefined && 
-                            maxWeightPreference <= 20 && 
-                            appointment.type != AppointmentType.FUN_SIZE) {
-                        setMessage("Dogs under 20 lbs. require a fun-size appointment (usually Fridays and Saturdays)")
-                    }
-                }}
-                defaultValue={maxWeightPreference}
-            /> */}
-            {warningMessage}
-        </div>
-    }
-
     const [weightPrefMessage, setWeightPrefMessage] = useState<string>("")
     function WeightPrefWarningMessage() {
         return <Message 
@@ -458,7 +380,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
     function PetsAtHomeFields() {
         return <div>
             I have the following pets at home:
-            <ul>
+            <ul style={{ paddingLeft: 0, listStyleType: "none" }}>
                 <li>
                     <CheckboxField 
                         id={"dog"} 
@@ -502,6 +424,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
     return <ModalWithButton 
         buttonClass={"grey-card-link"} 
         canSubmit={() => validate()}
+        height={"90%"}
         extendOnSubmit={() => handleSubmit()}
         extendOnClose={() => setDefaults()}
         extendOnOpen={() => handleOpen()}

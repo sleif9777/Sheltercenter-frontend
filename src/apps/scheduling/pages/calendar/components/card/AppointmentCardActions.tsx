@@ -179,7 +179,9 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
         let canView = false
 
         if (session.adminUser) {
-            canView = !appointment.checkInTime
+            canView = !appointment.checkInTime && 
+                !schedule.currentlyRefreshingAdopters &&
+                moment().diff(appointment.instant, "hours") < 24
         }
 
         if (session.greeterUser) {

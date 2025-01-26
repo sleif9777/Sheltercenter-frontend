@@ -7,6 +7,8 @@ import { IconDefinition, faCheck, faXmark } from "@fortawesome/free-solid-svg-ic
 import { Tooltip } from "react-tooltip"
 import { SubmissionButton } from "../forms/SubmissionButton"
 
+export type ModalHeight = "20%" | "30%" | "40%" | "50%" | "60%" | "70%" | "80%" | "90%"
+
 export interface ModalProps {
     canSubmit?: () => boolean,
     extendOnClose?: (param?: any) => void
@@ -21,6 +23,8 @@ export interface ModalWithButtonProps extends ModalProps {
     buttonIcon?: IconDefinition,
     buttonId: string,
     cancelBtnLabel?: string,
+    disabled?: boolean,
+    height: ModalHeight
     launchBtnLabel: JSX.Element | string,
     submitBtnLabel?: string,
     tooltipText?: string,
@@ -33,9 +37,11 @@ export default function ModalWithButton(props: ModalWithButtonProps) {
         buttonId, 
         canSubmit, 
         cancelBtnLabel,
+        disabled,
         extendOnClose, 
         extendOnOpen,
         extendOnSubmit, 
+        height,
         launchBtnLabel, 
         modalTitle,
         submitBtnLabel,
@@ -63,6 +69,7 @@ export default function ModalWithButton(props: ModalWithButtonProps) {
             className={`${buttonClass} launch-button`} 
             id={`${buttonId}-button`}
             data-tooltip-id={buttonId}
+            disabled={disabled}
             onClick={handleOpen}
         >
             {buttonIcon 
@@ -87,7 +94,7 @@ export default function ModalWithButton(props: ModalWithButtonProps) {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <Box className="modal">
+            <Box className="modal" height={height}>
                 <div className="header">
                     <button 
                         className="close-button"

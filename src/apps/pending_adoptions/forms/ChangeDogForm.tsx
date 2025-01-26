@@ -38,6 +38,7 @@ export function ChangeDogForm(props: ChangeDogFormProps) {
     }
 
     return <ModalWithButton 
+            height={"20%"}
             buttonClass={"chosen-board-action retain-size"} 
             canSubmit={() => validate()}
             extendOnSubmit={() => handleSubmit()}

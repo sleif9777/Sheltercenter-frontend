@@ -135,7 +135,6 @@ export function AppointmentForm(props: AppointmentFormProps) {
                 id="dog"
                 value={paperworkAdoption?.id}
                 label="Adoption"
-                // placeholder="Select an adoption"
                 style={{ width: 400 }}
                 onChange={(e) => {
                     const newAdoption = paperworkAdoptionOptions.find(a => a.id == e.target.value)
@@ -158,6 +157,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
         canSubmit={() => validate()}
         extendOnSubmit={() => handleSubmit()}
         extendOnClose={() => resetForm()}
+        height="60%"
         launchBtnLabel={"Add Appointment"} 
         modalTitle={"Add Appointment"}
     >

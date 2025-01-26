@@ -9,7 +9,7 @@ import { useStore } from "zustand"
 import { useSessionState } from "../../session/SessionState"
 import { Message } from "../../components/message/Message"
 
-interface MessagingModalProps extends Omit<ModalWithButtonProps, "extendOnSubmit"> {
+interface MessagingModalProps extends Omit<ModalWithButtonProps, "extendOnSubmit" | "height"> {
     recipient: IAdopter,
     subject: string,
     extendOnSubmit: (message: string, subject: string) => void,
@@ -43,11 +43,45 @@ export function MessagingModal(props: MessagingModalProps) {
 
     return <ModalWithButton 
             {...props}
+            height={"50%"}
             canSubmit={() => validate()}
             extendOnSubmit={() => handleSubmit()}
         >
         <Message level={"Default"} showMessage={message == ""} message={"If no template is selected, the system default message will be used."} />
-        <div className="form-content">
+        <table>
+            <tr>
+                <td style={{ verticalAlign: "top", paddingTop: 15, paddingRight: 5 }}>
+                    <ButtonGroup
+                        show={true} 
+                        singleColumn
+                        value={undefined}
+                        buttons={quickTexts}
+                        onChange={(_, newValue) => {
+                            const newType = quickTexts.find(qt => qt.value == newValue)
+                            setMessage(newType?.text ?? "")
+                        }} 
+                        labelText={""} 
+                        id={"quicktexts"}            
+                    />
+                </td>
+                <td>
+                    <div className="form-content">
+                        <label htmlFor="message-body">Message</label>
+                        <TextareaAutosize 
+                            minRows={10}
+                            maxRows={15}
+                            id="message-body"
+                            hidden={message == ""}
+                            value={message}
+                            onChange={(e) => {
+                                setMessage(e.target.value)
+                            }}
+                        />
+                    </div>
+                </td>
+            </tr>
+        </table>
+        {/* <div className="form-content">
             <label htmlFor="message-body">Message</label>
             <TextareaAutosize 
                 minRows={10}
@@ -70,6 +104,6 @@ export function MessagingModal(props: MessagingModalProps) {
             }} 
             labelText={""} 
             id={"quicktexts"}            
-        />
+        /> */}
     </ModalWithButton>
 }

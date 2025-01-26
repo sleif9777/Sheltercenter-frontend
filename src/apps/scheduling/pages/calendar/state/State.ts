@@ -30,7 +30,10 @@ export interface SchedulingHomeContext {
 
 interface SchedulingHomeState extends Omit<SchedulingHomeContext, "appointments"> {
     timeslots: TimeslotDictionary<IAppointment>
-    currentlyRefreshing: boolean,
+   
+    currentlyRefreshingAppointments: boolean,
+    currentlyRefreshingAdopters: boolean,
+    currentlyRefreshingAdoptions: boolean,
 
     refresh: (newViewDate: Date, refreshObjs: ("adopters" | "adoptions")[], userID?: number) => void,
 }
@@ -38,7 +41,10 @@ interface SchedulingHomeState extends Omit<SchedulingHomeContext, "appointments"
 export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
     viewDate: new Date(),
     weekday: (new Date().getDay() == 0 ? 6 : new Date().getDay() - 1),
-    currentlyRefreshing: false,
+    
+    currentlyRefreshingAppointments: false,
+    currentlyRefreshingAdopters: false,
+    currentlyRefreshingAdoptions: false,
 
     timeslots: [],
     closedDateID: null,
@@ -55,7 +61,9 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
 
     refresh: async (newViewDate: Date, refreshObjs: ("adopters" | "adoptions")[], userID?: number) => {
         set(() => ({
-            currentlyRefreshing: true
+            currentlyRefreshingAppointments: true,
+            currentlyRefreshingAdopters: refreshObjs.includes("adopters"),
+            currentlyRefreshingAdoptions: refreshObjs.includes("adoptions")
         }))
 
         const context: SchedulingHomeContext = await Appointment.fetchAppointmentsForDate(newViewDate, userID ?? 0)
@@ -63,6 +71,8 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
         set(() => ({ 
             viewDate: newViewDate, 
             weekday: (newViewDate.getDay() == 0 ? 6 : newViewDate.getDay() - 1),
+
+            currentlyRefreshingAppointments: false,
 
             timeslots: new TimeslotConstructor<IAppointment>().setUpTimeslots(context.appointments ?? {}),
             closedDateID: context.closedDateID,
@@ -79,19 +89,17 @@ export const useSchedulingHomeState = create<SchedulingHomeState>((set) => ({
         if (refreshObjs.includes("adopters")) {
             const getAdopters = await new AdopterAPI().GetAdoptersForBooking()
             set(() => ({ 
-                adoptersSansAppointment: getAdopters.data.adopters
+                adoptersSansAppointment: getAdopters.data.adopters,
+                currentlyRefreshingAdopters: false
             }))
         }
 
         if (refreshObjs.includes("adoptions")) {
             const getAdoptions = await new PendingAdoptionsAPI().GetAllPendingAdoptionsAwaitingPaperwork()
             set(() => ({ 
-                adoptionsSansPaperwork: getAdoptions.data.adoptions
+                adoptionsSansPaperwork: getAdoptions.data.adoptions,
+                currentlyRefreshingAdoptions: false
             }))
         }
-
-        set(() => ({
-            currentlyRefreshing: false
-        }))
     },
 }));

@@ -61,6 +61,7 @@ export function CheckInForm(props: CheckInFormProps) {
         extendOnSubmit={() => handleSubmit()}
         extendOnClose={() => setDefaults()}
         extendOnOpen={() => {}}
+        height="50%"
         launchBtnLabel={launchBtnLabel}
         buttonId={`checkin-appt-${appointment.id}`}
         modalTitle="Check In"
