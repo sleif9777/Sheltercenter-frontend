@@ -186,7 +186,6 @@ export default function CalendarApp() {
 
         let adopterBookedOnThisDay = false
         if (store.userCurrentAppointment) {
-            console.log(store.viewDate.toISOString(), store.userCurrentAppointment.instant.toString().split("T")[0])
             const dateKey = (date: Date) => {
                 return date.toISOString().split("T")[0]
             }
