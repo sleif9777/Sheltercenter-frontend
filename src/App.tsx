@@ -31,9 +31,11 @@ function App() {
 
   return <BrowserRouter>
     <NavigationApp />
-    <Routes>
-      {AllRoutes}
-    </Routes>
+    <div id="content">
+      <Routes>
+        {AllRoutes}
+      </Routes>
+    </div>
   </BrowserRouter>
 }
 

@@ -5,15 +5,16 @@ export interface PageButtonProps {
     extendOnClick?: () => void;
     route?: string;
     target?: ATagTarget;
-    isLast?: boolean
+    isLast?: boolean;
+    mobileSupported?: boolean;
 }
 
 export type ATagTarget = "_blank" | "_parent" | "_self" | "_top"
 
 export default function PageButton(props: PageButtonProps) {
-    const { caption, extendOnClick, route, target, isLast } = props
+    const { caption, extendOnClick, route, target, isLast, mobileSupported } = props
 
-    return <div className={`navbar-element page-button ${isLast ? "no-border" : ""}`}>
+    return <div className={`navbar-element page-button ${mobileSupported ? "" : "desktop-only"} ${isLast ? "no-border" : ""}`}>
         <a 
             href={route}
             onClick={() => {

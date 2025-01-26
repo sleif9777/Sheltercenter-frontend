@@ -17,6 +17,7 @@ import { AppointmentType } from "../../../../enums/Enums"
 import { AppointmentsAPI } from "../../api/AppointmentsAPI"
 import { Appointment } from "../../models/Appointment"
 import { useSchedulingHomeState } from "../../state/State"
+import { faDog, faHeadSideCough, faWheelchair } from "@fortawesome/free-solid-svg-icons"
 
 interface BookingFormProps {
     appointment: Appointment,
@@ -96,6 +97,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
             setHasCats(false)
             setHasOtherPets(false)
             setOtherPetsComment("")
+            setWeightPrefMessage("")
         }
     }
 
@@ -342,6 +344,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
             id={"low-allergy"} 
             toggleValue={() => setLowAllergy(!lowAllergy)} 
             checkByDefault={lowAllergy} 
+            customIcon={faHeadSideCough}
             labelText={"I require a low-allergy dog"}            
         />
     }
@@ -351,6 +354,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
             id={"mobility"} 
             toggleValue={() => setMobility(!mobility)} 
             checkByDefault={mobility} 
+            customIcon={faWheelchair}
             labelText={"I would like to request mobility assistance"}            
         />
     }
@@ -360,6 +364,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
             id={"bringing-dogs"} 
             toggleValue={() => setBringingDog(!bringingDog)} 
             checkByDefault={bringingDog} 
+            customIcon={faDog}
             labelText={"I plan to bring my dog(s) with me"}            
         />
     }
@@ -375,13 +380,55 @@ export function AdopterBookingForm(props: BookingFormProps) {
 
         return <div>
             Leave either field blank to indicate no min/max weight
-            <NumberField 
+            <label 
+                className="modal-form" 
+                htmlFor="min-weight"
+                style={{verticalAlign: "middle"}}
+            >
+                Min Weight
+                <input 
+                    type="number" 
+                    id="min-weight"
+                    value={minWeightPreference}
+                    onChange={(e) => setMinWeightPreference(e.target.valueAsNumber)} 
+                    style={{
+                        marginLeft: 4,
+                        verticalAlign: "middle"
+                    }}
+                />
+            </label>
+            <label 
+                className="modal-form" 
+                htmlFor="max-weight"
+                style={{verticalAlign: "middle"}}
+            >
+                Max Weight
+                <input 
+                    type="number" 
+                    id="max-weight"
+                    value={maxWeightPreference}
+                    onChange={(e) => {
+                        setMaxWeightPreference(e.target.valueAsNumber)
+
+                        if (maxWeightPreference != undefined && 
+                            maxWeightPreference <= 20 && 
+                            appointment.type != AppointmentType.FUN_SIZE) {
+                        setMessage("Dogs under 20 lbs. require a fun-size appointment (usually Fridays and Saturdays)")
+                    }
+                    }} 
+                    style={{
+                        marginLeft: 4,
+                        verticalAlign: "middle"
+                    }}
+                />
+            </label>
+            {/* <NumberField 
                 labelText="Min Weight"
                 id="min-weight"
                 onChange={(e) => setMinWeightPreference(e.target.valueAsNumber)}
                 defaultValue={minWeightPreference}
-            />
-            <NumberField 
+            /> */}
+            {/* <NumberField 
                 labelText="Max Weight"
                 id="max-weight"
                 onChange={(e) => {
@@ -394,10 +441,19 @@ export function AdopterBookingForm(props: BookingFormProps) {
                     }
                 }}
                 defaultValue={maxWeightPreference}
-            />
+            /> */}
             {warningMessage}
         </div>
     }
+
+    const [weightPrefMessage, setWeightPrefMessage] = useState<string>("")
+    function WeightPrefWarningMessage() {
+        return <Message 
+            level="Warning"
+            message={weightPrefMessage}
+            showMessage={weightPrefMessage?.length > 0}
+        />
+    } 
 
     function PetsAtHomeFields() {
         return <div>
@@ -506,7 +562,54 @@ export function AdopterBookingForm(props: BookingFormProps) {
                         <BringingDogsField />
                     </td>
                     <td className="two-column">
-                        <WeightPreferenceFields />
+                        <div>
+                            Leave either field blank to indicate no min/max weight
+                            <label 
+                                className="modal-form" 
+                                htmlFor="min-weight"
+                                style={{verticalAlign: "middle"}}
+                            >
+                                Min Weight
+                                <input 
+                                    type="number" 
+                                    id="min-weight"
+                                    value={minWeightPreference}
+                                    onChange={(e) => setMinWeightPreference(e.target.valueAsNumber)} 
+                                    style={{
+                                        marginLeft: 4,
+                                        verticalAlign: "middle"
+                                    }}
+                                />
+                            </label>
+                            <label 
+                                className="modal-form" 
+                                htmlFor="max-weight"
+                                style={{verticalAlign: "middle"}}
+                            >
+                                Max Weight
+                                <input 
+                                    type="number" 
+                                    id="max-weight"
+                                    value={maxWeightPreference}
+                                    onChange={(e) => {
+                                        setMaxWeightPreference(e.target.valueAsNumber)
+
+                                        if (maxWeightPreference != undefined && 
+                                            maxWeightPreference <= 20 && 
+                                            appointment.type != AppointmentType.FUN_SIZE) {
+                                            setWeightPrefMessage("Dogs under 20 lbs. require a fun-size appointment (usually Fridays and Saturdays)")
+                                        } else {
+                                            setWeightPrefMessage("")
+                                        }
+                                    }} 
+                                    style={{
+                                        marginLeft: 4,
+                                        verticalAlign: "middle"
+                                    }}
+                                />
+                            </label>
+                            <WeightPrefWarningMessage />
+                        </div>
                         <hr />
                         <PetsAtHomeFields />
                         {hasOtherPets ? <TextField

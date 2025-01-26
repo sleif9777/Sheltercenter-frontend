@@ -11,6 +11,7 @@ export function NavigationApp() {
         return <PageButton 
             caption="Calendar"    
             route="/calendar/"
+            mobileSupported
         />
     }
 
@@ -61,6 +62,7 @@ export function NavigationApp() {
 
     function PrivacyPolicyButton() {
         return <PageButton
+            mobileSupported
             caption="Privacy Policy"
             route="/privacy/"
         />
@@ -71,6 +73,7 @@ export function NavigationApp() {
             isLast
             extendOnClick={() => session.logOut(session.userID)}
             caption="Sign Out"
+            mobileSupported
         />
     }
 
@@ -80,13 +83,15 @@ export function NavigationApp() {
                 <img src={Logo} alt="" />
             </a>
         </div>
-        {CalendarButton()}
-        {WeeklyTemplateButton()}
-        {UploadAdoptersButton()}
-        {ManageAdoptersButton()}
-        {ChosenBoardButton()}
-        {InProgressAppointmentsButton()}
-        {PrivacyPolicyButton()}
-        {SignOutButton()}
+        <div id="all-elements">
+            {CalendarButton()}
+            {WeeklyTemplateButton()}
+            {UploadAdoptersButton()}
+            {ManageAdoptersButton()}
+            {ChosenBoardButton()}
+            {InProgressAppointmentsButton()}
+            {PrivacyPolicyButton()}
+            {SignOutButton()}
+        </div>
     </div>
 }

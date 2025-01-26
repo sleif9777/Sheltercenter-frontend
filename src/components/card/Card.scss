@@ -78,18 +78,6 @@
         border: 2px solid var(--maroon);
         color: var(--maroon);
 
-        &.alert {
-            width: auto;
-
-            .description {
-                width: 80%;
-            }
-
-            .actions {
-                width: 20%;
-            }
-        }
-
         .actions {
             button {
                 color: var(--maroon);
@@ -115,6 +103,18 @@
         }
     }
 
+    &.alert {
+        width: auto;
+
+        .description {
+            width: 80%;
+        }
+
+        .actions {
+            width: 20%;
+        }
+    }
+
     &.photo-card {
         #photo-cell {
             width: 150px;
@@ -133,7 +133,8 @@
 
     .actions {
         margin-right: 5px;
-        flex-wrap: nowrap;
+        vertical-align: top;
+        white-space: nowrap;
         width: 45%;
 
         button {

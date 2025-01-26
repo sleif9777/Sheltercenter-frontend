@@ -1,0 +1,36 @@
+.checkbox {
+    margin-bottom: 5px;
+
+    .label {
+        padding: 3px;
+        width: fit-content;
+
+        &:hover {
+            background-color: var(--light-pink);
+            transition-property: background-color;
+            transition-duration: 0.25s;
+        }
+    }
+
+    i {
+        border: 5px solid red;
+    }
+
+    .icon {
+        margin: 0 3px;
+        // border: 1px solid purple;
+        // border-radius: 50%
+    }
+
+    input[type=checkbox] {
+        display: none;
+
+        &:checked + .label {
+            background-color: var(--pink);
+            color: white;
+            font-weight: 700;
+            transition-property: background-color;
+            transition-duration: 0.25s;
+        }
+    }
+}

@@ -14,3 +14,14 @@
         color: var(--pink) !important;
     }
 }
+
+@media (pointer:none), (pointer:coarse) {
+    .page-button {
+        border-bottom: none !important;
+        display: inline;
+        
+        &:not(.no-border) {
+            padding-right: 10px;
+        }
+    }
+}

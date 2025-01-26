@@ -188,7 +188,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
 
         if (session.adopterUser) {
             canView = ((session.userID == booking?.adopter.userID) || // is their current appointment
-                !booking && !schedule.userCurrentAppointment) // is unbooked and appointment is open
+                !booking && !schedule.userCurrentAppointment && !appointment.locked) // is unbooked, appointment is open and unlocked
         }
 
         if (canView) {

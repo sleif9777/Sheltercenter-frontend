@@ -4,10 +4,11 @@
     box-shadow: 24px;
     font-family: 'Lato', Helvetica, Arial, Lucida, sans-serif;
     left: 50%;
+    height: 90%;
     min-width: 300px;
-    overflow-y: scroll;
+    overflow: hidden;
     padding: 10px;
-    position: absolute;
+    position: relative;
     top: 50%;
     transform: translate(-50%, -50%);
     width: 65%;
@@ -29,13 +30,42 @@
 	--teal: #1e6c80;
     
     h3 {
-        border-bottom: 1px solid var(--pink);
         font-size: 22px;
         margin: 0;
-        margin-bottom: 5px;
         padding-bottom: 5px;
         text-transform: uppercase;
         white-space: nowrap;
+    }
+
+    .header {
+        border-bottom: 1px solid var(--pink);
+        // margin: 5px;
+        position: absolute;
+        height: 50px;
+        top: 5px;
+        // left: 0;
+        width: 98%;
+        // width: /calc(100% - 10px);
+        overflow: hidden;
+    }
+
+    .body {
+        max-height: 80%;
+        overflow-y: scroll;
+        position: absolute;
+        top: 50px;
+        bottom: 50px;
+        width: 98%;
+        margin: 5px;
+    }
+
+    .footer {
+        border-top: 1px solid var(--pink);
+        margin-top: 5px;
+        position: absolute;
+        height: 50px;
+        bottom: 0px;
+        width: 98%;
     }
 
     button {

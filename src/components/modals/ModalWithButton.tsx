@@ -97,28 +97,32 @@ export default function ModalWithButton(props: ModalWithButtonProps) {
                     </button>
                     {modalTitle ? <h3 className="title">{modalTitle}</h3> : null}
                 </div>
-                {children}
-                <SubmissionButton 
-                    disabled={canSubmit ? !canSubmit() : false}
-                    hideIfDisabled={true}
-                    extendOnSubmit={() => {
-                        if (extendOnSubmit) {
-                            extendOnSubmit()
-                        }
-                        handleClose()
-                    }}
-                    icon={faCheck}
-                    textOverride={submitBtnLabel ?? undefined}
-                /> 
-                <SubmissionButton 
-                    classOverride="cancel-button"
-                    disabled={false}
-                    extendOnSubmit={() => {
-                        handleClose()
-                    }}
-                    icon={faXmark}
-                    textOverride={cancelBtnLabel ?? "Cancel"}
-                />
+                <div className="body">
+                    {children}
+                </div>
+                <div className="footer">
+                    <SubmissionButton 
+                        disabled={canSubmit ? !canSubmit() : false}
+                        hideIfDisabled={true}
+                        extendOnSubmit={() => {
+                            if (extendOnSubmit) {
+                                extendOnSubmit()
+                            }
+                            handleClose()
+                        }}
+                        icon={faCheck}
+                        textOverride={submitBtnLabel ?? undefined}
+                    /> 
+                    <SubmissionButton 
+                        classOverride="cancel-button"
+                        disabled={false}
+                        extendOnSubmit={() => {
+                            handleClose()
+                        }}
+                        icon={faXmark}
+                        textOverride={cancelBtnLabel ?? "Cancel"}
+                    />
+                </div>
             </Box>
         </Modal>
     </>

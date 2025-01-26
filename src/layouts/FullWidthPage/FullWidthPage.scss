@@ -40,9 +40,11 @@
     }
 }
 
-@media print {
+@media print, (pointer:none), (pointer:coarse) {
     .full-width-page {
         left: 0%;
         width: 100%;
+        // top: auto;
+        top: 75px;
     }
 }

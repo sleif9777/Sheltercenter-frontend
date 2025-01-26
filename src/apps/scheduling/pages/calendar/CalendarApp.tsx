@@ -25,11 +25,14 @@ import { Appointment } from "./models/Appointment"
 import { useSchedulingHomeState } from "./state/State"
 import { JumpToTimeslots } from "./components/alerts/JumpToTimeslots"
 import { AdopterFlagsAlert } from "./components/alerts/AdopterFlagsAlert"
+import { Collapsible } from "../../../../components/collapsible/Collapsible"
 
 export default function CalendarApp() {
     const store = useStore(useSchedulingHomeState)
     const weekday = DateTimeStrings.getWeekday(store.weekday).toLocaleUpperCase()
     const session = useStore(useSessionState)
+
+    const [alertsCollapsed, setAlertsCollapsed] = useState<boolean>(false)
 
     // Render the component
     useEffect(() => {
@@ -204,15 +207,32 @@ export default function CalendarApp() {
 
         return base
     }
+
+    function AlertsSection() {
+        return <>
+            <Collapsible 
+                items={alerts()} 
+                buttonLabel="Show Alerts" 
+                disableButton={store.currentlyRefreshing}
+                className="mobile-only"
+            />
+            <div className="desktop-only">
+                <ul style={{ columnCount: 3 }}>
+                    {alerts().map(a => <li>{a}</li>)}
+                </ul>
+            </div>
+        </>
+    }
     
     return <FullWidthPage 
         subtitle={weekday}
         title={<SchedulingHomeTitle />} 
         toolbarItems={toolbarItems()}  
     >
-        <ul style={{columnCount: 3}}>
+        <AlertsSection />
+        {/* <ul>
             {alerts().map(a => <li>{a}</li>)}
-        </ul>
+        </ul> */}
         {getContent()}
     </FullWidthPage>
 }

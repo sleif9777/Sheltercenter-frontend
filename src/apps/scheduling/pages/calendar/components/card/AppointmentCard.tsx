@@ -8,7 +8,6 @@ import { CardColor } from "../../../../../../components/card/CardEnums";
 import { CardItemListSection } from "../../../../../../components/card/CardItemListSection";
 import { CardTableSection, DataRow } from "../../../../../../components/card/CardTableSection";
 import { TwoColumnListItem } from "../../../../../../components/two_column_list/TwoColumnList";
-import { SecurityLevel } from "../../../../../../session/SecurityLevel";
 import { useSessionState } from "../../../../../../session/SessionState";
 import { isSurrenderAppointment } from "../../../../utils/AppointmentTypeUtils";
 import { Appointment } from "../../models/Appointment";
@@ -28,12 +27,18 @@ export function AppointmentCard(props: AppointmentCardProps) {
     const session = useStore(useSessionState)
     const booking = appointment.getCurrentBooking()
 
-    var oneBookingDisclaimer: JSX.Element | null = null
+    var bookingDisclaimer: JSX.Element | null = null
     if (store.userCurrentAppointment && 
-        session.securityLevel === SecurityLevel.ADOPTER &&
+        session.adopterUser &&
         appointment.id != store.userCurrentAppointment.id) {
-        oneBookingDisclaimer = <i>
+        bookingDisclaimer = <i>
             You may only have one appointment booked. Cancel your current appointment to enable booking this appointment.
+        </i>
+    }
+
+    if (session.adopterUser && appointment.locked) {
+        bookingDisclaimer = <i>
+            This appointment is restricted from open booking. If you are interested in this appointment, contact adoptions@savinggracenc.org.
         </i>
     }
 
@@ -275,24 +280,28 @@ export function AppointmentCard(props: AppointmentCardProps) {
             appointment.appointmentNotes &&
             appointment.appointmentNotes.length > 0
 
-    const description = <>
-        { context == "Current Appointment" || context == "Adopter Detail"
-            ? moment(appointment.instant).tz("America/New_York").format("MMM D, h:mm A")
-            : appointment.getAppointmentDescription() }
-        {appointment.locked ? <FontAwesomeIcon icon={faLock} style={{ marginLeft: 5 }} /> : null}
-        {booking?.adopter.mobility ? <FontAwesomeIcon icon={faWheelchair} style={{ marginLeft: 5 }} /> : null}
-        {booking?.adopter.bringingDog ? <FontAwesomeIcon icon={faDog} style={{ marginLeft: 5 }} /> : null}
-        {booking?.adopter.catsInHome ? <FontAwesomeIcon icon={faCat} style={{ marginLeft: 5 }} /> : null}
-        {booking?.adopter.otherPetsInHome ? <FontAwesomeIcon icon={faHorse} style={{ marginLeft: 5 }} /> : null}
-    </>
+    const description = () => {
+        return <>
+            { context == "Current Appointment" || context == "Adopter Detail"
+                ? moment(appointment.instant).tz("America/New_York").format("MMM D, h:mm A")
+                : appointment.getAppointmentDescription() }
+            <span style={{ whiteSpace: "nowrap" }}>
+                {appointment.locked ? <FontAwesomeIcon icon={faLock} style={{ marginLeft: 5 }} /> : null}
+                {booking?.adopter.mobility ? <FontAwesomeIcon icon={faWheelchair} style={{ marginLeft: 5 }} /> : null}
+                {booking?.adopter.bringingDog ? <FontAwesomeIcon icon={faDog} style={{ marginLeft: 5 }} /> : null}
+                {booking?.adopter.catsInHome ? <FontAwesomeIcon icon={faCat} style={{ marginLeft: 5 }} /> : null}
+                {booking?.adopter.otherPetsInHome ? <FontAwesomeIcon icon={faHorse} style={{ marginLeft: 5 }} /> : null}
+            </span>
+        </>
+    } 
 
     return <StandardCard
         actions={AppointmentCardActions(appointment, context)} 
         color={CardColor.GRAY}
-        description={description}
+        description={description()}
         topDetails={topDetails}
     >
-        {oneBookingDisclaimer}
+        {bookingDisclaimer}
         {showBookingInfo ? <BookingInfo /> : null}
         {showSurrenderNotes ? <NotesSection /> : null}
     </StandardCard>
