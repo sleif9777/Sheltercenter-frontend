@@ -22,6 +22,7 @@ export function CardTestPage() {
         />,
         <ToolbarModal 
             text={"Toolbar Modal"} 
+            height="30%"
             canSubmit={() => true}
             extendOnSubmit={() => {}}
             modalTitle={"Toolbar Modal"} 

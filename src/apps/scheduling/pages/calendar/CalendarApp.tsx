@@ -155,9 +155,21 @@ export default function CalendarApp() {
             </>
         }
 
-        if (session.securityLevel == SecurityLevel.ADOPTER && 
-            (moment(store.viewDate).diff(moment(new Date), 'days') + 1) > 14) {
-                return <PlaceholderText iconDef={faShieldDog} text={"Appointments will be open for booking two weeks in advance."} />
+        if (session.adopterUser) {
+            const difference = moment(store.viewDate).diff(moment(new Date), 'days') + 1
+            let text = ""
+
+            if (difference > 14) {
+                text = "Appointments will be open for booking two weeks in advance."
+            }
+
+            if (difference < 1) {
+                text = "This date is in the past."
+            }
+
+            if (text.length > 0) {
+                return <PlaceholderText iconDef={faShieldDog} text={text} />
+            }
         }
 
         if (store.timeslots.length === 0) {
@@ -172,8 +184,22 @@ export default function CalendarApp() {
             }
         }
 
+        let adopterBookedOnThisDay = false
+        if (store.userCurrentAppointment) {
+            console.log(store.viewDate.toISOString(), store.userCurrentAppointment.instant.toString().split("T")[0])
+            const dateKey = (date: Date) => {
+                return date.toISOString().split("T")[0]
+            }
+
+            if (dateKey(store.viewDate) === store.userCurrentAppointment.instant.toString().split("T")[0]) {
+                adopterBookedOnThisDay = true
+            }
+        }
+
         // Show placeholder if all appointments booked
-        if (session.adopterUser && fullyBookedDay(store.timeslots, session.userID)) {
+        if (session.adopterUser 
+            && fullyBookedDay(store.timeslots, session.userID) &&
+            !adopterBookedOnThisDay) {
             return <PlaceholderText iconDef={faShieldDog} text={"All appointments on this date are booked."} />
         }
 
@@ -207,23 +233,31 @@ export default function CalendarApp() {
     }
 
     function AlertsSection() {
-        return <>
-            <Collapsible 
-                items={alerts()} 
-                buttonLabel="Show Alerts" 
-                disableButton={
-                    store.currentlyRefreshingAppointments || 
-                    store.currentlyRefreshingAdoptions || 
-                    store.currentlyRefreshingAdopters
-                }
-                className="mobile-only"
-            />
-            <div className="desktop-only">
-                <ul style={{ columnCount: 3 }}>
+        if (!session.adopterUser) {
+            return <>
+                <Collapsible 
+                    items={alerts()} 
+                    buttonLabel="Show Alerts" 
+                    disableButton={
+                        store.currentlyRefreshingAppointments || 
+                        store.currentlyRefreshingAdoptions || 
+                        store.currentlyRefreshingAdopters
+                    }
+                    className="mobile-only"
+                />
+                <div className="desktop-only">
+                    <ul style={{ columnCount: 3 }}>
+                        {alerts().map(a => <li>{a}</li>)}
+                    </ul>
+                </div>
+            </>
+        } else {
+            return <div>
+                <ul>
                     {alerts().map(a => <li>{a}</li>)}
                 </ul>
             </div>
-        </>
+        }
     }
     
     return <FullWidthPage 
@@ -269,6 +303,7 @@ function JumpToDateModal() {
 
     return <ToolbarModal
         text="Jump to Date"
+        height="30%"
         canSubmit={() => jumpToDateValue != undefined}
         extendOnSubmit={async () => {
             store.refresh(jumpToDateValue, [], session.userID!)

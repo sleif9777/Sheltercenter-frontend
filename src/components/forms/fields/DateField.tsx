@@ -26,6 +26,7 @@ export function DateField(props: DateFieldProps) {
             format="MM/dd/yyyy"
             className="modal-date-picker" 
             onChange={(date) => changeDate(date)}
+            limitStartYear={new Date().getFullYear()}
         />
     </>
 }

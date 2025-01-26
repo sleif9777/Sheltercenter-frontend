@@ -1,6 +1,6 @@
 import { faPaw } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import ModalWithButton, { ModalProps } from "../../components/modals/ModalWithButton"
+import ModalWithButton, { ModalHeight, ModalProps } from "../../components/modals/ModalWithButton"
 import "./Toolbar.scss"
 import { ATagTarget } from "../../components/navigation/PageButton"
 
@@ -17,16 +17,19 @@ interface ToolbarButtonProps extends ToolbarElementProps {
     onClick: () => void
 }
 
-interface ToolbarModalProps extends ToolbarElementProps, ModalProps {}
+interface ToolbarModalProps extends ToolbarElementProps, ModalProps {
+    height: ModalHeight
+}
 
 export function ToolbarModal(props: ToolbarModalProps) {
-    const { text, canSubmit, extendOnClose, extendOnSubmit, children, modalTitle } = props
+    const { text, canSubmit, extendOnClose, extendOnSubmit, height, children, modalTitle } = props
         
     return <ModalWithButton 
         buttonClass="toolbar-element" 
         buttonIcon={faPaw}
         buttonId={""} 
-        launchBtnLabel={text} 
+        height={height}
+        launchBtnLabel={text}
         canSubmit={canSubmit}
         extendOnClose={extendOnClose}
         extendOnSubmit={extendOnSubmit}

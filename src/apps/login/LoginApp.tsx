@@ -82,11 +82,6 @@ export function LoginApp() {
                     <div>
                         <SubmissionButton 
                             disabled={OTP.length > 0 && OTP.length !== 8} 
-                            // extendOnSubmit={async () => {
-                            //     await store.attemptLogIn(email, OTP)
-                            //     setMessageLevel(store.message ? "Error" : "Default")
-                            //     setMessage(store.message ?? "")
-                            // }}
                             extendOnSubmit={() => attemptLogInTrigger()}
                             textOverride="Log In"
                         />
