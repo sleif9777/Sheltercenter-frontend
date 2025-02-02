@@ -32,7 +32,6 @@ export function fullyBookedSlot(ts: TimeslotProps<IAppointment>, userID?: number
 }
 
 export function fullyBookedDay(day: TimeslotDictionary<IAppointment>, userID?: number) {
-    console.log(day.filter(ts => !fullyBookedSlot(ts, userID)))
     return day.filter(ts => !fullyBookedSlot(ts, userID)).length === 0
 }
 
