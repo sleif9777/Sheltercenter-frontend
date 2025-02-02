@@ -37,4 +37,13 @@ export class AdopterAPI extends API {
         const path = this.buildCommandPath("ResendApproval")
         return this.post(path, data)
     }
+
+    RestoreCalendarAccess(adopterID: number) {
+        const data = {
+            adopterID: adopterID
+        }
+
+        const path = this.buildCommandPath("RestoreCalendarAccess")
+        return this.post(path, data)
+    }
 }

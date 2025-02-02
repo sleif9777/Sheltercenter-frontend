@@ -196,6 +196,7 @@ export default function CalendarApp() {
         }
 
         // Show placeholder if all appointments booked
+        console.log(session.adopterUser, fullyBookedDay(store.timeslots, session.userID), !adopterBookedOnThisDay)
         if (session.adopterUser 
             && fullyBookedDay(store.timeslots, session.userID) &&
             !adopterBookedOnThisDay) {

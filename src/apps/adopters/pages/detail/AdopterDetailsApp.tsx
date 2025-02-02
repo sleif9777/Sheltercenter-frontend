@@ -1,5 +1,4 @@
 import { AxiosResponse } from "axios";
-import moment from "moment";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -7,7 +6,6 @@ import TwoColumnPage from "../../../../layouts/TwoColumnPage/TwoColumnPage";
 import { AppointmentCard } from "../../../scheduling/pages/calendar/components/card/AppointmentCard";
 import { Appointment, IAppointment } from "../../../scheduling/pages/calendar/models/Appointment";
 import { AdopterAPI } from "../../api/API";
-import { AdopterApprovalStatus } from "../../enums/AdopterEnums";
 import { Adopter, IAdopter } from "../../models/Adopter";
 import { AdopterForm } from "../../shared_components/AdopterForm";
 import { Message } from "../../../../components/message/Message";
@@ -19,10 +17,16 @@ interface AdopterDetailsAppContext {
     bookingHistory: BookingHistory
 }
 
-export default function AdopterDetailsApp() {
+interface AdopterDetailsActionButtonProps {
+    adopter: IAdopter
+}
 
+export default function AdopterDetailsApp() {
     const { id } = useParams()
-    const [approvalSent, setApprovalSent] = useState<boolean | null>(null)
+    const [approvalSent, setApprovalSent] = useState<boolean>(false)
+    const [accessRestored, setAccessRestored] = useState<boolean>(false)
+    const [adopter, setAdopter] = useState<Adopter>()
+    const [appointment, setAppointment] = useState<IAppointment | null>()
     const [bookingHistory, setBookingHistory] = useState<BookingHistory>({ 
         adopted: 0,
         completed: 0,
@@ -42,29 +46,16 @@ export default function AdopterDetailsApp() {
     useEffect(() => {
         fetchData()
     }, [])
-
-    const [adopter, setAdopter] = useState<Adopter>()
-    const [appointment, setAppointment] = useState<IAppointment | null>()
-    // const [bookings, setBookings] = useState<IBooking[]>([]) TODO: Make booking history audit
      
     if (!adopter) {
         return null
     }
 
-    const getStatus = () => {
-        switch(adopter.status) {
-            case AdopterApprovalStatus.APPROVED:
-                return `Approved until ${moment(adopter.approvedUntil).format("MMM D, YYYY")}`
-            case AdopterApprovalStatus.DENIED:
-                return "Application denied"
-            case AdopterApprovalStatus.PENDING:
-                return "Application pending"
-            default:
-                return ""
+    function ResendApprovalButton(props: AdopterDetailsActionButtonProps) {
+        if (!adopter || adopter.approvalExpired()) {
+            return
         }
-    }
 
-    function ResendApprovalButton(props: { adopter: IAdopter }): JSX.Element {
         return <button 
             className="submit-button" 
             style={{ margin: 5 }} 
@@ -81,23 +72,56 @@ export default function AdopterDetailsApp() {
         </button>
     }
 
-    const leftContent = <AdopterForm defaults={adopter} extendOnSubmit={fetchData} context="Manage" />
+    function RestoreCalendarAccessButton(props: AdopterDetailsActionButtonProps) {
+        if (!adopter || !adopter.restrictedCalendar) {
+            return
+        }
 
-    const rightContent = () => {
+        return <button 
+            className="submit-button" 
+            style={{ margin: 5 }} 
+            onClick={async () => {
+                try {
+                    await new AdopterAPI().RestoreCalendarAccess(props.adopter.ID)
+                    setAccessRestored(true)
+                } catch {
+                    setAccessRestored(false)
+                }
+            }}
+        >
+            Restore Calendar Access
+        </button>
+    }
+
+    function AdopterDetailLeftColumn() {
+        if (!adopter) {
+            return <></>
+        }
+
+        return <AdopterForm defaults={adopter} extendOnSubmit={fetchData} context="Manage" />
+    }
+
+    function AdopterDetailRightColumn() {
+        if (!adopter) {
+            return <></>
+        }
+
         return <>
-            <Message level={"Success"} showMessage={approvalSent === true} message={"Approval resent."} />
+            <Message level={"Success"} showMessage={approvalSent} message={"Approval resent."} />
+            <Message level={"Success"} showMessage={accessRestored} message={"Calendar access restored."} />
             <ResendApprovalButton adopter={adopter} />
-            {appointment ? <AppointmentCard appointment={new Appointment(appointment)} context={"Adopter Detail"} /> : <></>}
+            <RestoreCalendarAccessButton adopter={adopter} />
+            {appointment && <AppointmentCard appointment={new Appointment(appointment)} context={"Adopter Detail"} />}
             <BookingHistoryCard history={bookingHistory} />
         </>
     }
 
     return <TwoColumnPage 
-        leftContent={leftContent} 
-        rightContent={rightContent()} 
+        leftContent={<AdopterDetailLeftColumn />} 
+        rightContent={<AdopterDetailRightColumn />} 
         title={adopter.getFullName()} 
         subtitle={
-            [adopter.primaryEmail, adopter.phoneNumber, getStatus()]
+            [adopter.primaryEmail, adopter.phoneNumber, adopter.getApprovalExpirationDate()]
                 .filter(i => i != "")
                 .join(" | ")
         }

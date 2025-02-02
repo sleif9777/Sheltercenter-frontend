@@ -1,3 +1,5 @@
+import moment from "moment-timezone"
+import { DateTime } from "../../../utils/DateTimeUtils"
 import { AdopterApprovalStatus } from "../enums/AdopterEnums"
 
 export interface IAdopter {
@@ -45,6 +47,9 @@ export interface IAdopter {
     // VISIT LOGISTICS ITEMS
     mobility: boolean,
     bringingDog: boolean,
+
+    // SECURITY ITEMS
+    restrictedCalendar: boolean,
 }
 
 export class Adopter implements IAdopter {
@@ -87,6 +92,8 @@ export class Adopter implements IAdopter {
     mobility: boolean
     bringingDog: boolean
 
+    restrictedCalendar: boolean
+
     constructor(dto: IAdopter) {
         this.ID = dto.ID
 
@@ -126,6 +133,8 @@ export class Adopter implements IAdopter {
 
         this.mobility = dto.mobility
         this.bringingDog = dto.bringingDog
+
+        this.restrictedCalendar = dto.restrictedCalendar
     }
 
     getFullName() {
@@ -147,6 +156,25 @@ export class Adopter implements IAdopter {
         }
 
         return `${this.city}, ${this.state}`
+    }
+
+    getApprovalExpirationDate(): string {
+        switch(this.status) {
+            case AdopterApprovalStatus.APPROVED:
+                return this.approvalExpired() 
+                    ? "Application expired" 
+                    : `Approved until ${new DateTime(this.approvedUntil).Format("MMM D, YYYY")}`
+            case AdopterApprovalStatus.DENIED:
+                return "Application denied"
+            case AdopterApprovalStatus.PENDING:
+                return "Application pending"
+            default:
+                return ""
+        }
+    }
+
+    approvalExpired(): boolean {
+        return moment(this.approvedUntil).diff(moment(), "days") < 0
     }
 
     activityLevelStr = () => {

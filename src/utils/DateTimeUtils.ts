@@ -1,6 +1,6 @@
 import moment from "moment-timezone"
 
-type DateTimeFormat = "yyyy-MM-DD" | "M/D/YYYY h:mm A"
+type DateTimeFormat = "yyyy-MM-DD" | "M/D/YYYY h:mm A" | "MMM D, YYYY"
 
 export class DateTime {
     instant: moment.Moment
