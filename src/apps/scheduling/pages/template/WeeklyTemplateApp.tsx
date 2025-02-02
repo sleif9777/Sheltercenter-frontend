@@ -7,7 +7,6 @@ import { Timeslot } from "../../components/Timeslot";
 import { CalendarMode, Weekday } from "../../enums/Enums";
 import { AppointmentForm } from "./components/AppointmentForm";
 import { useTemplateHomeState } from "./state/State";
-import { Moment } from "moment-timezone";
 import { ITemplateAppointment } from "./models/TemplateAppointment";
 
 export function WeeklyTemplateApp() {
@@ -41,7 +40,7 @@ export function WeeklyTemplateApp() {
             id={""}
         />
         <div>
-            {store.timeslots.map((timeslot: { appointments: (ITemplateAppointment)[]; instant: Moment; }) => <Timeslot 
+            {store.timeslots.map((timeslot: { appointments: (ITemplateAppointment)[]; instant: Date; }) => <Timeslot 
                     appointments={timeslot.appointments} 
                     mode={CalendarMode.TEMPLATE} 
                     instant={timeslot.instant} 

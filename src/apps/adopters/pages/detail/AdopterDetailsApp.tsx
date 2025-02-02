@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import TwoColumnPage from "../../../../layouts/TwoColumnPage/TwoColumnPage";
 import { AppointmentCard } from "../../../scheduling/pages/calendar/components/card/AppointmentCard";
-import { Appointment, IAppointment } from "../../../scheduling/pages/calendar/models/Appointment";
+import { IAppointment } from "../../../scheduling/pages/calendar/models/Appointment";
 import { AdopterAPI } from "../../api/API";
 import { AdopterApprovalStatus } from "../../enums/AdopterEnums";
 import { Adopter, IAdopter } from "../../models/Adopter";
@@ -87,7 +87,7 @@ export default function AdopterDetailsApp() {
         return <>
             <Message level={"Success"} showMessage={approvalSent === true} message={"Approval resent."} />
             <ResendApprovalButton adopter={adopter} />
-            {appointment ? <AppointmentCard appointment={new Appointment(appointment)} context={"Adopter Detail"} /> : <></>}
+            {appointment && <AppointmentCard data={appointment} context={"Adopter Detail"} />}
             <BookingHistoryCard history={bookingHistory} />
         </>
     }

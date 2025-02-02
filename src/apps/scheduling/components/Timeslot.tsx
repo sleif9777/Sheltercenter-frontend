@@ -66,7 +66,7 @@ export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointmen
         } else if (mode === CalendarMode.SCHEDULING) {
             appointmentObj = new Appointment(appointment as IAppointment)
             return <AppointmentCard 
-                appointment={appointmentObj} 
+                data={appointmentObj} 
                 context="Timeslot"
             />
         }

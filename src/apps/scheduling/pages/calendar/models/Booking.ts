@@ -1,5 +1,5 @@
-import moment from "moment";
 import { Adopter, IAdopter } from "../../../../adopters/models/Adopter";
+import { DateTime } from "../../../../../utils/DateTimeUtils";
 
 export interface IBooking {
     adopter: IAdopter,
@@ -28,6 +28,6 @@ export class Booking {
     }
 
     getCreatedInstant() {
-        return `Booked ${moment(this.created).format("M/D/YYYY h:mm A")}`
+        return `Booked ${new DateTime(this.created).Format("M/D/YYYY h:mm A")}}`
     }
 }

@@ -3,7 +3,7 @@ import { CalendarMode } from "../enums/Enums";
 import { IAppointmentBase } from "./AppointmentBase";
 
 export interface ITimeslot<T extends IAppointmentBase> {
-    instant: moment.Moment,
+    instant: Date,
     appointments: T[],
 }
 

@@ -16,6 +16,8 @@ import { AppointmentsAPI } from "../../api/AppointmentsAPI"
 import { IAppointment } from "../../models/Appointment"
 import { useSchedulingHomeState } from "../../state/State"
 
+export interface AppointmentFormSubmission extends Omit<IAppointment, "id" | "heartwormPositive"> {}
+
 interface AppointmentFormProps {
     defaults?: IAppointment,
     extendOnSubmit?: () => any,
@@ -39,7 +41,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
         .set("millisecond", 0)
 
     const [type, setType] = useState<AppointmentType | undefined>(defaults?.type)
-    const [instant, setInstant] = useState<Date | undefined>(defaults ? defaults.instant.toDate() : undefined)
+    const [instant, setInstant] = useState<Date | undefined>(defaults ? defaults.instant : undefined)
     const [locked, setLocked] = useState<boolean>(false)
 
     // ADMIN APPOINTMENT ONLY FIELDS
@@ -59,7 +61,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
     const resetForm = () => {
         if (defaults) {
             setType(defaults.type)
-            setInstant(defaults.instant.toDate())
+            setInstant(defaults.instant)
             setLocked(defaults.locked)
             setNotes(defaults.appointmentNotes ?? "")
         }
@@ -95,10 +97,10 @@ export function AppointmentForm(props: AppointmentFormProps) {
             return
         }
 
-        const data: Omit<IAppointment, "id" | "heartwormPositive"> = {
+        const data: AppointmentFormSubmission = {
             type: type!,
             locked: locked,
-            instant: moment(instant!),
+            instant: instant!,
             paperworkAdoptionID: paperworkAdoption?.id,
             appointmentNotes: notes,
             surrenderedDog: surrenderedDog,

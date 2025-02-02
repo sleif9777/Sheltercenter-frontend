@@ -1,4 +1,4 @@
-import { faPaw, faShieldDog, faShopLock, faSpinner } from "@fortawesome/free-solid-svg-icons"
+import { faPaw, faShieldDog, faShopLock } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import moment from "moment"
 import { useEffect, useState } from "react"
@@ -11,7 +11,7 @@ import PlaceholderText from "../../../../layouts/PlaceholderText/PlaceholderText
 import { ToolbarButton, ToolbarLink, ToolbarModal } from "../../../../layouts/Toolbar/Toolbar"
 import { SecurityLevel } from "../../../../session/SecurityLevel"
 import { useSessionState } from "../../../../session/SessionState"
-import { DateTimeStrings } from "../../../../utils/DateAndTimeStrings"
+import { DateTime } from "../../../../utils/DateTimeUtils"
 import { fullyBookedDay, Timeslot } from "../../components/Timeslot"
 import { CalendarMode, Weekday } from "../../enums/Enums"
 import { AppointmentsAPI } from "./api/AppointmentsAPI"
@@ -21,18 +21,18 @@ import { MissingOutcomesAlert } from "./components/alerts/MissingOutcomesAlert"
 import { AppointmentCard } from "./components/card/AppointmentCard"
 import { SchedulingHomeTitle } from "./components/SchedulingHomeTitle"
 import { AppointmentForm } from "./forms/appointment/AppointmentForm"
-import { Appointment } from "./models/Appointment"
 import { useSchedulingHomeState } from "./state/State"
 import { JumpToTimeslots } from "./components/alerts/JumpToTimeslots"
 import { AdopterFlagsAlert } from "./components/alerts/AdopterFlagsAlert"
 import { Collapsible } from "../../../../components/collapsible/Collapsible"
+import { LoadingPlaceholder } from "../../../../layouts/PlaceholderText/LoadingPlaceholder"
 
 export default function CalendarApp() {
-    const store = useStore(useSchedulingHomeState)
-    const weekday = DateTimeStrings.getWeekday(store.weekday).toLocaleUpperCase()
+    const schedule = useStore(useSchedulingHomeState)
     const session = useStore(useSessionState)
 
-    // Render the component
+    const weekday = new DateTime(schedule.viewDate).GetWeekday().toLocaleUpperCase()
+
     useEffect(() => {
         var dataToLoad: ("adopters" | "adoptions")[]
 
@@ -44,17 +44,123 @@ export default function CalendarApp() {
             dataToLoad = ["adopters", "adoptions"]
         }
         
-        store.refresh(store.viewDate, dataToLoad, session.userID!)
+        schedule.refresh(schedule.viewDate, dataToLoad, session.userID!)
     }, [])
 
-    if (session.userID == undefined) { return <></> }
+    // TOOLBAR
+    function GetToolbar() {
+        const base = [
+            <ReturnToTodayButton />,
+            <JumpToDateModal />,
+        ]
 
+        if (session.securityLevel && session.securityLevel > SecurityLevel.ADOPTER) {
+            base.push(<DailyReportButton />, <PrintViewButton />)
+        }
+
+        if (session.securityLevel && session.securityLevel > SecurityLevel.GREETER) {
+            base.push(<LockAllButton />, <UnlockAllButton />)
+        }
+
+        return base
+    }
+
+    function ReturnToTodayButton() {
+        const handleSubmit = async () => {
+            schedule.refresh(new Date(), [], session.userID!)
+        }
+
+        return <ToolbarButton
+            text="Return to Today"
+            onClick={() => handleSubmit()}
+        />
+    }
+
+    function JumpToDateModal() {
+        const resetForm = () => {
+            setJumpToDateValue(new Date())
+        }
+
+        const [jumpToDateValue, setJumpToDateValue] = useState<Date>(new Date())
+
+        return <ToolbarModal
+            text="Jump to Date"
+            height="30%"
+            canSubmit={() => jumpToDateValue != undefined}
+            extendOnSubmit={async () => {
+                schedule.refresh(jumpToDateValue, [], session.userID!)
+            }}
+            extendOnClose={resetForm}
+            modalTitle={"Jump to Date"}
+        >
+            <div className="form-content">
+                <DateField 
+                    id="jumpToDate"
+                    labelText="Date"
+                    placeholder={jumpToDateValue}
+                    changeDate={(e: Date | null) => setJumpToDateValue(e ?? new Date())}
+                />
+            </div>
+        </ToolbarModal>
+    }
+
+    function DailyReportButton() {
+        return <ToolbarLink 
+            href={"/daily_report/" + new DateTime(schedule.viewDate).Format("yyyy-MM-DD")}
+            text="Daily Report"
+        />
+    }
+
+    function PrintViewButton() {
+        return <ToolbarLink 
+            href={"/print_view/" + new DateTime(schedule.viewDate).Format("yyyy-MM-DD")}
+            text="Print View"
+        />
+    }
+
+    function LockAllButton() {
+        return <>
+            <AreYouSure 
+                extendOnSubmit={async () => {
+                    await toggleLockForAll(false, schedule.viewDate)
+                    schedule.refresh(schedule.viewDate, [], session.userID!)
+                }}
+                youWantTo="lock all appointments for this date"
+                submitBtnLabel="Yes"
+                buttonClass={`lock-all-appointments toolbar-element`}
+                buttonId={`lock-all-appointments`}
+                launchBtnLabel={<><FontAwesomeIcon icon={faPaw} /> Lock All</>}
+                cancelBtnLabel="Go Back"
+                modalTitle="Lock All Appointments"
+            />
+        </>
+    }
+
+    function UnlockAllButton() {
+        return <>
+            <AreYouSure 
+                extendOnSubmit={async () => {
+                    await toggleLockForAll(true, schedule.viewDate)
+                    schedule.refresh(schedule.viewDate, [], session.userID!)
+                }}
+                youWantTo="unlock all appointments for this date"
+                submitBtnLabel={"Yes"}
+                buttonClass={`unlock-all-appointments toolbar-element`}
+                buttonId={`unlock-all-appointments`}
+                launchBtnLabel={<><FontAwesomeIcon icon={faPaw} /> Unlock All</>}
+                cancelBtnLabel="Go Back"
+                modalTitle="Unlock All Appointments"
+            />
+        </>
+    }
+
+    // LARGE ACTION BUTTONS
     function CopyFromTemplateButton() {
         return <button 
             className="large-button" 
             onClick={async () => {
-                await new AppointmentsAPI().CreateBatchForDate(store.viewDate)
-                store.refresh(store.viewDate, [], session.userID!)
+                await new AppointmentsAPI().CreateBatchForDate(schedule.viewDate)
+                schedule.refresh(schedule.viewDate, [], session.userID!)
             }}
         >
             Copy from {weekday} Template
@@ -65,8 +171,8 @@ export default function CalendarApp() {
         return <button 
             className="large-button" 
             onClick={async () => {
-                await new ClosedDatesAPI().MarkDateAsClosed(store.viewDate)
-                store.refresh(store.viewDate, [], session.userID!)
+                await new ClosedDatesAPI().MarkDateAsClosed(schedule.viewDate)
+                schedule.refresh(schedule.viewDate, [], session.userID!)
             }}
         >
             Mark Date as Closed
@@ -81,130 +187,141 @@ export default function CalendarApp() {
         return <button 
             className="large-button" 
             onClick={async () => {
-                if (!store.closedDateID) {
+                if (!schedule.closedDateID) {
                     return
                 }
 
-                await new ClosedDatesAPI().delete(store.closedDateID)
-                store.refresh(store.viewDate, [], session.userID!)
+                await new ClosedDatesAPI().delete(schedule.closedDateID)
+                schedule.refresh(schedule.viewDate, [], session.userID!)
             }}
         >
             Undo Closed Date
         </button>
     }
 
-    const alerts = () => {
+    // ALERTS
+    function CalendarAppAlerts() {        
+        if (session.securityUndefined) {
+            return <></>
+        }
+
+        if (!session.securityLevel) { // No security OR adopter security
+            console.log(schedule)
+            return <div className="desktop-only">
+                {schedule.userCurrentAppointment && <AppointmentCard 
+                    data={schedule.userCurrentAppointment}
+                    context="Current Appointment"
+                />}
+            </div>
+        }
+
+        // Build the alerts list
+        var alerts = []
+
         switch (session.securityLevel) {
-            case SecurityLevel.ADOPTER:
-                if (store.userCurrentAppointment) {
-                    return [<AppointmentCard 
-                        appointment={new Appointment(store.userCurrentAppointment)} 
-                        context="Current Appointment"
-                    />]
-                }
-                return []
             case SecurityLevel.GREETER:
-                return [
-                    <JumpToTimeslots />
-                ] // TODO: Short notices, internal notes
+                alerts.push(<JumpToTimeslots />)
+                break
             case SecurityLevel.ADMIN:
             case SecurityLevel.SUPERUSER:
-                return [
-                    <EmptyDatesAlert />,
-                    <MissingOutcomesAlert />,
-                    <JumpToTimeslots />,
-                    <AdopterFlagsAlert />
-                ]
-            default:
-                return []
+                alerts.push(<EmptyDatesAlert />)
+                alerts.push(<MissingOutcomesAlert />)
+                alerts.push(<JumpToTimeslots />)
+                alerts.push(<AdopterFlagsAlert />)
+                break
         }
+
+        return <>
+            <Collapsible 
+                items={alerts} 
+                buttonLabel="Show Alerts" 
+                disableButton={
+                    schedule.currentlyRefreshingAppointments || 
+                    schedule.currentlyRefreshingAdoptions || 
+                    schedule.currentlyRefreshingAdopters
+                }
+                className="mobile-only"
+            />
+            <div className="desktop-only">
+                <ul style={{ columnCount: 3 }}>
+                    {alerts.map(a => <li>{a}</li>)}
+                </ul>
+            </div>
+        </>
     }
 
-    const getContent = () => {
+    function CalendarAppContent() {
         if (session.securityLevel == undefined) {
             return <></>
         }
 
-        if (store.currentlyRefreshingAppointments) {
-            return <>
-                <PlaceholderText iconDef={faSpinner} text={"Loading appointments..."} />
-            </>
-        }
-
-        if (session.adopterUser && store.userExceptions.length > 0) {
-            return <>
-                <PlaceholderText iconDef={faShieldDog} text={"Congrats on your adoption!"} />
-                <p>
-                    If you would like to start a new adoption, or need further assistance, email adoptions@savinggracenc.org.
-                </p>
-            </>
-        }
-
-        if (store.weekday == Weekday.SUNDAY) {
+        if (schedule.weekday == Weekday.SUNDAY) {
             return <PlaceholderText iconDef={faShopLock} text={"Sundays are closed by default."} />
-        } 
-        
-        if (store.closedDateID) {
+        }
+
+        if (schedule.currentlyRefreshingAppointments) {
+            return <LoadingPlaceholder what="appointments" />
+        }
+
+        if (schedule.closedDateID) {
             return <>
                 <PlaceholderText iconDef={faShopLock} text={"Saving Grace will be closed on this date."} />
-                {
-                    session.securityLevel > SecurityLevel.GREETER
-                        ? <UndoMarkClosedButton />
-                        : null
-                }
+                {session.securityLevel > SecurityLevel.GREETER && <UndoMarkClosedButton />}
             </>
         }
 
         if (session.adopterUser) {
-            const difference = moment(store.viewDate).diff(moment(new Date), 'days') + 1
-            let text = ""
-
-            if (difference > 14) {
-                text = "Appointments will be open for booking two weeks in advance."
+            // USER HAS A COMPLETED OR PENDING ADOPTION
+            if (schedule.userExceptions.length > 0) {
+                return <>
+                    <PlaceholderText iconDef={faShieldDog} text={"Congrats on your adoption!"} />
+                    <p>
+                        If you need further assistance, email adoptions@savinggracenc.org.
+                    </p>
+                </>
             }
 
-            if (difference < 1) {
-                text = "This date is in the past."
+            // DATE IS IN THE PAST OR FURTHER THAN TWO WEEKS OUT
+            const difference = moment(schedule.viewDate).diff(moment(), 'days') + 1
+            const dateOutsideBookingAllowance = difference < 1 || difference > 14
+            
+            if (dateOutsideBookingAllowance) {
+                return <PlaceholderText 
+                    iconDef={faShieldDog} 
+                    text={difference > 14 
+                        ? "Appointments will be open for booking two weeks in advance." 
+                        : "This date is in the past."} 
+                />
             }
 
-            if (text.length > 0) {
-                return <PlaceholderText iconDef={faShieldDog} text={text} />
+            const adopterBookedOnThisDay = schedule.userCurrentAppointment &&
+                DateTime.IsSameDate(new DateTime(schedule.viewDate), new DateTime(schedule.userCurrentAppointment.instant))
+
+            if (!adopterBookedOnThisDay && fullyBookedDay(schedule.timeslots, session.userID)) {
+                return <PlaceholderText 
+                    iconDef={faShieldDog} 
+                    text={"All appointments on this date are booked."} 
+                />
             }
         }
-
-        if (store.timeslots.length === 0) {
-            if (session.securityLevel > SecurityLevel.GREETER) {
-                return <>
+        
+        if (schedule.timeslots.length === 0) {
+            return <>
+                {session.securityLevel >= SecurityLevel.ADMIN && <>
                     <CopyFromTemplateButton /><br />
                     <AddAppointmentButton /><br />
                     <MarkAsClosedDateButton />
-                </>
-            } else {
-                return <PlaceholderText iconDef={faShieldDog} text={"No appointments published for this date."} />
-            }
-        }
-
-        let adopterBookedOnThisDay = false
-        if (store.userCurrentAppointment) {
-            const dateKey = (date: Date) => {
-                return date.toISOString().split("T")[0]
-            }
-
-            if (dateKey(store.viewDate) === store.userCurrentAppointment.instant.toString().split("T")[0]) {
-                adopterBookedOnThisDay = true
-            }
-        }
-
-        // Show placeholder if all appointments booked
-        if (session.adopterUser 
-            && fullyBookedDay(store.timeslots, session.userID) &&
-            !adopterBookedOnThisDay) {
-            return <PlaceholderText iconDef={faShieldDog} text={"All appointments on this date are booked."} />
+                </>}
+                {session.securityLevel < SecurityLevel.ADMIN && <PlaceholderText 
+                    iconDef={faShieldDog} 
+                    text={"No appointments published for this date."} 
+                />}
+            </>
         }
 
         return <>
             <AppointmentForm />
-            {store.timeslots.map((timeslot, index) => <Timeslot 
+            {schedule.timeslots.map((timeslot, index) => <Timeslot 
                 appointments={timeslot.appointments} 
                 mode={CalendarMode.SCHEDULING} 
                 instant={timeslot.instant} 
@@ -212,63 +329,14 @@ export default function CalendarApp() {
             />)}
         </>
     }
-
-
-    const toolbarItems = () => {
-        const base = [
-            ReturnToTodayButton(),
-            JumpToDateModal(),
-        ]
-
-        if (session.securityLevel && session.securityLevel > SecurityLevel.ADOPTER) {
-            base.push(DailyReportButton(), PrintViewButton())
-        }
-
-        if (session.securityLevel && session.securityLevel > SecurityLevel.GREETER) {
-            base.push(LockAllButton(), UnlockAllButton())
-        }
-
-        return base
-    }
-
-    function AlertsSection() {
-        if (!session.adopterUser) {
-            return <>
-                <Collapsible 
-                    items={alerts()} 
-                    buttonLabel="Show Alerts" 
-                    disableButton={
-                        store.currentlyRefreshingAppointments || 
-                        store.currentlyRefreshingAdoptions || 
-                        store.currentlyRefreshingAdopters
-                    }
-                    className="mobile-only"
-                />
-                <div className="desktop-only">
-                    <ul style={{ columnCount: 3 }}>
-                        {alerts().map(a => <li>{a}</li>)}
-                    </ul>
-                </div>
-            </>
-        } else {
-            return <div>
-                <ul>
-                    {alerts().map(a => <li>{a}</li>)}
-                </ul>
-            </div>
-        }
-    }
     
     return <FullWidthPage 
         subtitle={weekday}
         title={<SchedulingHomeTitle />} 
-        toolbarItems={toolbarItems()}  
+        toolbarItems={GetToolbar()}  
     >
-        <AlertsSection />
-        {/* <ul>
-            {alerts().map(a => <li>{a}</li>)}
-        </ul> */}
-        {getContent()}
+        <CalendarAppAlerts />
+        <CalendarAppContent />
     </FullWidthPage>
 }
 
@@ -277,106 +345,4 @@ async function toggleLockForAll(isUnlock: boolean, forDate: Date) {
     return await new AppointmentsAPI().ToggleLockForAll(isUnlock, forDate)
 }
 
-////// TOOLBAR COMPONENTS //////
-function ReturnToTodayButton() {
-    const store = useStore(useSchedulingHomeState)
-    const session = useStore(useSessionState)
-    const handleSubmit = async () => {
-        store.refresh(new Date(), [], session.userID!)
-    }
 
-    return <ToolbarButton
-        text="Return to Today"
-        onClick={() => handleSubmit()}
-    />
-}
-
-function JumpToDateModal() {
-    const store = useStore(useSchedulingHomeState)
-    const session = useStore(useSessionState)
-    const resetForm = () => {
-        setJumpToDateValue(new Date())
-    }
-
-    const [jumpToDateValue, setJumpToDateValue] = useState<Date>(new Date())
-
-    return <ToolbarModal
-        text="Jump to Date"
-        height="30%"
-        canSubmit={() => jumpToDateValue != undefined}
-        extendOnSubmit={async () => {
-            store.refresh(jumpToDateValue, [], session.userID!)
-        }}
-        extendOnClose={resetForm}
-        modalTitle={"Jump to Date"}
-    >
-        <div className="form-content">
-            <DateField 
-                id="jumpToDate"
-                labelText="Date"
-                placeholder={jumpToDateValue}
-                changeDate={(e: Date | null) => setJumpToDateValue(e ?? new Date())}
-            />
-        </div>
-    </ToolbarModal>
-}
-
-function DailyReportButton() {
-    const store = useStore(useSchedulingHomeState)
-
-    return <ToolbarLink 
-        href={"/daily_report/" + moment(store.viewDate).format("yyyy-MM-DD")}
-        text="Daily Report"
-    />
-}
-
-function PrintViewButton() {
-    const store = useStore(useSchedulingHomeState)
-
-    return <ToolbarLink 
-        href={"/print_view/" + moment(store.viewDate).format("yyyy-MM-DD")}
-        text="Print View"
-    />
-}
-
-function LockAllButton() {
-    const store = useStore(useSchedulingHomeState)
-    const session = useStore(useSessionState)
-
-    return <>
-        <AreYouSure 
-            extendOnSubmit={async () => {
-                await toggleLockForAll(false, store.viewDate)
-                store.refresh(store.viewDate, [], session.userID!)
-            }}
-            youWantTo="lock all appointments for this date"
-            submitBtnLabel={"Yes"}
-            buttonClass={`lock-all-appointments toolbar-element`}
-            buttonId={`lock-all-appointments`}
-            launchBtnLabel={<><FontAwesomeIcon icon={faPaw} /> Lock All</>}
-            cancelBtnLabel="Go Back"
-            modalTitle="Lock All Appointments"
-        />
-    </>
-}
-
-function UnlockAllButton() {
-    const store = useStore(useSchedulingHomeState)
-    const session = useStore(useSessionState)
-
-    return <>
-        <AreYouSure 
-            extendOnSubmit={async () => {
-                await toggleLockForAll(true, store.viewDate)
-                store.refresh(store.viewDate, [], session.userID!)
-            }}
-            youWantTo="unlock all appointments for this date"
-            submitBtnLabel={"Yes"}
-            buttonClass={`unlock-all-appointments toolbar-element`}
-            buttonId={`unlock-all-appointments`}
-            launchBtnLabel={<><FontAwesomeIcon icon={faPaw} /> Unlock All</>}
-            cancelBtnLabel="Go Back"
-            modalTitle="Unlock All Appointments"
-        />
-    </>
-}

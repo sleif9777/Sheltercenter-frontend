@@ -24,6 +24,7 @@ interface SessionState extends SessionContext {
     greeterUser: boolean,
     adminUser: boolean,
     sessionExpires?: Date,
+    securityUndefined: boolean,
 }
 
 export const useSessionState = create<SessionState>()(
@@ -33,6 +34,7 @@ export const useSessionState = create<SessionState>()(
             adminUser: false,
             adopterUser: false,
             greeterUser: false,
+            securityUndefined: true,
             attemptLogIn: async (email, otp) => {
                 const context: AxiosResponse<SessionContext> = await new UserProfilesAPI().AuthenticateOTP(email, otp)
 
@@ -50,6 +52,7 @@ export const useSessionState = create<SessionState>()(
                     adopterUser: context.data.securityLevel === SecurityLevel.ADOPTER,
                     greeterUser: context.data.securityLevel === SecurityLevel.GREETER,
                     securityLevel: context.data.securityLevel,
+                    securityUndefined: context.data.securityLevel != undefined,
                     sessionExpires: new Date(new Date().getTime() + (7 * 24 * 60 * 60 * 1000))
                 }))
             },

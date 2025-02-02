@@ -10,27 +10,29 @@ import { CardTableSection, DataRow } from "../../../../../../components/card/Car
 import { TwoColumnListItem } from "../../../../../../components/two_column_list/TwoColumnList";
 import { useSessionState } from "../../../../../../session/SessionState";
 import { isSurrenderAppointment } from "../../../../utils/AppointmentTypeUtils";
-import { Appointment } from "../../models/Appointment";
+import { Appointment, IAppointment } from "../../models/Appointment";
 import { useSchedulingHomeState } from "../../state/State";
 import { AppointmentCardActions } from "./AppointmentCardActions";
 
 export type AppointmentCardContext = "Timeslot" | "Current Appointment" | "Adopter Detail"
 
 interface AppointmentCardProps {
-    appointment: Appointment,
+    data: IAppointment,
     context: AppointmentCardContext // TODO: ENUM
 }
 
 export function AppointmentCard(props: AppointmentCardProps) {
-    const { appointment, context } = props
-    const store = useStore(useSchedulingHomeState)
-    const session = useStore(useSessionState)
+    const { data, context } = props
+    console.log(data)
+    const appointment = new Appointment(data)
     const booking = appointment.getCurrentBooking()
+    const schedule = useStore(useSchedulingHomeState)
+    const session = useStore(useSessionState)
 
     var bookingDisclaimer: JSX.Element | null = null
-    if (store.userCurrentAppointment && 
+    if (schedule.userCurrentAppointment && 
         session.adopterUser &&
-        appointment.id != store.userCurrentAppointment.id) {
+        appointment.id != schedule.userCurrentAppointment.id) {
         bookingDisclaimer = <i>
             You may only have one appointment booked. Cancel your current appointment to enable booking this appointment.
         </i>

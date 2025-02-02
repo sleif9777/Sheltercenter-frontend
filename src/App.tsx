@@ -23,6 +23,7 @@ function App() {
 
   if (session.userID && sessionExpired) {
     session.logOut(session.userID)
+    return <LoginApp />
   }
 
   if (!session.isAuthenticated || !session.sessionExpires) {
