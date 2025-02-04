@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import ButtonGroup from "../../../components/forms/fields/ButtonGroup";
 import ModalWithButton from "../../../components/modals/ModalWithButton";
 import { AdopterAPI } from "../../adopters/api/API";
-import { Adopter, IAdopter } from "../../adopters/models/Adopter";
+import { IAdopterBase } from "../../adopters/models/Adopter";
 import { PendingAdoptionsAPI } from "../api/API";
 import { PendingAdoptionCircumstance } from "../enums/Enums";
 import { IPendingAdoption } from "../models/PendingAdoption";
@@ -19,13 +19,13 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
     const { defaults, extendOnSubmit } = props
 
     const [dog, setDog] = useState<string | undefined>(undefined)
-    const [adopter, setAdopter] = useState<Adopter | undefined>(undefined)
+    const [adopter, setAdopter] = useState<IAdopterBase | undefined>(undefined)
     const [circumstance, setCircumstance] = useState<PendingAdoptionCircumstance>()
-    const [adopterOptions, setAdopterOptions] = useState<Adopter[]>([])
+    const [adopterOptions, setAdopterOptions] = useState<IAdopterBase[]>([])
         
     const fetchData = async () => {
-        const response: AxiosResponse<{adopters: IAdopter[]}> = await new AdopterAPI().GetAllAdopters()
-        setAdopterOptions(response.data.adopters.map(adopter => new Adopter(adopter)))
+        const response: AxiosResponse<{adopters: IAdopterBase[]}> = await new AdopterAPI().GetAllAdopters()
+        setAdopterOptions(response.data.adopters)
     }
     
     useEffect(() => {
@@ -35,7 +35,7 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
     const setDefaults = () => {
         if (defaults) {
             setDog(defaults.dog)
-            setAdopter(new Adopter(defaults.adopter))
+            setAdopter(defaults.adopter)
             setCircumstance(defaults.circumstance)
             return
         }
@@ -51,9 +51,7 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
             (circumstance != undefined)
     }
 
-    async function handleSubmit() {
-        validate()
-        
+    async function handleSubmit() {        
         const data = {
             dog: dog,
             adopter: adopter!.ID,
@@ -94,7 +92,6 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
                     id="adopter"
                     value={adopter?.ID}
                     label="Adopter"
-                    // placeholder="Select an adopter"
                     fullWidth
                     onChange={(e) => {
                         const newAdopter = adopterOptions.find(a => a.ID == e.target.value)

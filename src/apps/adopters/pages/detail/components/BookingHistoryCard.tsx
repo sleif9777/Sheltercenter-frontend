@@ -2,6 +2,13 @@ import { StandardCard } from "../../../../../components/card/Card";
 import { CardColor } from "../../../../../components/card/CardEnums";
 import { CardItemListSection } from "../../../../../components/card/CardItemListSection";
 
+export const DefaultBookingHistory: BookingHistory = { 
+    adopted: 0,
+    completed: 0,
+    noShow: 0,
+    noDecision: 0 
+}
+
 export type BookingHistory = { 
     adopted: number
     completed: number

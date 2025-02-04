@@ -2,19 +2,24 @@ import moment from "moment-timezone"
 import { DateTime } from "../../../utils/DateTimeUtils"
 import { AdopterApprovalStatus } from "../enums/AdopterEnums"
 
-export interface IAdopter {
+export interface IAdopterBase {
     ID: number,
 
-    // USER PROFILE ITEMS
     primaryEmail: string,
     firstName: string,
     lastName: string,
+    
     fullName: string,
     disambiguatedName: string,
+
+    status: AdopterApprovalStatus,
+}
+
+export interface IAdopter extends IAdopterBase {
+    // USER PROFILE ITEMS
     city?: string,
     state?: string,
     phoneNumber?: string,
-    status: AdopterApprovalStatus,
     userID: number,
     
     // APPLICATION ITEMS
@@ -141,13 +146,13 @@ export class Adopter implements IAdopter {
         return this.firstName + " " + this.lastName
     }
 
-    matchesSearch(filterText: string) {
+    static matchesSearch(adopter: IAdopterBase, filterText: string) {
         if (filterText === "") { return false }
 
         filterText = filterText.toLowerCase()
-        return this.fullName.toLowerCase().startsWith(filterText) ||
-            this.lastName.toLowerCase().startsWith(filterText) ||
-            this.primaryEmail.toLowerCase().includes(filterText)
+        return adopter.fullName.toLowerCase().startsWith(filterText) ||
+            adopter.lastName.toLowerCase().startsWith(filterText) ||
+            adopter.primaryEmail.toLowerCase().startsWith(filterText)
     }
 
     getCityAndState() {

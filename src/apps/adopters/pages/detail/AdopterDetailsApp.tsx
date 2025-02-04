@@ -9,7 +9,7 @@ import { AdopterAPI } from "../../api/API";
 import { Adopter, IAdopter } from "../../models/Adopter";
 import { AdopterForm } from "../../shared_components/AdopterForm";
 import { Message } from "../../../../components/message/Message";
-import { BookingHistory, BookingHistoryCard } from "./components/BookingHistoryCard";
+import { BookingHistory, BookingHistoryCard, DefaultBookingHistory } from "./components/BookingHistoryCard";
 
 interface AdopterDetailsAppContext {
     adopter: IAdopter,
@@ -27,12 +27,7 @@ export default function AdopterDetailsApp() {
     const [accessRestored, setAccessRestored] = useState<boolean>(false)
     const [adopter, setAdopter] = useState<Adopter>()
     const [appointment, setAppointment] = useState<IAppointment | null>()
-    const [bookingHistory, setBookingHistory] = useState<BookingHistory>({ 
-        adopted: 0,
-        completed: 0,
-        noShow: 0,
-        noDecision: 0 
-    })
+    const [bookingHistory, setBookingHistory] = useState<BookingHistory>(DefaultBookingHistory)
 
     const fetchData = async () => {
         if (id) {
