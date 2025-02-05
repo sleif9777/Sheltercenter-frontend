@@ -14,17 +14,13 @@ interface ChangeDogFormProps {
 
 export function ChangeDogForm(props: ChangeDogFormProps) {
     const { adoption, extendOnSubmit } = props
-
     const [dog, setDog] = useState<string>(adoption.dog)
-
 
     const validate = () => {
         return dog != undefined && dog.length > 0
     }
 
     async function handleSubmit() {
-        validate()
-        
         const data = {
             newDog: dog,
             adoptionID: adoption.id,
@@ -38,12 +34,12 @@ export function ChangeDogForm(props: ChangeDogFormProps) {
     }
 
     return <ModalWithButton 
-            height={"20%"}
+            height={"30%"}
             buttonClass={"chosen-board-action retain-size"} 
             canSubmit={() => validate()}
             extendOnSubmit={() => handleSubmit()}
             launchBtnLabel={<FontAwesomeIcon icon={faPencil} />}
-            buttonId={`launch-chang-dog`}
+            buttonId={`launch-change-dog`}
             modalTitle="Change Dog"
         >
         <div className="form-content">

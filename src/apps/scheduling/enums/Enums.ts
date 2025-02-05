@@ -36,3 +36,11 @@ export enum CalendarMode {
     SCHEDULING,
     TEMPLATE
 }
+
+export enum Outcome {
+    ADOPTION,
+    FTA,
+    CHOSEN,
+    NO_DECISION,
+    NO_SHOW
+}

@@ -41,6 +41,7 @@ export default function AdopterDetailCard(props: AdopterDetailCardProps) {
     return <StandardCard 
         color={CardColor.GRAY} 
         description={adopter.getFullName()}
+        topBorder
         topDetails={topDetails}
     >
         <CardTableSection data={notesSectionData} showBorder={false} />

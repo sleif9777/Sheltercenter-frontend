@@ -1,4 +1,4 @@
-import { faCat, faDog, faHorse, faLock, faWheelchair } from "@fortawesome/free-solid-svg-icons";
+import { IconDefinition, faCat, faDog, faHorse, faLock, faWheelchair } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
 import { useStore } from "zustand";
@@ -13,6 +13,8 @@ import { isSurrenderAppointment } from "../../../../utils/AppointmentTypeUtils";
 import { Appointment } from "../../models/Appointment";
 import { useSchedulingHomeState } from "../../state/State";
 import { AppointmentCardActions } from "./AppointmentCardActions";
+import { Outcome } from "../../../../enums/Enums";
+import { DateTime } from "../../../../../../utils/DateTimeUtils";
 
 export type AppointmentCardContext = "Timeslot" | "Current Appointment" | "Adopter Detail"
 
@@ -22,245 +24,105 @@ interface AppointmentCardProps {
 }
 
 export function AppointmentCard(props: AppointmentCardProps) {
-    const { appointment, context } = props
-    const store = useStore(useSchedulingHomeState)
+    let { appointment, context } = props
+    const schedule = useStore(useSchedulingHomeState)
     const session = useStore(useSessionState)
     const booking = appointment.getCurrentBooking()
-
-    var bookingDisclaimer: JSX.Element | null = null
-    if (store.userCurrentAppointment && 
+    const notes: DataRow[] = appointment.getNotesToDisplay(session.securityLevel)
+        
+    const showSingleBookingDisclaimer = schedule.userCurrentAppointment && 
         session.adopterUser &&
-        appointment.id != store.userCurrentAppointment.id) {
-        bookingDisclaimer = <i>
+        appointment.id != schedule.userCurrentAppointment.id
+
+    const showLockedDisclaimer = session.adopterUser && 
+        appointment.locked && 
+        !showSingleBookingDisclaimer
+
+    function SingleBookingDisclaimer() {
+        return <i>
             You may only have one appointment booked. Cancel your current appointment to enable booking this appointment.
         </i>
     }
 
-    if (session.adopterUser && appointment.locked) {
-        bookingDisclaimer = <i>
+    function LockedAppointmentDisclaimer() {
+        return <i>
             This appointment is restricted from open booking. If you are interested in this appointment, contact adoptions@savinggracenc.org.
         </i>
     }
 
-    const topDetails: TwoColumnListItem[] = [
-        {text: `(${appointment.getType()})`},
-    ]
+    function GetTopDetails() {
+        let topDetails: TwoColumnListItem[] = []
 
-    if (appointment.getCurrentBooking() && appointment.outcome != 4) {
-        topDetails.push({text: appointment.getAdopterVisitorCount()})
-    }
-
-    if (appointment.checkInTime) {
-        const checkInTime = moment(appointment.checkInTime)
-        
-        const formatted: string = checkInTime.tz("America/New_York").format("h:mm A")
-
-        let checkInDetails: string = `Checked in ${formatted}`
-
-        if (appointment.counselor) {
-            checkInDetails += ` (${appointment.counselor})`
+        const addItem = (text: string) => {
+            topDetails.push({ text: text })
         }
 
-        topDetails.push({ text: checkInDetails })
-        topDetails.push({ text: appointment.clothingDescription })
-    }
+        // Add the type
+        addItem("(" + appointment.getType() + ")")
 
-    if (appointment.checkOutTime) {
-        topDetails.push({ text: `Checked out ${moment(appointment.checkOutTime).format("h:mm A")}` })
-    }
+        // If booked and not a no-show, set the visit count
+        if (appointment.getCurrentBooking() && appointment.outcome != Outcome.NO_SHOW) {
+            addItem(appointment.getAdopterVisitorCount())
+        }
+
+        // If checked in, get the timestamp, counselor, and clothing
+        if (appointment.checkInTime) {
+            const formatted = new DateTime(appointment.checkInTime).Format("h:mm A")
+
+            let checkInDetails = `Checked in ${formatted}`
+            if (appointment.counselor) {
+                checkInDetails += ` (${appointment.counselor})`
+            }
     
-    if (appointment.outcome != undefined) {
-        topDetails.push({ text: appointment.getOutcome() })
+            addItem(checkInDetails)
+            addItem(appointment.clothingDescription ?? "")
+        }
+
+        // If checked out or otherwise completed, get the timestamp and outcome
+        if (appointment.checkOutTime) {
+            const formatted = new DateTime(appointment.checkOutTime).Format("h:mm A")
+            addItem(`Checked out ${formatted}`)
+        }
+        
+        if (appointment.outcome != undefined) {
+            addItem(appointment.getOutcome())
+        }
+
+        return topDetails
     }
 
     function ContactInfoSection() {
-        if (!booking) {
-            return
-        }
-
-        const data = [
-            { text: booking.adopter.primaryEmail ?? "" },
-            { text: booking.adopter.phoneNumber ?? "" }
-        ]
-
-        return <CardItemListSection 
-            data={data}
-            title="Contact Info"
-            showBorder={true}
-        />
+        return <>
+            {booking && <CardItemListSection 
+                data={[
+                    { text: booking.adopter.primaryEmail ?? "" },
+                    { text: booking.adopter.phoneNumber ?? "" }
+                ]}
+                title="Contact Info"
+                showBorder={true}
+            />}
+        </>
     }
 
     function NotesSection() {
-        if (isSurrenderAppointment(appointment.type)) {
-            return <CardTableSection 
-                data={[
-                    { label: "From Adoptions", content: appointment.appointmentNotes }
-                ]}
+        return <>
+            {notes.length > 0 && <CardTableSection 
+                data={notes}
                 title="Notes"
-                showBorder={false}
-            />
-        }
-
-        if (!booking || 
-                (!booking.adopter.adopterNotes && 
-                !booking.adopter.internalNotes && 
-                !booking.adopter.applicationComments)) {
-            return
-        }
-
-        let data: DataRow[] = []
-
-        if (!session.adopterUser) {
-            data.push({ label: "From Adoptions", content: booking.adopter.internalNotes })
-        }
-
-        data.push({ label: "From Shelterluv", content: booking.adopter.applicationComments })
-        data.push({ label: `From ${booking.adopter.firstName}`, content: booking.adopter.adopterNotes })
-
-        return <CardTableSection 
-            data={data}
-            title="Notes"
-            showBorder={true}
-        />
+                showBorder={true}
+            />}
+        </>
     }
 
-    // TODO: Put this into more discrete functions
     function AboutSection() {
         if (!booking) {
             return
         }
 
-        const data: TwoColumnListItem[] = [
-            { text: `Booked ${moment(booking.created).format("M/D/YYYY h:mm A")}` }
-        ]
-
-        if (booking.adopter.activityLevel) {
-            const activityLevelStr = () => {
-                switch (booking.adopter.activityLevel) {
-                    case 0:
-                        return "Low"
-                    case 1:
-                        return "Medium"
-                    case 2:
-                        return "High"
-                    case 3:
-                        return "Very High"
-                }
-            }
-
-            data.push({ text: `${activityLevelStr()} activity household` })
-        }
-
-        if (booking.adopter.city && booking.adopter.state) {
-            data.push({ text: `From ${booking.adopter.city}, ${booking.adopter.state}` })
-        }
-
-        switch (booking.adopter.genderPreference) {
-            case 0:
-                data.push({ text: "Only interested in males" })
-                break
-            case 1:
-                data.push({ text: "Only interested in females" })
-                break
-            default:
-                break
-        }
-
-        switch (booking.adopter.agePreference) {
-            case 0:
-                data.push({ text: "Only interested in adults" })
-                break
-            case 1:
-                data.push({ text: "Only interested in puppies" })
-                break
-            default:
-                break
-        }
-
-        if (booking.adopter.minWeightPreference && booking.adopter.maxWeightPreference) {
-            data.push({ text: `Prefers between ${booking.adopter.minWeightPreference} and ${booking.adopter.maxWeightPreference} lbs.` })
-        } else if (booking.adopter.minWeightPreference) {
-            data.push({ text: `Prefers over ${booking.adopter.minWeightPreference} lbs.` })
-        } else if (booking.adopter.maxWeightPreference) {
-            data.push({ text: `Prefers under ${booking.adopter.maxWeightPreference} lbs.` })
-        }
-
-        if (booking.adopter.lowAllergy) {
-            data.push({ text: "Prefers low-allergy/hypoallergenic!"} )
-        }
-
-        var housingTypeStr, housingOwnershipStr
-        switch (booking.adopter.housingType) {
-            case 0:
-                housingTypeStr = "House"
-                break
-            case 1:
-                housingTypeStr = "Apartment"
-                break
-            case 2:
-                housingTypeStr = "Condo"
-                break
-            case 3:
-                housingTypeStr = "Townhouse"
-                break
-            case 4:
-                housingTypeStr = "Dorm"
-                break
-            case 5:
-                housingTypeStr = "Mobile Home"
-                break
-        }
-
-        switch (booking.adopter.housingOwnership) {
-            case 0:
-                housingOwnershipStr = "Own"
-                break
-            case 1:
-                housingOwnershipStr = "Rent"
-                break
-            case 2:
-                housingOwnershipStr = "Lives with Parents"
-                break
-        }
-
-        if (housingTypeStr && housingOwnershipStr) {
-            data.push({ text: `${housingTypeStr} (${housingOwnershipStr})` })
-        } else if (housingTypeStr) {
-            data.push({ text: `${housingTypeStr}` })
-        } else if (housingOwnershipStr) {
-            data.push({ text: `Unknown Housing Type (${housingOwnershipStr})` })
-        }
-
-        if (booking.adopter.hasFence) {
-            data.push({ text: "Has fence" })
-        }
-
-        const petsInHome = () => {
-            const pets = []
-
-            if (booking.adopter.dogsInHome) {
-                pets.push('dogs')
-            }
-
-            if (booking.adopter.catsInHome) {
-                pets.push('cats')
-            }
-
-            if (booking.adopter.otherPetsInHome) {
-                pets.push(`other (${booking.adopter.otherPetsComment})`)
-            }
-
-            return pets.length > 0
-                ? "Pets in home: " + pets.join(", ")
-                : ""
-        }
-
-        if (petsInHome().length > 0) {
-            data.push({ text: petsInHome() })
-        }
+        let data = [booking.getCreatedInstant()].concat(booking.adopter.getAboutSectionData())
 
         return <CardItemListSection 
-            data={data}
+            data={data.map(d => { return { text: d } })}
             title={`About ${booking.adopter.firstName}`}
             showBorder={false}
         />
@@ -280,28 +142,33 @@ export function AppointmentCard(props: AppointmentCardProps) {
             appointment.appointmentNotes &&
             appointment.appointmentNotes.length > 0
 
-    const description = () => {
+    function AppointmentDescription() {
+        function Icon(props: { def: IconDefinition }) {
+            return <FontAwesomeIcon icon={props.def} style={{ marginLeft: 5 }} />
+        }
+
         return <>
             { context == "Current Appointment" || context == "Adopter Detail"
                 ? moment(appointment.instant).tz("America/New_York").format("MMM D, h:mm A")
                 : appointment.getAppointmentDescription() }
             <span style={{ whiteSpace: "nowrap" }}>
-                {appointment.locked ? <FontAwesomeIcon icon={faLock} style={{ marginLeft: 5 }} /> : null}
-                {booking?.adopter.mobility ? <FontAwesomeIcon icon={faWheelchair} style={{ marginLeft: 5 }} /> : null}
-                {booking?.adopter.bringingDog ? <FontAwesomeIcon icon={faDog} style={{ marginLeft: 5 }} /> : null}
-                {booking?.adopter.catsInHome ? <FontAwesomeIcon icon={faCat} style={{ marginLeft: 5 }} /> : null}
-                {booking?.adopter.otherPetsInHome ? <FontAwesomeIcon icon={faHorse} style={{ marginLeft: 5 }} /> : null}
+                {appointment.locked && <Icon def={faLock} />}
+                {booking?.adopter.mobility && <Icon def={faWheelchair} />}
+                {booking?.adopter.bringingDog && <Icon def={faDog} />}
+                {booking?.adopter.catsInHome && <Icon def={faCat} />}
+                {booking?.adopter.otherPetsInHome && <Icon def={faHorse} />}
             </span>
         </>
-    } 
+    }
 
     return <StandardCard
         actions={AppointmentCardActions(appointment, context)} 
         color={CardColor.GRAY}
-        description={description()}
-        topDetails={topDetails}
+        description={<AppointmentDescription />}
+        topDetails={GetTopDetails()}
     >
-        {bookingDisclaimer}
+        {showSingleBookingDisclaimer ? <SingleBookingDisclaimer /> : null}
+        {showLockedDisclaimer ? <LockedAppointmentDisclaimer /> : null}
         {showBookingInfo ? <BookingInfo /> : null}
         {showSurrenderNotes ? <NotesSection /> : null}
     </StandardCard>

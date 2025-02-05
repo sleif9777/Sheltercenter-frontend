@@ -5,6 +5,9 @@ import { AxiosResponse } from "axios"
 import { AppointmentsAPI } from "../api/AppointmentsAPI"
 import { SchedulingHomeContext } from "../state/State"
 import { Booking, IBooking } from "./Booking"
+import { SecurityLevel } from "../../../../../session/SecurityLevel"
+import { DataRow } from "../../../../../components/card/CardTableSection"
+import { isSurrenderAppointment } from "../../../utils/AppointmentTypeUtils"
 
 export interface IAppointment extends IAppointmentBase {
     id: number,
@@ -66,6 +69,13 @@ export class Appointment extends AppointmentBase implements IAppointment {
         this.surrenderedDogFka = dto.surrenderedDogFka
     }
 
+    // LOGIC THAT SHOULD PROBABLY GET MOVED
+    static async fetchAppointmentsForDate(viewDate: Date, userID: number): Promise<SchedulingHomeContext> {
+        const response: AxiosResponse<SchedulingHomeContext> = await new AppointmentsAPI().GetContextForDate(viewDate, userID)
+        return response.data
+    }
+
+    // DISPLAY HELPERS
     getType(): string {
         if (this.type === AppointmentType.PAPERWORK) {
             if (this.heartwormPositive) {
@@ -75,48 +85,6 @@ export class Appointment extends AppointmentBase implements IAppointment {
         }
 
         return super.getType()
-    }
-
-    static requiresAdopter(type: AppointmentType) {
-        return [
-            AppointmentType.ADULTS,
-            AppointmentType.ALL_AGES,
-            AppointmentType.PUPPIES
-        ].includes(type)
-    }
-
-    static async fetchAppointmentsForDate(viewDate: Date, userID: number): Promise<SchedulingHomeContext> {
-        const response: AxiosResponse<SchedulingHomeContext> = await new AppointmentsAPI().GetContextForDate(viewDate, userID)
-        return response.data
-    }
-
-    isAdoptionAppointment(): boolean {
-        return [
-            AppointmentType.ADULTS,
-            AppointmentType.PUPPIES,
-            AppointmentType.ALL_AGES,
-            AppointmentType.FUN_SIZE
-        ].includes(this.type)
-    }
-
-    isAdminAppointment(): boolean {
-        return !this.isAdoptionAppointment()
-    }
-
-    isOnOrAfterToday(): boolean {
-        const adjustedInstant = moment(this.instant)
-        adjustedInstant.set("hours", 0)
-        adjustedInstant.set("minutes", 0)
-        adjustedInstant.set("seconds", 0)
-        adjustedInstant.set("milliseconds", 0)
-
-        const adjustedToday: moment.Moment = moment()
-        adjustedToday.set("hours", 0)
-        adjustedToday.set("minutes", 0)
-        adjustedToday.set("seconds", 0)
-        adjustedToday.set("milliseconds", 0)
-
-        return adjustedInstant >= adjustedToday
     }
 
     getAppointmentDescription(): string {
@@ -130,7 +98,7 @@ export class Appointment extends AppointmentBase implements IAppointment {
             return "OPEN"
         }
 
-        if (this.type === AppointmentType.SURRENDER) {
+        if (this.isSurrenderAppointment()) {
             if (this.surrenderedDogFka) {
                 return `${this.surrenderedDog} (fka ${this.surrenderedDogFka})`
             }
@@ -138,31 +106,15 @@ export class Appointment extends AppointmentBase implements IAppointment {
             return this.surrenderedDog ?? "UNKNOWN"
         }
 
-        if (this.type === AppointmentType.PAPERWORK) {
+        if (this.isPaperworkAppointment()) {
             return this.paperworkAdoptionDog ?? "UNKNOWN"
         }
 
         if (this.type === AppointmentType.DONATION_DROP_OFF) {
-            return "Donation Drop-Off"
+            return "DONATION DROP-OFF"
         }
 
         return this.appointmentNotes!
-    }
-
-    getCurrentBooking(): Booking | null {
-        return this.bookings.find(b => b.status == 0) || this.bookings.find(b => b.status >= 3) || null
-    }
-
-    showToAdopter(userID: number): boolean {
-        const booking = this.getCurrentBooking()
-
-        if (booking != null) {
-            return booking.adopter.userID == userID
-        } else if (this.isAdoptionAppointment()) {
-            return moment(this.instant).diff(moment(), "hours") >= 2
-        }
-
-        return false
     }
 
     getOutcome() {
@@ -240,5 +192,85 @@ export class Appointment extends AppointmentBase implements IAppointment {
         }
         
         return moment(this.checkOutTime).format("h:mm A")
+    }
+
+    getNotesToDisplay(sec?: SecurityLevel): DataRow[] {
+        let data: DataRow[] = []
+        const booking = this.getCurrentBooking()
+
+        if (isSurrenderAppointment(this.type)) {
+            data.push({ label: "From Adoptions", content: this.appointmentNotes })
+        } else if (booking) {
+            if (sec && sec > SecurityLevel.ADOPTER) {
+                data.push({ label: "From Adoptions", content: booking.adopter.internalNotes })
+            }
+
+            data.push({ label: "From Shelterluv", content: booking.adopter.applicationComments })
+            data.push({ label: `From ${booking.adopter.firstName}`, content: booking.adopter.adopterNotes })
+        }
+
+        return data
+    }
+
+    // OTHER METHODS
+    isAdoptionAppointment(): boolean {
+        return [
+            AppointmentType.ADULTS,
+            AppointmentType.PUPPIES,
+            AppointmentType.ALL_AGES,
+            AppointmentType.FUN_SIZE
+        ].includes(this.type)
+    }
+
+    isAdminAppointment(): boolean {
+        return !this.isAdoptionAppointment()
+    }
+    
+    isPaperworkAppointment() {
+        return this.type === AppointmentType.PAPERWORK
+    }
+    
+    isNonPaperworkAdminAppointment() {
+        return this.isAdminAppointment() && !this.isPaperworkAppointment()
+    }
+    
+    isSurrenderAppointment() {
+        return this.type === AppointmentType.SURRENDER
+    }
+
+    isOnOrAfterToday(): boolean {
+        const adjustedInstant = moment(this.instant)
+        adjustedInstant.set("hours", 0)
+        adjustedInstant.set("minutes", 0)
+        adjustedInstant.set("seconds", 0)
+        adjustedInstant.set("milliseconds", 0)
+
+        const adjustedToday: moment.Moment = moment()
+        adjustedToday.set("hours", 0)
+        adjustedToday.set("minutes", 0)
+        adjustedToday.set("seconds", 0)
+        adjustedToday.set("milliseconds", 0)
+
+        return adjustedInstant >= adjustedToday
+    }
+
+    getCurrentBooking(): Booking | null {
+        return this.bookings.find(b => b.status == 0) || this.bookings.find(b => b.status >= 3) || null
+    }
+
+    isBooked(): boolean {
+        return this.getCurrentBooking() != null
+    }
+
+    showToAdopter(userID: number): boolean {
+        const booking = this.getCurrentBooking()
+
+        if (booking != null) {
+            return booking.adopter.userID == userID
+        } else if (this.isAdoptionAppointment()) {
+            return moment(this.instant).diff(moment(), "hours") >= 2
+        }
+
+        return false
     }
 }

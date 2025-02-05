@@ -15,8 +15,9 @@ interface StandardCardProps {
     color: CardColor,
     children?: JSX.Element | null | (JSX.Element | null)[],
     description?: string | JSX.Element,
+    topBorder?: boolean,
     topDetails?: TwoColumnListItem[],
-    topIcon?: IconDefinition
+    topIcon?: IconDefinition,
 }
 
 interface PhotoCardProps extends StandardCardProps {
@@ -30,6 +31,7 @@ export function StandardCard(props: StandardCardProps) {
         color, 
         children, 
         description, 
+        // topBorder = true,
         topDetails, 
         topIcon,
     } = props
@@ -39,6 +41,7 @@ export function StandardCard(props: StandardCardProps) {
 
     return <div className={`card ${className ?? ""} ${color}`}>
         <table className={renderableChildren.length > 0 ? "border" : ""}>
+        {/* <table className={topBorder ? "border" : ""}> */}
             <tr>
                 <td className="description">
                     {topIcon ? <FontAwesomeIcon icon={topIcon} /> : <></>} {description}
