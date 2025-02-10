@@ -11,10 +11,10 @@ import { SecurityLevel } from "../../../../../../session/SecurityLevel"
 import { useSessionState } from "../../../../../../session/SessionState"
 import { IPendingAdoption } from "../../../../../pending_adoptions/models/PendingAdoption"
 import { AppointmentType } from "../../../../enums/Enums"
-import { isAdminAppointment, isAdoptionAppointment, isNonPaperworkAdminAppointment, isPaperworkAppointment, isSurrenderAppointment } from "../../../../utils/AppointmentTypeUtils"
 import { AppointmentsAPI } from "../../api/AppointmentsAPI"
 import { IAppointment } from "../../models/Appointment"
 import { useSchedulingHomeState } from "../../state/State"
+import { AppointmentTypeFunctions } from "../../../../utils/AppointmentTypeUtils"
 
 interface AppointmentFormProps {
     defaults?: IAppointment,
@@ -75,15 +75,15 @@ export function AppointmentForm(props: AppointmentFormProps) {
             return false
         }
 
-        if (isPaperworkAppointment(type)) {
+        if (AppointmentTypeFunctions.isPaperworkAppointment(type)) {
             return paperworkAdoption != undefined
         }
 
-        if (isSurrenderAppointment(type)) {
+        if (AppointmentTypeFunctions.isSurrenderAppointment(type)) {
             return surrenderedDog.length > 0
         }
 
-        if (isAdminAppointment(type)) {
+        if (AppointmentTypeFunctions.isAdminAppointment(type)) {
             return notes.length > 0
         }
 
@@ -171,29 +171,35 @@ export function AppointmentForm(props: AppointmentFormProps) {
                     setType(newType)
 
                     if (!newType) {
-                        // setShowSubtypeField(false)
-                        // setSubtype(undefined)
                         setShowPaperworkAdoptionField(false)
-                        setPaperworkAdoption(undefined)
                         setShowLockedField(true)
-                        setLocked(false)
                         setShowNotesField(false)
                         setShowSurrenderedDogField(false)
                         setShowSurrenderedDogFkaField(false)
+
+                        setPaperworkAdoption(undefined)
+                        setLocked(false)
                         setNotes("")
                         setSurrenderedDog("")
                         setSurrenderedDogFka("")
                     } else {
-                        setShowPaperworkAdoptionField(isPaperworkAppointment(newType))
-                        setPaperworkAdoption(isPaperworkAppointment(newType) ? paperworkAdoption : undefined)
-                        setShowLockedField(isAdoptionAppointment(newType))
-                        setLocked(isAdoptionAppointment(newType) ? locked : false)
-                        setShowNotesField(isNonPaperworkAdminAppointment(newType))
-                        setShowSurrenderedDogField(isSurrenderAppointment(newType))
-                        setShowSurrenderedDogFkaField(isSurrenderAppointment(newType))
-                        setNotes(isNonPaperworkAdminAppointment(newType) ? notes : "")
-                        setSurrenderedDog(isSurrenderAppointment(newType) ? surrenderedDog : "")
-                        setSurrenderedDogFka(isSurrenderAppointment(newType) ? surrenderedDogFka : "")
+                        const isPaperwork = AppointmentTypeFunctions.isPaperworkAppointment(newType)
+                        setShowPaperworkAdoptionField(isPaperwork)
+                        setPaperworkAdoption(isPaperwork ? paperworkAdoption : undefined)
+                        
+                        const isAdoption = AppointmentTypeFunctions.isAdoptionAppointment(newType)
+                        setShowLockedField(isAdoption)
+                        setLocked(isAdoption ? locked : false)
+
+                        const isNonPaperworkAdmin = AppointmentTypeFunctions.isNonPaperworkAdminAppointment(newType)
+                        setShowNotesField(isNonPaperworkAdmin)
+                        setNotes(isNonPaperworkAdmin ? notes : "")
+
+                        const isSurrender = AppointmentTypeFunctions.isSurrenderAppointment(newType)
+                        setShowSurrenderedDogField(isSurrender)
+                        setShowSurrenderedDogFkaField(isSurrender)
+                        setSurrenderedDog(isSurrender ? surrenderedDog : "")
+                        setSurrenderedDogFka(isSurrender ? surrenderedDogFka : "")
                     }
                 }}
                 buttons={[
@@ -241,26 +247,24 @@ export function AppointmentForm(props: AppointmentFormProps) {
                     /><br />
                 </> 
                 : null}
-            {showNotesField && type
-                ? <TextField
-                    id="outlined-controlled"
-                    label={type == AppointmentType.VISIT ? "Dog" : "Notes"}
-                    margin="dense"
-                    style={{marginRight: 5}}
-                    value={notes}
-                    fullWidth
-                    error={isNonPaperworkAdminAppointment(type) && !isSurrenderAppointment(type) && notes.length === 0}
-                    onChange={(e) => setNotes(e.target.value)}
-                />
-                : null}
-            {showLockedField
-                ? <CheckboxField 
-                    id={"locked"} 
-                    toggleValue={() => setLocked(!locked)} 
-                    checkByDefault={locked} 
-                    labelText={"Lock Appointment"}            
-                />
-                : null}
+            {showNotesField && type && <TextField
+                id="outlined-controlled"
+                label={type == AppointmentType.VISIT ? "Dog" : "Notes"}
+                margin="dense"
+                style={{marginRight: 5}}
+                value={notes}
+                fullWidth
+                error={AppointmentTypeFunctions.isNonPaperworkAdminAppointment(type) && 
+                    !AppointmentTypeFunctions.isSurrenderAppointment(type) && 
+                    notes.length === 0}
+                onChange={(e) => setNotes(e.target.value)}
+            />}
+            {showLockedField && <CheckboxField 
+                id={"locked"} 
+                toggleValue={() => setLocked(!locked)} 
+                checkByDefault={locked} 
+                labelText={"Lock Appointment"}            
+            />}
         </div>
     </ModalWithButton>
 }

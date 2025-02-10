@@ -9,12 +9,13 @@ import { CardItemListSection } from "../../../../../../components/card/CardItemL
 import { CardTableSection, DataRow } from "../../../../../../components/card/CardTableSection";
 import { TwoColumnListItem } from "../../../../../../components/two_column_list/TwoColumnList";
 import { useSessionState } from "../../../../../../session/SessionState";
-import { isSurrenderAppointment } from "../../../../utils/AppointmentTypeUtils";
+// import { isSurrenderAppointment } from "../../../../utils/AppointmentTypeUtils";
 import { Appointment } from "../../models/Appointment";
 import { useSchedulingHomeState } from "../../state/State";
 import { AppointmentCardActions } from "./AppointmentCardActions";
 import { Outcome } from "../../../../enums/Enums";
 import { DateTime } from "../../../../../../utils/DateTimeUtils";
+import { AppointmentTypeFunctions } from "../../../../utils/AppointmentTypeUtils";
 
 export type AppointmentCardContext = "Timeslot" | "Current Appointment" | "Adopter Detail"
 
@@ -138,7 +139,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
 
     const showBookingInfo = booking && appointment.outcome == undefined
     const showSurrenderNotes = !showBookingInfo &&
-            isSurrenderAppointment(appointment.type) &&
+            AppointmentTypeFunctions.isSurrenderAppointment(appointment.type) &&
             appointment.appointmentNotes &&
             appointment.appointmentNotes.length > 0
 

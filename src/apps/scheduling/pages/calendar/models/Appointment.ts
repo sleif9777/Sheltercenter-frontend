@@ -7,7 +7,6 @@ import { SchedulingHomeContext } from "../state/State"
 import { Booking, IBooking } from "./Booking"
 import { SecurityLevel } from "../../../../../session/SecurityLevel"
 import { DataRow } from "../../../../../components/card/CardTableSection"
-import { isSurrenderAppointment } from "../../../utils/AppointmentTypeUtils"
 
 export interface IAppointment extends IAppointmentBase {
     id: number,
@@ -198,7 +197,7 @@ export class Appointment extends AppointmentBase implements IAppointment {
         let data: DataRow[] = []
         const booking = this.getCurrentBooking()
 
-        if (isSurrenderAppointment(this.type)) {
+        if (this.isSurrenderAppointment()) {
             data.push({ label: "From Adoptions", content: this.appointmentNotes })
         } else if (booking) {
             if (sec && sec > SecurityLevel.ADOPTER) {
