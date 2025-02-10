@@ -1,10 +1,8 @@
 import { InputLabel, MenuItem, Select, TextField } from "@mui/material"
-import { AxiosResponse } from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import ButtonGroup from "../../../components/forms/fields/ButtonGroup";
 import ModalWithButton from "../../../components/modals/ModalWithButton";
-import { AdopterAPI } from "../../adopters/api/API";
 import { IAdopterBase } from "../../adopters/models/Adopter";
 import { PendingAdoptionsAPI } from "../api/API";
 import { PendingAdoptionCircumstance } from "../enums/Enums";
@@ -24,16 +22,6 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
     const [dog, setDog] = useState<string | undefined>(undefined)
     const [adopter, setAdopter] = useState<IAdopterBase | undefined>(undefined)
     const [circumstance, setCircumstance] = useState<PendingAdoptionCircumstance>()
-    const [adopterOptions, setAdopterOptions] = useState<IAdopterBase[]>([])
-        
-    const fetchData = async () => {
-        const response: AxiosResponse<{adopters: IAdopterBase[]}> = await new AdopterAPI().GetAllAdopters()
-        setAdopterOptions(response.data.adopters)
-    }
-    
-    useEffect(() => {
-        fetchData()
-    }, [])
 
     const setDefaults = () => {
         if (defaults) {
@@ -98,11 +86,11 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
                     label="Adopter"
                     fullWidth
                     onChange={(e) => {
-                        const newAdopter = adopterOptions.find(a => a.ID == e.target.value)
+                        const newAdopter = board.adopterOptions.find(a => a.ID == e.target.value)
                         setAdopter(newAdopter)
                     }}
                 >
-                    {adopterOptions
+                    {board.adopterOptions
                         .sort((a, b) => a.fullName.localeCompare(b.fullName))
                         .map(adopter => <MenuItem value={adopter.ID}>
                             {adopter.disambiguatedName}
