@@ -9,6 +9,8 @@ import { IAdopterBase } from "../../adopters/models/Adopter";
 import { PendingAdoptionsAPI } from "../api/API";
 import { PendingAdoptionCircumstance } from "../enums/Enums";
 import { IPendingAdoption } from "../models/PendingAdoption";
+import { useStore } from "zustand";
+import { useChosenBoardState } from "../state/State";
 
 interface PendingAdoptionFormProps {
     extendOnSubmit?: () => void,
@@ -17,6 +19,7 @@ interface PendingAdoptionFormProps {
 
 export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
     const { defaults, extendOnSubmit } = props
+    const board = useStore(useChosenBoardState)
 
     const [dog, setDog] = useState<string | undefined>(undefined)
     const [adopter, setAdopter] = useState<IAdopterBase | undefined>(undefined)
@@ -68,15 +71,16 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
     }
 
     return <ModalWithButton 
-            height={"50%"}
-            buttonClass={"submit-button"} 
-            canSubmit={() => validate()}
-            extendOnSubmit={() => handleSubmit()}
-            extendOnClose={() => setDefaults()}
-            launchBtnLabel={"Add Adoption"}
-            buttonId={`launch-create-appointment`}
-            modalTitle="Add Adoption"
-        >
+        height={"50%"}
+        buttonClass={"submit-button"} 
+        canSubmit={() => validate()}
+        extendOnSubmit={() => handleSubmit()}
+        extendOnClose={() => setDefaults()}
+        launchBtnLabel={"Add Adoption"}
+        buttonId={`launch-create-appointment`}
+        modalTitle="Add Adoption"
+        disabled={board.currentlyRefreshing}
+    >
         <div className="form-content">
             <TextField
                 id="outlined-controlled"
