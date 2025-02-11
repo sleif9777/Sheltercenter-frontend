@@ -8,7 +8,8 @@ import { AdopterAPI } from "../../adopters/api/API";
 export interface ChosenBoardContext {
     adoptions: PendingAdoption[],
     adopterOptions: IAdopterBase[],
-    currentlyRefreshing: boolean,
+    refreshingAdoptions: boolean,
+    refreshingAdopters: boolean,
 }
 
 interface ChosenBoardState extends ChosenBoardContext {
@@ -18,17 +19,24 @@ interface ChosenBoardState extends ChosenBoardContext {
 export const useChosenBoardState = create<ChosenBoardState>((set) => ({
     adoptions: [],
     adopterOptions: [],
-    currentlyRefreshing: false,
+    refreshingAdoptions: false,
+    refreshingAdopters: false,
     refresh: async () => {
         set(() => ({
-            currentlyRefreshing: true
+            refreshingAdoptions: true,
+            refreshingAdopters: true,
         }))
+
         const adoptionsResponse: AxiosResponse<ChosenBoardContext> = await new PendingAdoptionsAPI().GetAllPendingAdoptions()
+        set(() => ({
+            refreshingAdoptions: false,
+            adoptions: adoptionsResponse.data.adoptions,
+        }))
+        
         const adoptersResponse: AxiosResponse<{adopters: IAdopterBase[]}> = await new AdopterAPI().GetAllAdopters()
         set(() => ({ 
-            adoptions: adoptionsResponse.data.adoptions,
             adopterOptions: adoptersResponse.data.adopters,
-            currentlyRefreshing: false,
+            refreshingAdopters: false,
         })
     )}
 }));

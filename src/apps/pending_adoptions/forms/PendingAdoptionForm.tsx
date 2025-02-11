@@ -67,7 +67,7 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
         launchBtnLabel={"Add Adoption"}
         buttonId={`launch-create-appointment`}
         modalTitle="Add Adoption"
-        disabled={board.currentlyRefreshing}
+        disabled={board.refreshingAdopters}
     >
         <div className="form-content">
             <TextField

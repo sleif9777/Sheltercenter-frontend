@@ -121,7 +121,7 @@ export function ChosenBoardApp() {
                     return RowGroup(store.adoptions.filter(a => a.status == status))
                 })}
             </table>
-            {store.currentlyRefreshing ? <PlaceholderText iconDef={faSpinner} text={"Loading adoptions..."} /> : <></>}
+            {store.refreshingAdoptions ? <PlaceholderText iconDef={faSpinner} text={"Loading adoptions..."} /> : <></>}
         </FullWidthPage>
     }   
 }
