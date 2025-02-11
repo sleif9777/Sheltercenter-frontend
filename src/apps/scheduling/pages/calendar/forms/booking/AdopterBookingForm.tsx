@@ -432,6 +432,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
         buttonId={`edit-appt-${appointment.id}`}
         modalTitle="Book Appointment"
         tooltipText={booking ? "Edit Booking" : "Book Appointment"}
+        disabled={store.currentlyRefreshingAdopters}
     >
         <div className="form-content">
             {AllFieldsOptionalMessage()}

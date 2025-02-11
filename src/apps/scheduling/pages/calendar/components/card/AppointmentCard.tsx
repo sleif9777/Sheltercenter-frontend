@@ -110,7 +110,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
             {notes.length > 0 && <CardTableSection 
                 data={notes}
                 title="Notes"
-                showBorder={true}
+                showBorder={appointment.isAdoptionAppointment()}
             />}
         </>
     }
