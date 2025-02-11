@@ -145,6 +145,10 @@
             &:hover {
                 color: #444;
             }
+
+            &:disabled {
+                color: #ccc;
+            }
         }
     }
 

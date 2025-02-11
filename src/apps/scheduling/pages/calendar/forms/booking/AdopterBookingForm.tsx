@@ -421,6 +421,14 @@ export function AdopterBookingForm(props: BookingFormProps) {
         />
     }
 
+    function getTooltip() {
+        if (store.currentlyRefreshingAdopters) {
+            return "Loading..."
+        }
+
+        return booking ? "Edit Booking" : "Book Appointment"
+    }
+
     return <ModalWithButton 
         buttonClass={"grey-card-link"} 
         canSubmit={() => validate()}
@@ -431,7 +439,7 @@ export function AdopterBookingForm(props: BookingFormProps) {
         launchBtnLabel={launchBtnLabel}
         buttonId={`edit-appt-${appointment.id}`}
         modalTitle="Book Appointment"
-        tooltipText={booking ? "Edit Booking" : "Book Appointment"}
+        tooltipText={getTooltip()}
         disabled={store.currentlyRefreshingAdopters}
     >
         <div className="form-content">
