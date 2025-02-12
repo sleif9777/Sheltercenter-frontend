@@ -111,7 +111,7 @@ export function LoginApp() {
             <Message 
                 level={messageLevel ?? "Default"} 
                 message={message} 
-                showMessage={message.length > 0} 
+                showMessage={message.length > 0 } 
             />
         </div>
     </div>
