@@ -157,14 +157,15 @@ export default function CalendarApp() {
 
         if (session.adopterUser) {
             const difference = moment(store.viewDate).diff(moment(new Date), 'days') + 1
+            const pastCloseTime = store.timeslots.filter(t => t.instant > moment()).length === 0
             let text = ""
 
             if (difference > 14) {
                 text = "Appointments will be open for booking two weeks in advance."
             }
 
-            if (difference < 1) {
-                text = "This date is in the past."
+            if (difference < 1 || pastCloseTime) {
+                text = "This date is now closed."
             }
 
             if (text.length > 0) {
@@ -195,11 +196,16 @@ export default function CalendarApp() {
             }
         }
 
+        const fullyBooked = fullyBookedDay(store.timeslots, session.userID)
+        const pastCloseTime = store.timeslots.filter(t => t.instant > moment()).length === 0
         // Show placeholder if all appointments booked
-        if (session.adopterUser 
-            && fullyBookedDay(store.timeslots, session.userID) &&
+        if (session.adopterUser && 
+            (fullyBooked || pastCloseTime) &&
             !adopterBookedOnThisDay) {
-            return <PlaceholderText iconDef={faShieldDog} text={"All appointments on this date are booked."} />
+            return <PlaceholderText 
+                iconDef={faShieldDog} 
+                text={"All appointments on this date are booked."} 
+            />
         }
 
         return <>

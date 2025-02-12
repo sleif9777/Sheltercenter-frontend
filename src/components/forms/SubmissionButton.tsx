@@ -19,7 +19,7 @@ export function SubmissionButton(props: SubmissionButtonProps) {
     }
 
     return <button
-        className={`submit-button ${classOverride} ${disabled ? "disabled" : ""}`}
+        className={`submit-button ${classOverride}`}
         disabled={disabled}
         onClick={(e) => {
             extendOnSubmit()
