@@ -93,7 +93,7 @@ export function LoginApp() {
                     <SubmissionButton 
                         disabled={OTP.length !== 8 || loggingIn} 
                         extendOnSubmit={() => attemptLogInTrigger()}
-                        hideIfDisabled
+                        // hideIfDisabled
                         textOverride="Log In"
                     />
                 </div>
@@ -102,7 +102,7 @@ export function LoginApp() {
                 <SubmissionButton 
                     disabled={email.length == 0 || !EmailValidator.validate(email) || generatingOTP} 
                     extendOnSubmit={() => generateOTPTrigger()}
-                    hideIfDisabled
+                    // hideIfDisabled
                     textOverride="Generate Passcode"
                 />
             </div>
