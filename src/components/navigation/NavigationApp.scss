@@ -25,7 +25,7 @@
     }
 }
 
-@media (pointer:none), (pointer:coarse) {
+@media only screen and (pointer:none), (pointer:coarse) {
     .navbar {
         background-color: white;
         border: none;

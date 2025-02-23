@@ -15,7 +15,7 @@
     }
 }
 
-@media (pointer:none), (pointer:coarse) {
+@media only screen and (pointer:none), (pointer:coarse) {
     .page-button {
         border-bottom: none !important;
         display: inline;

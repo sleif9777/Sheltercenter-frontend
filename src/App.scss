@@ -54,22 +54,8 @@
 	display: none;
 }
 
-@media (pointer:none), (pointer:coarse) {
-    .mobile-only {
-		display: block;
-	}
-
-	ul {
-		columns: 1 !important;
-	}
-
-	.desktop-only {
-		display: none;
-	}
-}
-
-@media (pointer:none), (pointer:coarse) {
-    .mobile-only {
+@media only screen and (pointer:none), (pointer:coarse) {
+	.mobile-only {
 		display: block;
 	}
 
