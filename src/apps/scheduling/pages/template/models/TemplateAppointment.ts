@@ -18,7 +18,6 @@ export class TemplateAppointment extends AppointmentBase implements ITemplateApp
     subtype?: PaperworkAppointmentSubtype | undefined
 
     constructor(dto: ITemplateAppointment) {
-        console.log(dto)
         super(dto)
         this.weekday = dto.weekday
         this.time = dto.time

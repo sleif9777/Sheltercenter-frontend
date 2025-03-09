@@ -158,7 +158,6 @@ export default function CalendarApp() {
         if (session.adopterUser) {
             const difference = moment(store.viewDate).diff(moment(new Date), 'days') + 1
             const pastCloseTime = store.timeslots.filter(t => moment(t.instant).isAfter(moment())).length === 0
-            console.log(store.timeslots, store.timeslots.filter(t => moment(t.instant).isAfter(moment())))
             let text = ""
 
             if (difference > 14) {

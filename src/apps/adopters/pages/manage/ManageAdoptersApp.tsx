@@ -13,7 +13,6 @@ export default function ManagerAdoptersApp() {
     const fetchData = async () => {
         const response: AxiosResponse<{adopters: IAdopterBase[]}> = await new AdopterAPI().GetAllAdopters()
         setAllAdopters(response.data.adopters)
-        console.log(response.data.adopters)
     }
 
     const [allAdopters, setAllAdopters] = useState<IAdopterBase[]>([])
