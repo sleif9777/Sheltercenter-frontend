@@ -1,5 +1,4 @@
 import moment from "moment"
-import { useState } from "react"
 import { useStore } from "zustand"
 
 import { SecurityLevel } from "../../../session/SecurityLevel"
@@ -13,6 +12,7 @@ import { TemplateAppointmentCard } from "../pages/template/components/TemplateAp
 import { ITemplateAppointment, TemplateAppointment } from "../pages/template/models/TemplateAppointment"
 
 import "../styles/Timeslot.scss"
+import { DateTime } from "../../../utils/DateTimeUtils"
 
 export interface TimeslotProps<T extends IAppointmentBase> extends ITimeslot<T> {
     mode: CalendarMode,
@@ -38,7 +38,9 @@ export function fullyBookedDay(day: TimeslotDictionary<IAppointment>, userID?: n
 export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointment>) {
     const session = useStore(useSessionState)
     var { appointments, mode, instant, index } = props
-    const [label, setLabel] = useState<string>()
+    instant = moment(instant)
+
+    const label = new DateTime(instant.toDate(), mode === CalendarMode.TEMPLATE).Format("h:mm A")
 
     const filterAppointmentsToShow: () => Appointment[] | TemplateAppointment[] = () => {
         if (mode == CalendarMode.TEMPLATE) {
@@ -58,19 +60,18 @@ export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointmen
 
     const renderCardUsingMode = (appointment: IAppointmentBase) => {
         var appointmentObj: TemplateAppointment | Appointment | undefined
+        
         if (mode === CalendarMode.TEMPLATE) {
             appointmentObj = new TemplateAppointment(appointment as ITemplateAppointment)
             return <TemplateAppointmentCard appointment={appointmentObj} />
-        } else if (mode === CalendarMode.SCHEDULING) {
+        }
+        
+        if (mode === CalendarMode.SCHEDULING) {
             appointmentObj = new Appointment(appointment as IAppointment)
             return <AppointmentCard 
                 appointment={appointmentObj} 
                 context="Timeslot"
             />
-        }
-
-        if (!label && appointmentObj) {
-            setLabel(appointmentObj.getTime())
         }
     }
 
@@ -82,7 +83,8 @@ export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointmen
         <table>
             <tr>
                 <td className="description">
-                    {moment(instant).tz("America/New_York").format("h:mm A")}
+                    {label}
+                    {/* {moment(instant).tz("America/New_York").format("h:mm A")} */}
                 </td>
                 <td className="timeslot-actions">
                     {/* TODO: Add form, lock/unlock buttons */}

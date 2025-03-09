@@ -5,14 +5,14 @@ export interface IAppointmentBase {
     id?: number;
     type: AppointmentType;
     subtype?: PaperworkAppointmentSubtype;
-    instant: moment.Moment,
+    instant: Date,
 }
 
 export abstract class AppointmentBase implements IAppointmentBase {
     id?: number | undefined
     type: AppointmentType
     subtype?: PaperworkAppointmentSubtype | undefined
-    instant: moment.Moment
+    instant: Date
 
     constructor(dto: IAppointmentBase) {
         this.id = dto.id

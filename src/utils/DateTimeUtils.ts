@@ -5,8 +5,8 @@ type DateTimeFormat = "yyyy-MM-DD" | "M/D/YYYY h:mm A" | "MMM D, YYYY" | "h:mm A
 export class DateTime {
     instant: moment.Moment
 
-    constructor(instant: Date) {
-        this.instant = moment(instant).tz("America/New_York")
+    constructor(instant: Date, ignoreTZ: boolean = false) {
+        this.instant = ignoreTZ ? moment(instant) : moment(instant).tz("America/New_York")
     }
 
     GetWeekday(): string {
