@@ -20,7 +20,7 @@ export default function ButtonGroup(props: ButtonGroupProps) {
         return
     }
 
-    return <div >
+    return <div>
         <label className="modal-form" htmlFor={id}>{labelText}</label>
         <ul id="options" className={singleColumn ? "single-column" : ""}>
             {buttons.map((button, i) => {
