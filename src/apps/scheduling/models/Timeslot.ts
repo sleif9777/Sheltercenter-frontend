@@ -1,3 +1,4 @@
+import moment from "moment";
 import { SimpleTimeslotDictionary, TimeslotDictionary } from "../components/Timeslot";
 import { CalendarMode } from "../enums/Enums";
 import { IAppointmentBase } from "./AppointmentBase";
@@ -14,7 +15,7 @@ export class TimeslotConstructor<T extends IAppointmentBase> {
             newTimeslots.push({
                 appointments: blocks[time],
                 mode: CalendarMode.TEMPLATE,
-                instant: blocks[time][0].instant,
+                instant: moment(blocks[time][0].instant),
             })
         }
 

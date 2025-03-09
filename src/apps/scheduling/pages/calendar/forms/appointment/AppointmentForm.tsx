@@ -39,7 +39,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
         .set("millisecond", 0)
 
     const [type, setType] = useState<AppointmentType | undefined>(defaults?.type)
-    const [instant, setInstant] = useState<Date | undefined>(defaults ? defaults.instant.toDate() : undefined)
+    const [instant, setInstant] = useState<Date | undefined>(defaults ? defaults.instant : undefined)
     const [locked, setLocked] = useState<boolean>(false)
 
     // ADMIN APPOINTMENT ONLY FIELDS
@@ -59,7 +59,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
     const resetForm = () => {
         if (defaults) {
             setType(defaults.type)
-            setInstant(defaults.instant.toDate())
+            setInstant(defaults.instant)
             setLocked(defaults.locked)
             setNotes(defaults.appointmentNotes ?? "")
         }
@@ -91,14 +91,14 @@ export function AppointmentForm(props: AppointmentFormProps) {
     }
 
     const handleSubmit = async () => {
-        if (!validate()) {
+        if (!validate() || !instant) {
             return
         }
 
         const data: Omit<IAppointment, "id" | "heartwormPositive"> = {
             type: type!,
             locked: locked,
-            instant: moment(instant!),
+            instant: instant,
             paperworkAdoptionID: paperworkAdoption?.id,
             appointmentNotes: notes,
             surrenderedDog: surrenderedDog,
