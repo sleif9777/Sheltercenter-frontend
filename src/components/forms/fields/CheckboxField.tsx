@@ -9,14 +9,15 @@ interface CheckboxFieldProps extends FieldProps {
     toggleValue: (() => void) | ((e: React.MouseEvent<HTMLElement, MouseEvent>) => void)
     checkByDefault: boolean
     customIcon?: IconDefinition
+    className?: string
 }
 
 export function CheckboxField(props: CheckboxFieldProps) {
-    const { id, customIcon, labelText, checkByDefault, toggleValue } = props
+    const { id, customIcon, labelText, checkByDefault, toggleValue, className } = props
     const [isSelected, setIsSelected] = useState<boolean>(checkByDefault)
 
     return <div 
-        className={`checkbox`}
+        className={`checkbox ${className}`}
         onClick={(e) => {
             toggleValue(e)
             setIsSelected(!isSelected)
@@ -30,7 +31,7 @@ export function CheckboxField(props: CheckboxFieldProps) {
             <input 
                 type="checkbox" 
                 id={id}
-                checked={checkByDefault} 
+                checked={isSelected} 
                 style={{
                     display: "none",
                     marginLeft: 4,

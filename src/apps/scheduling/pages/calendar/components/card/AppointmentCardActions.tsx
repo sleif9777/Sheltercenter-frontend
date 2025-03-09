@@ -32,17 +32,23 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
                 ? `${session.userFName} ${session.userLName}`
                 : "The Adoptions Team"
 
+            const quickTexts = AppointmentCardQuickTexts(booking, signature)
+
             return <MessagingModal 
                 recipient={booking.adopter} 
                 subject={`A message about your upcoming appointment: ${booking.adopter.fullName.toLocaleUpperCase()}`} 
-                extendOnSubmit={async (message, subject) => {
+                extendOnSubmit={async (message, subject, templateID) => {
                     await new AdopterAPI().MessageAdopter({
                         adopterID: booking.adopter.ID,
                         message: message,
                         subject: subject
                     })
+
+                    if (templateID >= 0) {
+                        await new AppointmentsAPI().MarkTemplateSent(appointment.id, templateID)
+                    }
                 }} 
-                quickTexts={AppointmentCardQuickTexts(booking, signature)} 
+                quickTexts={quickTexts}
                 buttonClass={`message-appt-${appointment.id}`}
                 buttonId={`message-appt-${appointment.id}`}
                 launchBtnLabel={<FontAwesomeIcon icon={faEnvelope} />} 

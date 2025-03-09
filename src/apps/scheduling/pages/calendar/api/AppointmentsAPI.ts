@@ -32,6 +32,15 @@ export class AppointmentsAPI extends API {
         return this.post(path, data)
     }
 
+    MarkTemplateSent(id: number, templateID: number) {
+        const data = {
+            appointmentID: id,
+            templateID: templateID
+        }
+        const path = this.buildCommandPath("MarkTemplateSent")
+        return this.post(path, data)
+    }
+
     CancelAppointment(id: number) {
         const data = {
             appointmentID: id

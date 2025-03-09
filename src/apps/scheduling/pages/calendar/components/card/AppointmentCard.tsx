@@ -9,7 +9,6 @@ import { CardItemListSection } from "../../../../../../components/card/CardItemL
 import { CardTableSection, DataRow } from "../../../../../../components/card/CardTableSection";
 import { TwoColumnListItem } from "../../../../../../components/two_column_list/TwoColumnList";
 import { useSessionState } from "../../../../../../session/SessionState";
-// import { isSurrenderAppointment } from "../../../../utils/AppointmentTypeUtils";
 import { Appointment } from "../../models/Appointment";
 import { useSchedulingHomeState } from "../../state/State";
 import { AppointmentCardActions } from "./AppointmentCardActions";

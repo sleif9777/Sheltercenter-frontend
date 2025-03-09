@@ -33,4 +33,10 @@
             transition-duration: 0.25s;
         }
     }
+
+    &.crossout {
+        .label {
+            text-decoration: line-through;
+        }
+    }
 }
