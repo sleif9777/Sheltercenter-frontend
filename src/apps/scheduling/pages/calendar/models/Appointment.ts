@@ -208,7 +208,7 @@ export class Appointment extends AppointmentBase implements IAppointment {
             data.push({ label: `From ${booking.adopter.firstName}`, content: booking.adopter.adopterNotes })
         }
 
-        return data
+        return data.filter(d => d.content && d.content.length > 0)
     }
 
     // OTHER METHODS

@@ -195,7 +195,6 @@ export function AdopterBookingForm(props: BookingFormProps) {
                 label="Adopter"
                 disabled={booking != null || session.adopterUser}
                 // placeholder="Select an adopter"
-                fullWidth
                 onChange={(e) => {
                     const newAdopter = adopterOptions.find(a => a.ID == e.target.value)
                     setAdopter(newAdopter)
@@ -454,17 +453,20 @@ export function AdopterBookingForm(props: BookingFormProps) {
                     <td className="two-column">
                         <div>
                             {session.securityLevel == SecurityLevel.ADOPTER
-                                    ? <TextField
-                                        id="outlined-controlled"
-                                        label="Notes"
-                                        margin="dense"
-                                        maxRows={4}
-                                        fullWidth
-                                        style={{marginRight: 5}}
-                                        value={adopterNotes}
-                                        error={adopterNotes.length > 100}
-                                        onChange={(e) => setAdopterNotes(e.target.value)}
-                                    />
+                                    ? <>
+                                        <TextField
+                                            id="outlined-controlled"
+                                            label="Notes/Who to Meet (if available)"
+                                            margin="dense"
+                                            maxRows={4}
+                                            fullWidth
+                                            style={{marginRight: 5}}
+                                            value={adopterNotes}
+                                            error={adopterNotes.length > 100}
+                                            onChange={(e) => setAdopterNotes(e.target.value)}
+                                        />
+                                        <Message level="Inline-Error" showMessage message="We are a first come, first serve organization and do not place dogs on hold." />
+                                    </>
                                     : <TextField
                                         key={"internal-notes"}
                                         id="outlined-controlled"
@@ -489,13 +491,14 @@ export function AdopterBookingForm(props: BookingFormProps) {
                     <td className="two-column">
                         <GenderPreferenceField />
                         <AgePreferenceField />
+                        <hr />
                         <RequiresLowAllergyField />
                         <MobilityField />
                         <BringingDogsField />
                     </td>
                     <td className="two-column">
                         <div>
-                            Leave either field blank to indicate no min/max weight
+                            <Message level={"Default"} showMessage={true} message="Leave either field blank to indicate no min/max weight." />
                             <label 
                                 className="modal-form" 
                                 htmlFor="min-weight"

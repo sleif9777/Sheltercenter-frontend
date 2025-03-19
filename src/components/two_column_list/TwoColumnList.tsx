@@ -1,10 +1,11 @@
 import { StringUtils } from "../../utils/StringUtils";
+import { CardItemProps } from "../card/CardItem";
 
 import "./TwoColumnList.scss"
 
 export interface TwoColumnListProps {
     data: TwoColumnListItem[],
-    itemRender: (item: TwoColumnListItem) => JSX.Element,
+    itemRender: (item: CardItemProps) => JSX.Element,
     showBorder?: boolean
 }
 

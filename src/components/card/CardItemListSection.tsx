@@ -1,9 +1,10 @@
-import { TwoColumnList, TwoColumnListItem } from "../two_column_list/TwoColumnList";
-import { CardItem } from "./CardItem";
+import { TwoColumnList } from "../two_column_list/TwoColumnList";
+import { CardItem, CardItemProps } from "./CardItem";
 import { CardSectionProps } from "./CardSection";
 
 export interface CardListItemSectionProps extends CardSectionProps {
-    data: TwoColumnListItem[],
+    data: CardItemProps[],
+    className?: string
 }
 
 export function CardItemListSection(props: CardListItemSectionProps) {
@@ -16,7 +17,7 @@ export function CardItemListSection(props: CardListItemSectionProps) {
         <TwoColumnList 
             data={data} 
             itemRender={item => {
-                return <CardItem text={item.text} link={item.link} />
+                return <CardItem text={item.text} link={item.link} className={item.className} />
             }} 
         />
     </table>

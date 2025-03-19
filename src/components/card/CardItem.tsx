@@ -1,13 +1,17 @@
 import { TwoColumnListItem } from "../two_column_list/TwoColumnList"
 
-export function CardItem(props: TwoColumnListItem) {
-    const { link, text, onClick } = props
+export interface CardItemProps extends TwoColumnListItem {
+    className?: string
+}
+
+export function CardItem(props: CardItemProps) {
+    const { link, text, onClick, className } = props
 
     if (link) {
-        return <li>
+        return <li className={className ?? ""}>
             <a onClick={onClick} href={link}>{text}</a>
         </li>
     }
 
-    return <li>{text}</li>
+    return <li className={className ?? ""}>{text}</li>
 }

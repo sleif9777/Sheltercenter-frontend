@@ -15,6 +15,8 @@ import { AppointmentCardActions } from "./AppointmentCardActions";
 import { Outcome } from "../../../../enums/Enums";
 import { DateTime } from "../../../../../../utils/DateTimeUtils";
 import { AppointmentTypeFunctions } from "../../../../utils/AppointmentTypeUtils";
+import { CardItemProps } from "../../../../../../components/card/CardItem";
+import { AppointmentCardQuickTexts } from "./QuickTexts";
 
 export type AppointmentCardContext = "Timeslot" | "Current Appointment" | "Adopter Detail"
 
@@ -114,6 +116,29 @@ export function AppointmentCard(props: AppointmentCardProps) {
         </>
     }
 
+    function TemplatesSection() {
+        if (!booking || session.adopterUser) {
+            return <></>
+        }
+        
+        const crossOut = (condition: boolean) => {
+            return condition ? "crossout" : ""
+        }
+
+        const items: CardItemProps[] = AppointmentCardQuickTexts(booking).map(qt => { 
+            return {
+                text: qt.name,
+                className: crossOut(qt.sent ?? false)
+            }
+        })
+
+        return <CardItemListSection 
+            data={items}
+            title="Messages"
+            showBorder
+        />
+    }
+
     function AboutSection() {
         if (!booking) {
             return
@@ -132,6 +157,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
         return <>
             <ContactInfoSection />
             <NotesSection />
+            <TemplatesSection />
             <AboutSection />
         </>
     }

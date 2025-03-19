@@ -18,4 +18,10 @@
             text-align: right;
         }
     }
+
+    li {
+        &.crossout {
+            text-decoration: line-through;
+        }
+    }
 }

@@ -46,6 +46,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
 
                     if (templateID >= 0) {
                         await new AppointmentsAPI().MarkTemplateSent(appointment.id, templateID)
+                        schedule.refresh(schedule.viewDate, [], session.userID)
                     }
                 }} 
                 quickTexts={quickTexts}
