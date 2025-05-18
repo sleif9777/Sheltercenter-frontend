@@ -183,7 +183,7 @@ export function AppointmentCardActions(forAppt: IAppointment, context: Appointme
 
     // BOOKING FORM
     function bookingForm() {
-        let canView = true
+        let canView = false
 
         if (session.adminUser) {
             canView = !appointment.checkInTime && 
