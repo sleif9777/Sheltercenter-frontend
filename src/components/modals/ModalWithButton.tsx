@@ -19,6 +19,7 @@ export interface ModalProps {
 }
 
 export interface ModalWithButtonProps extends ModalProps {
+    avoidOpen?: boolean
     buttonClass: string,
     buttonIcon?: IconDefinition,
     buttonId: string,
@@ -26,12 +27,14 @@ export interface ModalWithButtonProps extends ModalProps {
     disabled?: boolean,
     height: ModalHeight
     launchBtnLabel: JSX.Element | string,
+    onAvoidOpen?: () => void,
     submitBtnLabel?: string,
     tooltipText?: string,
 }
 
 export default function ModalWithButton(props: ModalWithButtonProps) {
     const { 
+        avoidOpen,
         buttonClass, 
         buttonIcon,
         buttonId, 
@@ -44,12 +47,18 @@ export default function ModalWithButton(props: ModalWithButtonProps) {
         height,
         launchBtnLabel, 
         modalTitle,
+        onAvoidOpen,
         submitBtnLabel,
         tooltipText,
         children 
     } = props
     const [open, setOpen] = useState<boolean>(false)
     const handleOpen = () => {
+        if (avoidOpen) {
+            if (onAvoidOpen) { onAvoidOpen() }
+            return
+        }
+
         if (extendOnOpen) {
             extendOnOpen()
         }

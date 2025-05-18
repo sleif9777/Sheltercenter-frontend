@@ -17,6 +17,7 @@ import { AppointmentsAPI } from "../../api/AppointmentsAPI"
 import { Appointment } from "../../models/Appointment"
 import { useSchedulingHomeState } from "../../state/State"
 import { faDog, faHeadSideCough, faWheelchair } from "@fortawesome/free-solid-svg-icons"
+import moment from "moment"
 
 interface BookingFormProps {
     appointment: Appointment,
@@ -193,8 +194,8 @@ export function AdopterBookingForm(props: BookingFormProps) {
                 id="adopter"
                 value={adopter?.ID}
                 label="Adopter"
+                fullWidth
                 disabled={booking != null || session.adopterUser}
-                // placeholder="Select an adopter"
                 onChange={(e) => {
                     const newAdopter = adopterOptions.find(a => a.ID == e.target.value)
                     setAdopter(newAdopter)
@@ -429,17 +430,19 @@ export function AdopterBookingForm(props: BookingFormProps) {
     }
 
     return <ModalWithButton 
+        avoidOpen={moment().diff(appointment.instant, "hours") > 2}
         buttonClass={"grey-card-link"} 
+        buttonId={`edit-appt-${appointment.id}`}
         canSubmit={() => validate()}
-        height={"90%"}
-        extendOnSubmit={() => handleSubmit()}
+        disabled={store.currentlyRefreshingAdopters}
         extendOnClose={() => setDefaults()}
         extendOnOpen={() => handleOpen()}
+        extendOnSubmit={() => handleSubmit()}
+        height={"90%"}
         launchBtnLabel={launchBtnLabel}
-        buttonId={`edit-appt-${appointment.id}`}
+        onAvoidOpen={() => store.refresh(new Date(), [])}
         modalTitle="Book Appointment"
         tooltipText={getTooltip()}
-        disabled={store.currentlyRefreshingAdopters}
     >
         <div className="form-content">
             {AllFieldsOptionalMessage()}

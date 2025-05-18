@@ -1,4 +1,4 @@
-import { faPaw, faShieldDog, faShopLock, faSpinner } from "@fortawesome/free-solid-svg-icons"
+import { faPaw, faPencil, faShieldDog, faShopLock, faSpinner, faTrash, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import moment from "moment"
 import { useEffect, useState } from "react"
@@ -26,6 +26,7 @@ import { useSchedulingHomeState } from "./state/State"
 import { JumpToTimeslots } from "./components/alerts/JumpToTimeslots"
 import { AdopterFlagsAlert } from "./components/alerts/AdopterFlagsAlert"
 import { Collapsible } from "../../../../components/collapsible/Collapsible"
+import { Message } from "../../../../components/message/Message"
 
 export default function CalendarApp() {
     const store = useStore(useSchedulingHomeState)
@@ -135,8 +136,13 @@ export default function CalendarApp() {
             return <>
                 <PlaceholderText iconDef={faShieldDog} text={"Congrats on your adoption!"} />
                 <p>
-                    If you would like to start a new adoption, or need further assistance, email adoptions@savinggracenc.org.
+                    Calendar access is restricted after choosing a dog. Email adoptions@savinggracenc.org for futher assistance, including any of the following:
                 </p>
+                <ul>
+                    <li>My dog is pending, and I want to visit.</li>
+                    <li>I need to surrender my adopted or foster-to-adopt dog.</li>
+                    <li>I want to begin a new adoption.</li>
+                </ul>
             </>
         }
 
@@ -209,6 +215,7 @@ export default function CalendarApp() {
 
         return <>
             <AppointmentForm />
+            <UserInstructions />
             {store.timeslots.map((timeslot, index) => <Timeslot 
                 appointments={timeslot.appointments} 
                 mode={CalendarMode.SCHEDULING} 
@@ -270,11 +277,22 @@ export default function CalendarApp() {
         toolbarItems={toolbarItems()}  
     >
         <AlertsSection />
-        {/* <ul>
-            {alerts().map(a => <li>{a}</li>)}
-        </ul> */}
         {getContent()}
     </FullWidthPage>
+}
+
+function UserInstructions() {
+    const session = useStore(useSessionState)
+    const message = <>
+        Click the <FontAwesomeIcon icon={faWandMagicSparkles} /> magic wand icon to open the booking form.<br />
+        Fill the booking form out, providing as much information as you'd like, and press Accept to confirm.<br />
+        Click the <FontAwesomeIcon icon={faPencil} /> trash can icon to edit your appointment.<br />
+        Click the <FontAwesomeIcon icon={faTrash} /> trash can icon to delete your appointment.
+    </>
+
+    return <div>
+        <Message level={"Default"} showMessage={session.adopterUser} message={message} />
+    </div>
 }
 
 ////// DATA HOOKS //////

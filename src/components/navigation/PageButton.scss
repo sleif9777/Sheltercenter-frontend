@@ -15,7 +15,9 @@
     }
 }
 
-@media only screen and (pointer:none), (pointer:coarse) {
+@media only screen 
+and ((pointer:none) or (pointer:coarse))
+and (max-device-width: 1024px) {
     .page-button {
         border-bottom: none !important;
         display: inline;

@@ -40,7 +40,9 @@
     }
 }
 
-@media print, (pointer:none), (pointer:coarse) {
+@media print, only screen
+and ((pointer:none) or (pointer:coarse))
+and (max-device-width: 1024px){
     .full-width-page {
         left: 0%;
         width: 100%;
