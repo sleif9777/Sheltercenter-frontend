@@ -1,4 +1,4 @@
-import { faPaw, faPencil, faShieldDog, faShopLock, faSpinner, faTrash, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons"
+import { faPaw, faPencil, faQuestionCircle, faShieldDog, faShopLock, faSpinner, faTrash, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import moment from "moment"
 import { useEffect, useState } from "react"
@@ -26,7 +26,9 @@ import { useSchedulingHomeState } from "./state/State"
 import { JumpToTimeslots } from "./components/alerts/JumpToTimeslots"
 import { AdopterFlagsAlert } from "./components/alerts/AdopterFlagsAlert"
 import { Collapsible } from "../../../../components/collapsible/Collapsible"
-import { Message } from "../../../../components/message/Message"
+import { StandardCard } from "../../../../components/card/Card"
+import { CardColor } from "../../../../components/card/CardEnums"
+import { CardSectionBase } from "../../../../components/card/CardSectionBase"
 
 export default function CalendarApp() {
     const store = useStore(useSchedulingHomeState)
@@ -97,13 +99,14 @@ export default function CalendarApp() {
     const alerts = () => {
         switch (session.securityLevel) {
             case SecurityLevel.ADOPTER:
+                const adopterAlerts = [<UserInstructions />];
                 if (store.userCurrentAppointment) {
-                    return [<AppointmentCard 
+                    adopterAlerts.unshift(<AppointmentCard 
                         appointment={new Appointment(store.userCurrentAppointment)} 
                         context="Current Appointment"
-                    />]
+                    />)
                 }
-                return []
+                return adopterAlerts
             case SecurityLevel.GREETER:
                 return [
                     <JumpToTimeslots />
@@ -215,7 +218,6 @@ export default function CalendarApp() {
 
         return <>
             <AppointmentForm />
-            <UserInstructions />
             {store.timeslots.map((timeslot, index) => <Timeslot 
                 appointments={timeslot.appointments} 
                 mode={CalendarMode.SCHEDULING} 
@@ -244,31 +246,23 @@ export default function CalendarApp() {
     }
 
     function AlertsSection() {
-        if (!session.adopterUser) {
-            return <>
-                <Collapsible 
-                    items={alerts()} 
-                    buttonLabel="Show Alerts" 
-                    disableButton={
-                        store.currentlyRefreshingAppointments || 
-                        store.currentlyRefreshingAdoptions || 
-                        store.currentlyRefreshingAdopters
-                    }
-                    className="mobile-only"
-                />
-                <div className="desktop-only">
-                    <ul style={{ columnCount: 3 }}>
-                        {alerts().map(a => <li>{a}</li>)}
-                    </ul>
-                </div>
-            </>
-        } else {
-            return <div>
-                <ul>
+        return <>
+            <Collapsible 
+                items={alerts()} 
+                buttonLabel="Show Alerts" 
+                disableButton={
+                    store.currentlyRefreshingAppointments || 
+                    store.currentlyRefreshingAdoptions || 
+                    store.currentlyRefreshingAdopters
+                }
+                className="mobile-only"
+            />
+            <div className="desktop-only">
+                <ul style={{ columnCount: session.adopterUser ? 2 : 3 }}>
                     {alerts().map(a => <li>{a}</li>)}
                 </ul>
             </div>
-        }
+        </>
     }
     
     return <FullWidthPage 
@@ -281,18 +275,27 @@ export default function CalendarApp() {
     </FullWidthPage>
 }
 
-function UserInstructions() {
-    const session = useStore(useSessionState)
-    const message = <>
-        Click the <FontAwesomeIcon icon={faWandMagicSparkles} /> magic wand icon to open the booking form.<br />
-        Fill the booking form out, providing as much information as you'd like, and press Accept to confirm.<br />
-        Click the <FontAwesomeIcon icon={faPencil} /> trash can icon to edit your appointment.<br />
-        Click the <FontAwesomeIcon icon={faTrash} /> trash can icon to delete your appointment.
-    </>
-
-    return <div>
-        <Message level={"Default"} showMessage={session.adopterUser} message={message} />
-    </div>
+function UserInstructions(): JSX.Element {
+    return <StandardCard color={CardColor.PINK} description={"Help"} topIcon={faQuestionCircle}>
+        <CardSectionBase showBorder={false}>
+            <b style={{ fontSize: "large", textDecoration: "underline" }}>Using the Scheduler</b>
+            <ul>
+                <li>The scheduler works best on desktops and laptops.</li>
+                <li>Click the <FontAwesomeIcon icon={faWandMagicSparkles} /> magic wand icon to open the booking form.</li>
+                <li>Fill the booking form out and press Accept to confirm.</li>
+                <li>Click the <FontAwesomeIcon icon={faPencil} /> trash can icon to edit your appointment.</li>
+                <li>Click the <FontAwesomeIcon icon={faTrash} /> trash can icon to cancel your appointment.</li>
+            </ul>
+            <b style={{ fontSize: "large", textDecoration: "underline" }}>Appointment Types</b>
+            <ul>
+                <li><b>"Fun Size"</b> appointments are for specific <u>adult</u> dogs under 20 lbs living in foster homes (<a href="https://savinggracenc.org/adopt/meet-our-dogs/" target="_blank">noted on their profile</a>). These dogs are available to meet Fridays and Saturdays.</li>
+                <li><b>"Puppies"</b> appointments are for all available puppies (regardless of size).</li>
+                <li><b>"All Ages"</b> appointments are for all available puppies and adults above 20 pounds not listed as "by appointment only".</li>
+            </ul>
+            <b style={{ fontSize: "large", textDecoration: "underline" }}>Interested in a specific dog?</b>
+            <p>If interested in a specific dog, <a href="https://savinggracenc.org/adopt/meet-our-dogs/" target="_blank">check for an arrival date on their profile</a>. If listed, book as early as possible on their arrival date or after and mention that dog in the appointment notes. If no listed date, the dog is available to meet at any time.</p>
+        </CardSectionBase>
+    </StandardCard>
 }
 
 ////// DATA HOOKS //////

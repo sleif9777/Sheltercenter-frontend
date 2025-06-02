@@ -84,14 +84,14 @@ export function NavigationApp() {
             </a>
         </div>
         <div id="all-elements">
-            {CalendarButton()}
-            {WeeklyTemplateButton()}
-            {UploadAdoptersButton()}
-            {ManageAdoptersButton()}
-            {ChosenBoardButton()}
-            {InProgressAppointmentsButton()}
-            {PrivacyPolicyButton()}
-            {SignOutButton()}
+            <CalendarButton />
+            <WeeklyTemplateButton />
+            <UploadAdoptersButton />
+            <ManageAdoptersButton />
+            <ChosenBoardButton/>
+            <InProgressAppointmentsButton />
+            <PrivacyPolicyButton />
+            <SignOutButton />
         </div>
     </div>
 }
