@@ -11,7 +11,7 @@ import { AdopterForm } from "../../shared_components/AdopterForm";
 import { Message } from "../../../../components/message/Message";
 import { BookingHistory, BookingHistoryCard, DefaultBookingHistory } from "./components/BookingHistoryCard";
 
-interface AdopterDetailsAppContext {
+export interface AdopterDetailsAppContext {
     adopter: IAdopter,
     currentAppointment?: IAppointment,
     bookingHistory: BookingHistory

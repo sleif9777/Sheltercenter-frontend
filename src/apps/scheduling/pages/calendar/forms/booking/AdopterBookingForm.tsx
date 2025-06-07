@@ -18,6 +18,7 @@ import { Appointment } from "../../models/Appointment"
 import { useSchedulingHomeState } from "../../state/State"
 import { faDog, faHeadSideCough, faWheelchair } from "@fortawesome/free-solid-svg-icons"
 import moment from "moment"
+import { AdopterDetailsAppContext } from "../../../../../adopters/pages/detail/AdopterDetailsApp"
 
 interface BookingFormProps {
     appointment: Appointment,
@@ -196,10 +197,12 @@ export function AdopterBookingForm(props: BookingFormProps) {
                 label="Adopter"
                 fullWidth
                 disabled={booking != null || session.adopterUser}
-                onChange={(e) => {
-                    const newAdopter = adopterOptions.find(a => a.ID == e.target.value)
-                    setAdopter(newAdopter)
-                    setDefaults(newAdopter)
+                onChange={async (e) => {
+                    const newAdopterID = adopterOptions.find(a => a.ID == e.target.value)!.ID
+                    const response: AxiosResponse<AdopterDetailsAppContext> = await new AdopterAPI().GetAdopterDetail(newAdopterID)
+                    const newAdopterModel = response.data.adopter
+                    setAdopter(newAdopterModel)
+                    setDefaults(newAdopterModel)
                 }}
             >
                 {adopterOptions
