@@ -13,6 +13,9 @@ import { ITemplateAppointment, TemplateAppointment } from "../pages/template/mod
 
 import "../styles/Timeslot.scss"
 import { DateTime } from "../../../utils/DateTimeUtils"
+import PlaceholderText from "../../../layouts/PlaceholderText/PlaceholderText"
+import { faCalendarXmark } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 export interface TimeslotProps<T extends IAppointmentBase> extends ITimeslot<T> {
     mode: CalendarMode,
@@ -75,16 +78,16 @@ export function Timeslot(props: TimeslotProps<IAppointment | ITemplateAppointmen
         }
     }
 
-    if (!filterAppointmentsToShow() || filterAppointmentsToShow().length == 0) {
-        return <></>
+    var submessage: JSX.Element = <></>
+    if ((!filterAppointmentsToShow() || filterAppointmentsToShow().length == 0) && session.adopterUser) {
+        submessage = <span>&mdash; <FontAwesomeIcon icon={faCalendarXmark} /> FULLY BOOKED</span>
     }
 
     return <div className="timeslot" id={index ? `timeslot-${index}`: ""}>
         <table>
             <tr>
                 <td className="description">
-                    {label}
-                    {/* {moment(instant).tz("America/New_York").format("h:mm A")} */}
+                    {label} {submessage}
                 </td>
                 <td className="timeslot-actions">
                     {/* TODO: Add form, lock/unlock buttons */}

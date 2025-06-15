@@ -537,8 +537,9 @@ export function AdopterBookingForm(props: BookingFormProps) {
 
                                         if (maxWeightPreference != undefined && 
                                             maxWeightPreference <= 20 && 
-                                            appointment.type != AppointmentType.FUN_SIZE) {
-                                            setWeightPrefMessage("Dogs under 20 lbs. require a fun-size appointment (usually Fridays and Saturdays)")
+                                            appointment.type != AppointmentType.FUN_SIZE &&
+                                            moment(appointment.instant).weekday() < 5) {
+                                            setWeightPrefMessage("Dogs under 20 lbs. should be booked as a fun-size appointment (usually Fridays and Saturdays)")
                                         } else {
                                             setWeightPrefMessage("")
                                         }

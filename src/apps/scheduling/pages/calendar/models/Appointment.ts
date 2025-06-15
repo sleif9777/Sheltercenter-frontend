@@ -204,7 +204,7 @@ export class Appointment extends AppointmentBase implements IAppointment {
                 data.push({ label: "From Adoptions", content: booking.adopter.internalNotes })
             }
 
-            data.push({ label: "From Shelterluv", content: booking.adopter.applicationComments })
+            data.push({ label: `From ${sec == SecurityLevel.ADOPTER ? "My Application" : "ShelterLuv"}`, content: booking.adopter.applicationComments })
             data.push({ label: `From ${booking.adopter.firstName}`, content: booking.adopter.adopterNotes })
         }
 
