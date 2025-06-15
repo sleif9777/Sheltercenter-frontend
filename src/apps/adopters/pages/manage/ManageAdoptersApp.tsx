@@ -66,8 +66,8 @@ export default function ManagerAdoptersApp() {
         </div>
         <div>
             <i>
-                Only adopters with an active application are searchable.<br />
-                Contact Sam if you need to access inactive adopters (over one year ago or before 7/1/2024).
+                Only adopters with an active application and some activity within 90 days (an upload, booking, or login) are searchable.<br />
+                Contact Sam if you need to access inactive adopters (approved over one year ago or before 7/1/2024; or without an upload, login, or booking in the past 90 days).
             </i>
         </div>
         <div className="adopter-list">
