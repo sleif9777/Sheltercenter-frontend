@@ -13,7 +13,6 @@ import { ITemplateAppointment, TemplateAppointment } from "../pages/template/mod
 
 import "../styles/Timeslot.scss"
 import { DateTime } from "../../../utils/DateTimeUtils"
-import PlaceholderText from "../../../layouts/PlaceholderText/PlaceholderText"
 import { faCalendarXmark } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
