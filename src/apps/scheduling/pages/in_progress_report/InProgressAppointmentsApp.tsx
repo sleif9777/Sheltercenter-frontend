@@ -51,7 +51,7 @@ export default function InProgressAppointmentsApp() {
             {appointments.map(a => {
                 return <tr>
                     <td>{moment(a.instant).format("h:mm A")}</td>
-                    <td>{a.getCurrentBooking()!.adopter.firstName}</td>
+                    <td>{a.getCurrentBooking()!.adopter.getFullName()}</td>
                     <td>
                         {moment(a.checkInTime).format("h:mm A")}<br />
                         <span className="small-detail">{calcAppointmentDuration(a)}</span>
