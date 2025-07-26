@@ -4,6 +4,10 @@ import moment from "moment"
 import { useEffect, useState } from "react"
 import { useStore } from "zustand"
 
+import { StandardCard } from "../../../../components/card/Card"
+import { CardColor } from "../../../../components/card/CardEnums"
+import { CardSectionBase } from "../../../../components/card/CardSectionBase"
+import { Collapsible } from "../../../../components/collapsible/Collapsible"
 import { DateField } from "../../../../components/forms/fields/DateField"
 import { AreYouSure } from "../../../../components/modals/AreYouSure"
 import FullWidthPage from "../../../../layouts/FullWidthPage/FullWidthPage"
@@ -16,19 +20,15 @@ import { fullyBookedDay, Timeslot } from "../../components/Timeslot"
 import { CalendarMode, Weekday } from "../../enums/Enums"
 import { AppointmentsAPI } from "./api/AppointmentsAPI"
 import { ClosedDatesAPI } from "./api/ClosedDatesAPI"
+import { AdopterFlagsAlert } from "./components/alerts/AdopterFlagsAlert"
 import { EmptyDatesAlert } from "./components/alerts/EmptyDatesAlert"
+import { JumpToTimeslots } from "./components/alerts/JumpToTimeslots"
 import { MissingOutcomesAlert } from "./components/alerts/MissingOutcomesAlert"
 import { AppointmentCard } from "./components/card/AppointmentCard"
 import { SchedulingHomeTitle } from "./components/SchedulingHomeTitle"
 import { AppointmentForm } from "./forms/appointment/AppointmentForm"
 import { Appointment } from "./models/Appointment"
 import { useSchedulingHomeState } from "./state/State"
-import { JumpToTimeslots } from "./components/alerts/JumpToTimeslots"
-import { AdopterFlagsAlert } from "./components/alerts/AdopterFlagsAlert"
-import { Collapsible } from "../../../../components/collapsible/Collapsible"
-import { StandardCard } from "../../../../components/card/Card"
-import { CardColor } from "../../../../components/card/CardEnums"
-import { CardSectionBase } from "../../../../components/card/CardSectionBase"
 
 export default function CalendarApp() {
     const store = useStore(useSchedulingHomeState)
@@ -143,6 +143,7 @@ export default function CalendarApp() {
                 </p>
                 <ul>
                     <li>My dog is pending, and I want to visit.</li>
+                    <li>My dog is ready to go home, and I need arrange up a pickup time.</li>
                     <li>I need to surrender my adopted or foster-to-adopt dog.</li>
                     <li>I want to begin a new adoption.</li>
                 </ul>

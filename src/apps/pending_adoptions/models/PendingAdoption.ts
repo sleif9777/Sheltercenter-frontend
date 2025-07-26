@@ -1,8 +1,9 @@
 import { AxiosResponse } from "axios";
+import moment from "moment";
+
 import { Adopter, IAdopter } from "../../adopters/models/Adopter";
 import { Appointment, IAppointment } from "../../scheduling/pages/calendar/models/Appointment";
 import { PendingAdoptionsAPI } from "../api/API";
-import moment from "moment";
 import { PendingAdoptionCircumstance, PendingAdoptionStatus } from "../enums/Enums";
 
 export interface IPendingAdoptionUpdate {
@@ -113,5 +114,4 @@ export class PendingAdoption {
     getLatestUpdate() {
         return this.getSortedUpdates()[0]
     }
-
 }

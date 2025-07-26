@@ -1,15 +1,15 @@
+import { faCheck } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { TextareaAutosize } from "@mui/material"
 import { useState } from "react"
+import { useStore } from "zustand"
 
 import ButtonGroup from "../../components/forms/fields/ButtonGroup"
+import { Message } from "../../components/message/Message"
 import ModalWithButton, { ModalWithButtonProps } from "../../components/modals/ModalWithButton"
+import { useSessionState } from "../../session/SessionState"
 import { IAdopter } from "../adopters/models/Adopter"
 import { IQuickText } from "./QuickText"
-import { useStore } from "zustand"
-import { useSessionState } from "../../session/SessionState"
-import { Message } from "../../components/message/Message"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCheck } from "@fortawesome/free-solid-svg-icons"
 
 interface MessagingModalProps extends Omit<ModalWithButtonProps, "extendOnSubmit" | "height"> {
     recipient: IAdopter,
@@ -81,6 +81,8 @@ export function MessagingModal(props: MessagingModalProps) {
                         </ul>
                     </div>}
                 </td>
+            </tr>
+            <tr>
                 <td>
                     <div className="form-content">
                         <label htmlFor="message-body">Message</label>

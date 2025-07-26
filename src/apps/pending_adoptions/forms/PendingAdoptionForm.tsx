@@ -1,5 +1,6 @@
 import { InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import { useState } from "react";
+import { useStore } from "zustand";
 
 import ButtonGroup from "../../../components/forms/fields/ButtonGroup";
 import ModalWithButton from "../../../components/modals/ModalWithButton";
@@ -7,7 +8,6 @@ import { IAdopterBase } from "../../adopters/models/Adopter";
 import { PendingAdoptionsAPI } from "../api/API";
 import { PendingAdoptionCircumstance } from "../enums/Enums";
 import { IPendingAdoption } from "../models/PendingAdoption";
-import { useStore } from "zustand";
 import { useChosenBoardState } from "../state/State";
 
 interface PendingAdoptionFormProps {
@@ -60,7 +60,7 @@ export function PendingAdoptionForm(props: PendingAdoptionFormProps) {
 
     return <ModalWithButton 
         height={"50%"}
-        buttonClass={"submit-button"} 
+        buttonClass={"submit-button desktop-only"} 
         canSubmit={() => validate()}
         extendOnSubmit={() => handleSubmit()}
         extendOnClose={() => setDefaults()}

@@ -1,21 +1,22 @@
-import { useEffect } from "react";
-import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage";
-import { IPendingAdoption, PendingAdoption } from "./models/PendingAdoption";
-import { ChosenBoardActions } from "./components/ChosenBoardActions";
-import { useStore } from "zustand";
-import { useChosenBoardState } from "./state/State";
-import { PendingAdoptionForm } from "./forms/PendingAdoptionForm";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
+import { useEffect } from "react";
+import { useStore } from "zustand";
+
+import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage";
+import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText";
 import { MessagingModal } from "../messaging/MessagingModal";
 import { PendingAdoptionsAPI } from "./api/API";
+import { ChosenBoardActions } from "./components/ChosenBoardActions";
+import { PendingAdoptionStatus } from "./enums/Enums";
+import { ChangeDogForm } from "./forms/ChangeDogForm";
+import { PendingAdoptionForm } from "./forms/PendingAdoptionForm";
+import { IPendingAdoption, PendingAdoption } from "./models/PendingAdoption";
 import { ChosenBoardUpdateQuickTexts } from "./QuickTexts";
+import { useChosenBoardState } from "./state/State";
 
 import "../scheduling/pages/print_view/ReportingPage.scss"
 import "./ChosenBoardApp.scss"
-import { PendingAdoptionStatus } from "./enums/Enums";
-import { ChangeDogForm } from "./forms/ChangeDogForm";
-import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 export function ChosenBoardApp() {
     const store = useStore(useChosenBoardState)
@@ -23,6 +24,62 @@ export function ChosenBoardApp() {
     useEffect(() => {
         store.refresh()
     }, [])
+
+    function getSourceAppointmentOrCircumstanceDetails(adoption: PendingAdoption) {
+        return adoption.sourceAppointment 
+            ? <>
+                {moment(adoption.sourceAppointment.instant).format("MMMM D, YYYY")}<br />
+                {moment(adoption.sourceAppointment.instant).format("h:mm A")}
+            </>
+            : <>
+                {adoption.getCircumstance()}<br />
+                {moment(adoption.created).format("MMMM D, YYYY h:mm A")}<br />
+            </>
+    }
+
+    function MobileRowGroup(adoptions: IPendingAdoption[]) {
+        if (adoptions.length == 0) { return; }
+        const adoptionObjs = adoptions.map(a => new PendingAdoption(a))
+        adoptionObjs.sort((a, b) => a.dog.localeCompare(b.dog))
+
+        return <>
+            <tr 
+                className="group-subheader no-border" 
+            >
+                <td colSpan={1}>
+                    {adoptionObjs[0].getStatus(true)}
+                </td>
+            </tr>
+            {adoptionObjs.map(a => {
+                return <tr>
+                    <td>
+                        <div className="dog-name">{a.dog.toLocaleUpperCase()}</div>
+                        <div className="small-detail">{a.adopter.fullName.toLocaleUpperCase()}</div>
+                        <div className="small-detail">
+                            {a.sourceAppointment
+                                ? <>
+                                    {moment(a.sourceAppointment.instant).format("MMMM D, YYYY")} - {moment(a.sourceAppointment.instant).format("h:mm A")}
+                                </>
+                                : <>
+                                    {a.getCircumstance()} - {moment(a.created).format("MMMM D, YYYY h:mm A")}<br />
+                                </>}
+                        </div>
+                        <div className="small-detail">
+                            Status: {a.getStatus()}
+                            {a.readyToRollInstant && !a.paperworkAppointment
+                                ? <><br />{moment(a.readyToRollInstant).format("MMMM D, YYYY h:mm A")}</>
+                                : null}
+                            {a.paperworkAppointment 
+                                ? <><br />{moment(a.paperworkAppointment.instant).format("MMMM D, YYYY h:mm A")}</>
+                                : null}
+                        </div>
+                        <div className="small-detail">Last Update: {moment(a.getLatestUpdate()?.instant).format("MMM D, h:mm A")}</div>
+                        <ChosenBoardActions adoption={a} />
+                    </td>
+                </tr>
+            })}
+        </>
+    }
 
     function RowGroup(adoptions: IPendingAdoption[]) {
         const adoptionObjs = adoptions.map(a => new PendingAdoption(a))
@@ -107,20 +164,27 @@ export function ChosenBoardApp() {
     
     if (store.adoptions) {
         return <FullWidthPage title={"Chosen Board"}>
-            <PendingAdoptionForm extendOnSubmit={() => store.refresh()} /><br />
-            <i>Schedule paperwork appointments directly in the calendar.</i>
-            <table className="report">
-                <tr className="no-border">
-                    <th>Original Appointment</th>
-                    <th>Adoption</th>
-                    <th>Status</th>
-                    <th>Updates</th>
-                    <th>Actions</th>
-                </tr>
-                {Object.values(PendingAdoptionStatus).reverse().map(status => {
-                    return RowGroup(store.adoptions.filter(a => a.status == status))
-                })}
-            </table>
+                <table className="report mobile-only">
+                    {Object.values(PendingAdoptionStatus).reverse().map(status => {
+                        return MobileRowGroup(store.adoptions.filter(a => a.status == status))
+                    })}
+                </table>
+            <div className="desktop-only">
+                <PendingAdoptionForm extendOnSubmit={() => store.refresh()} /><br />
+                <i>Schedule paperwork appointments directly in the calendar.</i>
+                <table className="report">
+                    <tr className="no-border">
+                        <th>Original Appointment</th>
+                        <th>Adoption</th>
+                        <th>Status</th>
+                        <th>Updates</th>
+                        <th>Actions</th>
+                    </tr>
+                    {Object.values(PendingAdoptionStatus).reverse().map(status => {
+                        return RowGroup(store.adoptions.filter(a => a.status == status))
+                    })}
+                </table>
+            </div>
             {store.refreshingAdoptions ? <PlaceholderText iconDef={faSpinner} text={"Loading adoptions..."} /> : <></>}
         </FullWidthPage>
     }   
