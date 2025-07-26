@@ -47,6 +47,7 @@ export function NavigationApp() {
             return <PageButton 
                 caption="Chosen Board"
                 route="/chosen_board/"
+                mobileSupported
             />
         }
     }

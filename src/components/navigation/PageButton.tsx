@@ -24,7 +24,7 @@ export default function PageButton(props: PageButtonProps) {
             }}
             target={target}
         >
-            {caption}
+            <span className="button-text">{caption}</span>
         </a>
     </div>
 }
