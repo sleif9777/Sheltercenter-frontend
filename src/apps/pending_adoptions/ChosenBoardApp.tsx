@@ -25,18 +25,6 @@ export function ChosenBoardApp() {
         store.refresh()
     }, [])
 
-    function getSourceAppointmentOrCircumstanceDetails(adoption: PendingAdoption) {
-        return adoption.sourceAppointment 
-            ? <>
-                {moment(adoption.sourceAppointment.instant).format("MMMM D, YYYY")}<br />
-                {moment(adoption.sourceAppointment.instant).format("h:mm A")}
-            </>
-            : <>
-                {adoption.getCircumstance()}<br />
-                {moment(adoption.created).format("MMMM D, YYYY h:mm A")}<br />
-            </>
-    }
-
     function MobileRowGroup(adoptions: IPendingAdoption[]) {
         if (adoptions.length == 0) { return; }
         const adoptionObjs = adoptions.map(a => new PendingAdoption(a))
