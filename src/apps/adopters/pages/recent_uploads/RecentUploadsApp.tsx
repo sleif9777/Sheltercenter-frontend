@@ -1,11 +1,9 @@
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons"
-import moment from "moment"
 import { useCallback, useEffect, useState } from "react"
 import { isRouteErrorResponse } from "react-router-dom"
 
 import ReportTable, { ColumnDef, ColumnFormatCallback, ReportActionIconButton, Row, Value } from "../../../../components/report/Report"
 import FullWidthPage from "../../../../layouts/FullWidthPage/FullWidthPage"
-import { DateTimeStrings } from "../../../../utils/DateAndTimeStrings"
 import { DateTime } from "../../../../utils/DateTimeUtils"
 import { AdopterAPI } from "../../api/API"
 import { AdopterApprovalStatusDisplay } from "../../enums/AdopterEnums"
