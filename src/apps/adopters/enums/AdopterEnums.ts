@@ -4,6 +4,12 @@ export enum AdopterApprovalStatus {
     DENIED,
 }
 
+export const AdopterApprovalStatusDisplay: Record<AdopterApprovalStatus, string> = {
+    [AdopterApprovalStatus.APPROVED]: "Approved",
+    [AdopterApprovalStatus.PENDING]: "Pending",
+    [AdopterApprovalStatus.DENIED]: "Denied"
+}
+
 export enum HousingOwnership {
     OWN,
     RENT,

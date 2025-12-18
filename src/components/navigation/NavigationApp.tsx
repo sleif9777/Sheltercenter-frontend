@@ -1,8 +1,10 @@
-import PageButton from "./PageButton";
-import Logo from "../../assets/logo.png"
-import "./NavigationApp.scss"
 import { useStore } from "zustand";
+
+import Logo from "../../assets/logo.png"
 import { useSessionState } from "../../session/SessionState";
+import PageButton from "./PageButton";
+
+import "./NavigationApp.scss"
 
 export function NavigationApp() {
     const session = useStore(useSessionState)
@@ -69,6 +71,15 @@ export function NavigationApp() {
         />
     }
 
+    function RecentUploadsButton() {
+        if (session.adminUser) {
+            return <PageButton
+                caption="Recent Uploads"
+                route="/recent_uploads/"
+            />
+        }
+    }
+
     function SignOutButton() {
         return <PageButton
             isLast
@@ -92,6 +103,7 @@ export function NavigationApp() {
             <ChosenBoardButton/>
             <InProgressAppointmentsButton />
             <PrivacyPolicyButton />
+            <RecentUploadsButton />
             <SignOutButton />
         </div>
     </div>
