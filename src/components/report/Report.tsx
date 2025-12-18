@@ -1,11 +1,13 @@
-import moment from "moment"
-import { useEffect } from "react"
-import { useParams } from "react-router-dom"
-import { useStore } from "zustand"
+import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Tooltip } from "react-tooltip";
+import { ButtonProps } from "rsuite";
+
+import { AreYouSure } from "../modals/AreYouSure";
 
 import "./Report.scss"
 
-export  function InProgressAppointmentsApp() {
+export function InProgressAppointmentsApp() {
 	// const { date } = useParams()
 	// const viewDate = (date == ":date") ? moment(new Date()) : moment(date)
 
@@ -56,18 +58,19 @@ export  function InProgressAppointmentsApp() {
 	// </table>
 }
 
-type Value = string | null
+export type Value = string | null
 
-type Row = Record<string, Value>
+export type Row = Record<string, Value>
 
-type ColumnDef = {
+export type ColumnDef = {
 	key: string
 	header: string
-	aggregate?: "sum" | "avg"
-	format?: (value: Value) => React.ReactNode
+	renderFn?: ColumnFormatCallback
 }
 
-type ReportTableProps = {
+export type ColumnFormatCallback = (value?: Value) => JSX.Element
+
+export type ReportTableProps = {
 	columns: ColumnDef[]
 	rows: Row[]
 }
@@ -85,15 +88,59 @@ export default function ReportTable({ columns, rows }: ReportTableProps) {
 		<tbody>
 			{rows.map((row, i) =>
 				<tr key={i}>
-					{columns.map(col =>
+					{columns.map(col => <>
 						<td key={col.key}>
-							{col.format
-								? col.format(row[col.key])
+							{col.renderFn
+								? col.renderFn(row[col.key])
 								: row[col.key] ?? ""}
 						</td>
+					</>
 					)}
 				</tr>
 			)}
 		</tbody>
 	</table>
+}
+
+interface ReportActionIconButtonProps extends ButtonProps {
+	actionName: string,
+	areYouSureOptions?: {
+		modalTitle: string,
+		youWantTo: string
+	},
+	elementID?: string,
+	icon: IconDefinition,
+	tooltipContent: string,
+}
+
+export function ReportActionIconButton(props: ReportActionIconButtonProps) {
+	const { actionName, areYouSureOptions, elementID, icon, onClick, tooltipContent } = props
+
+	if (areYouSureOptions) {
+		return <AreYouSure
+			youWantTo={areYouSureOptions.youWantTo}
+			buttonClass="report-action"
+			buttonId={actionName + "^" + elementID}
+			launchBtnLabel={<FontAwesomeIcon icon={icon} />}
+			modalTitle={areYouSureOptions.modalTitle}
+			tooltipText={tooltipContent}
+		/>
+	}
+
+	return <>
+		<button
+			className="chosen-board-action"
+			data-tooltip-id={elementID + "-ttp"}
+			id={elementID}
+			onClick={onClick}
+		>
+			<FontAwesomeIcon icon={icon} />
+		</button>
+		{tooltipContent && elementID && <Tooltip
+			anchorSelect={"#" + elementID}
+			id={elementID + "-ttp"}
+			content={tooltipContent}
+			place="bottom-start"
+		/>}
+	</>
 }

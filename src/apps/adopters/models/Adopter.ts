@@ -1,4 +1,5 @@
 import moment from "moment-timezone"
+
 import { DateTime } from "../../../utils/DateTimeUtils"
 import { ActivityLevel, AdopterApprovalStatus, AgePreference, GenderPreference, HousingOwnership, HousingType } from "../enums/AdopterEnums"
 
@@ -13,6 +14,7 @@ export interface IAdopterBase {
     disambiguatedName: string,
 
     status: AdopterApprovalStatus,
+    uploadDate: string,
 }
 
 export interface IAdopter extends IAdopterBase {
@@ -69,6 +71,7 @@ export class Adopter implements IAdopter {
     state?: string
     phoneNumber?: string
     status: number
+    uploadDate: string
     userID: number
     
     shelterluvAppID?: string
@@ -111,6 +114,7 @@ export class Adopter implements IAdopter {
         this.state = dto.state
         this.phoneNumber = dto.phoneNumber
         this.status = dto.status
+        this.uploadDate = dto.uploadDate
         this.userID = dto.userID
 
         this.shelterluvAppID = dto.shelterluvAppID

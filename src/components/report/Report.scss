@@ -32,6 +32,18 @@ table.report {
             border-bottom: 1px solid var(--teal);
         }
     }
+
+    button.report-action {
+        color: var(--pink);
+    
+        &:not(.retain-size) {
+            font-size: x-large;
+        }
+        
+        &:hover {
+            color: var(--teal);
+        }
+    }
 }
 
 @media print {
