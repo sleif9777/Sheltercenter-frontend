@@ -2,6 +2,7 @@ import { Route } from "react-router-dom";
 
 import AdopterDetailsApp from "../../apps/adopters/pages/detail/AdopterDetailsApp";
 import ManagerAdoptersApp from "../../apps/adopters/pages/manage/ManageAdoptersApp";
+import RecentUploadsApp from "../../apps/adopters/pages/recent_uploads/RecentUploadsApp";
 import { UploadAdoptersApp } from "../../apps/adopters/pages/upload/UploadAdoptersApp";
 import { ChosenBoardApp } from "../../apps/pending_adoptions/ChosenBoardApp";
 import { PrivacyPolicyApp } from "../../apps/privacy/PrivacyPolicyApp";
@@ -24,23 +25,23 @@ export const AllRoutes = <>
         element={<WeeklyTemplateApp />}
         path="/calendar_template/"
     />
-    <Route 
+    <Route
         element={<PrintViewApp />}
         path="/print_view/:date/"
     />
-    <Route 
+    <Route
         element={<DailyReportApp />}
         path="/daily_report/:date/"
     />
-    <Route 
+    <Route
         element={<UploadAdoptersApp />}
         path="/adopters/upload/"
     />
-    <Route 
+    <Route
         element={<ManagerAdoptersApp />}
         path="/adopters/manage/"
     />
-    <Route 
+    <Route
         element={<AdopterDetailsApp />}
         path="/adopters/manage/:id"
     />
@@ -48,11 +49,15 @@ export const AllRoutes = <>
         element={<ChosenBoardApp />}
         path="/chosen_board/"
     />
-    <Route 
+    <Route
         element={<InProgressAppointmentsApp />}
         path="/in_progress/"
     />
-    <Route 
+    <Route
+        element={<RecentUploadsApp />}
+        path="/recent_uploads/"
+    />
+    <Route
         element={<PrivacyPolicyApp />}
         path="/privacy/"
     />
