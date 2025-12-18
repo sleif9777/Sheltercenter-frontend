@@ -14,7 +14,7 @@ export interface IAdopterBase {
     disambiguatedName: string,
 
     status: AdopterApprovalStatus,
-    uploadDate: string,
+    lastUploaded: string,
 }
 
 export interface IAdopter extends IAdopterBase {
@@ -71,7 +71,7 @@ export class Adopter implements IAdopter {
     state?: string
     phoneNumber?: string
     status: number
-    uploadDate: string
+    lastUploaded: string
     userID: number
     
     shelterluvAppID?: string
@@ -114,7 +114,7 @@ export class Adopter implements IAdopter {
         this.state = dto.state
         this.phoneNumber = dto.phoneNumber
         this.status = dto.status
-        this.uploadDate = dto.uploadDate
+        this.lastUploaded = dto.lastUploaded
         this.userID = dto.userID
 
         this.shelterluvAppID = dto.shelterluvAppID

@@ -76,9 +76,9 @@ export type ReportTableProps = {
 }
 
 export default function ReportTable({ columns, rows }: ReportTableProps) {
-	return <table>
+	return <table className="report">
 		<thead>
-			<tr>
+			<tr className="no-border">
 				{columns.map(col =>
 					<th key={col.key}>{col.header}</th>
 				)}

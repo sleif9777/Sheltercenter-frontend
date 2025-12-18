@@ -1,14 +1,15 @@
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons"
+import moment from "moment"
 import { useCallback, useEffect, useState } from "react"
 import { isRouteErrorResponse } from "react-router-dom"
 
 import ReportTable, { ColumnDef, ColumnFormatCallback, ReportActionIconButton, Row, Value } from "../../../../components/report/Report"
 import FullWidthPage from "../../../../layouts/FullWidthPage/FullWidthPage"
+import { DateTimeStrings } from "../../../../utils/DateAndTimeStrings"
+import { DateTime } from "../../../../utils/DateTimeUtils"
 import { AdopterAPI } from "../../api/API"
 import { AdopterApprovalStatusDisplay } from "../../enums/AdopterEnums"
 import { IAdopterBase } from "../../models/Adopter"
-
-import "../print_view/ReportingPage.scss"
 
 export default function RecentUploadsApp() {
 	const [emailedIDs, setEmailedIDs] = useState<string[]>([])
@@ -18,23 +19,24 @@ export default function RecentUploadsApp() {
 		{ key: "email", header: "Email" },
 		{ key: "status", header: "Status" },
 		{ key: "uploadDate", header: "Last Uploaded" },
-		{ key: "actions", header: "", renderFn: () => getResendEmailButton() }
+		{ key: "actionID", header: "", renderFn: v => getResendEmailButton(v) }
 	]
 
 	const getNameLink: ColumnFormatCallback = useCallback((v?: Value) => {
 		const [adopterName, adopterID] = (v?.toString() || "Unknown Adopter").split("^")
 
-		return <a href={adopterID}>{adopterName}</a>
+		return <a href={"/adopters/manage/" + adopterID}>{adopterName}</a>
 	}, [])
 
-	const getResendEmailButton: ColumnFormatCallback = useCallback((adopterID?: Value) => {
-		if (!adopterID) return <></>
+	const getResendEmailButton: ColumnFormatCallback = useCallback((v?: Value) => {
+		if (!v) return <>{v}</>
 
 		return <ReportActionIconButton
 			actionName="resendEmail"
-			disabled={emailedIDs.includes(adopterID)}
+			disabled={emailedIDs.includes(v)}
+			elementID={"resend-to-" + v}
 			icon={faEnvelope}
-			onClick={() => handleResendEmailClick(adopterID)}
+			onClick={() => handleResendEmailClick(v)}
 			tooltipContent="Resend Email"
 		/>
 	}, [])
@@ -68,7 +70,7 @@ function constructRows(adopters: IAdopterBase[]): Row[] {
 			name: a.fullName + "^" + a.ID,
 			email: a.primaryEmail,
 			status: AdopterApprovalStatusDisplay[a.status],
-			uploadDate: a.uploadDate,
+			uploadDate: new DateTime(new Date(a.lastUploaded)).Format("M/D/YYYY h:mm A"),
 			actionID: a.ID.toString()
 		}
 	})
