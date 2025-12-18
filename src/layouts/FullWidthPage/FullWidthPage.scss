@@ -1,0 +1,52 @@
+.full-width-page {
+    overflow: auto;
+    position: absolute;
+    left: 15%;
+    top: 0;
+    width: 85%;
+    z-index: 9;
+
+    .title {
+        padding: 10px 0 0 0;
+
+        h1 {
+            margin: auto;
+            user-select: none;
+        }
+
+        h2 {
+            margin: 0;
+            text-transform: uppercase;
+        }
+    }
+
+    .content {
+        margin: auto;
+        margin-bottom: 50px;
+        padding: 10px;
+        width: 90%;
+    }
+
+    .toolbar {
+        a, h1 {
+            margin: 0 10px;
+
+            &:hover {
+                cursor: pointer;
+                color: var(--dark-gray);
+                text-decoration: none;
+            }
+        }
+    }
+}
+
+@media print, only screen
+and ((pointer:none) or (pointer:coarse))
+and (max-device-width: 1024px){
+    .full-width-page {
+        left: 0%;
+        width: 100%;
+        // top: auto;
+        top: 100px;
+    }
+}

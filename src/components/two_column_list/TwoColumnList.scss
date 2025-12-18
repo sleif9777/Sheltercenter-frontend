@@ -1,0 +1,27 @@
+.two-col-list {
+    margin: 0;
+    padding-inline-start: 0;
+    width: fit-content;
+
+    td {
+        width: 50%;
+    }
+
+    ul {
+        width: 100%;
+
+        &.left {
+            text-align: left;
+        }
+        
+        &.right {
+            text-align: right;
+        }
+    }
+
+    li {
+        &.crossout {
+            text-decoration: line-through;
+        }
+    }
+}

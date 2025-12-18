@@ -1,0 +1,21 @@
+.container {
+    text-align: left;
+
+    h2 {
+        color: var(--pink);
+        font-size: x-large;
+    }
+
+    .m10 {
+        margin: 10px 0;
+    }
+
+    p, ul, .m10 {
+        margin: 10px 0;
+    }
+
+    li:not(.no-bullet) {
+        list-style-type: circle !important;
+        margin-left: 20px;
+    }
+}

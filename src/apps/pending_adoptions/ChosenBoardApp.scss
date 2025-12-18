@@ -1,0 +1,25 @@
+.overdue {
+    color: var(--medium-red);
+}
+
+.chosen-board-action {
+    color: var(--pink);
+
+    &:not(.retain-size) {
+        font-size: x-large;
+    }
+    
+    &:hover {
+        color: var(--teal);
+    }
+}
+
+.dog-name {
+    font-size: medium;
+    font-weight: bolder;
+    text-decoration: underline;
+}
+
+.adopter-name {
+    font-style: italic;
+}

@@ -1,0 +1,16 @@
+a.switch-date-button {
+    color: black !important;
+
+    :hover {
+        cursor: pointer;
+        color:var(--pink);
+    }
+
+    &.left {
+        padding-right: 20px;
+    }
+
+    &.right {
+        padding-left: 20px;
+    }
+}

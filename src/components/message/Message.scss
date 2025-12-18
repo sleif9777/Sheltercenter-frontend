@@ -1,0 +1,37 @@
+.message {
+    border: 2px solid;
+    font-weight: 600;
+    margin: 5px auto;
+    padding: 3px 10px;
+    width: fit-content;
+
+    &.inline-error {
+        border: none;
+        color: var(--maroon);
+        padding: none;
+    }
+
+    &.error {
+        background-color: var(--light-red);
+        border-color: var(--maroon);
+        color: var(--maroon);
+    }
+
+    &.success {
+        background-color: var(--light-green);
+        border-color: var(--green);
+        color: var(--green);
+    }
+
+    &.warning {
+        background-color: var(--light-yellow);
+        border-color: var(--yellow);
+        color: var(--yellow);
+    }
+
+    &.default {
+        background-color: var(--light-gray);
+        border-color: var(--dark-gray);
+        color: var(--dark-gray);
+    }
+}
