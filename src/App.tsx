@@ -18,25 +18,26 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 function App() {
-  const session = useStore(useSessionState)
-  const sessionExpired: boolean = session.sessionExpires != undefined && moment().isAfter(moment(session.sessionExpires))
+	const session = useStore(useSessionState)
+	const sessionExpired: boolean = session.sessionExpires != undefined && moment().isAfter(moment(session.sessionExpires))
 
-  if (session.userID && sessionExpired) {
-    session.logOut(session.userID)
-  }
+	if (session.userID && sessionExpired) {
+		session.logOut(session.userID)
+		return <LoginApp />
+	}
 
-  if (!session.isAuthenticated || !session.sessionExpires) {
-    return <LoginApp />
-  }
+	if (!session.isAuthenticated || !session.sessionExpires) {
+		return <LoginApp />
+	}
 
-  return <BrowserRouter>
-    <NavigationApp />
-    <div id="content">
-      <Routes>
-        {AllRoutes}
-      </Routes>
-    </div>
-  </BrowserRouter>
+	return <BrowserRouter>
+		<NavigationApp />
+		<div id="content">
+			<Routes>
+				{AllRoutes}
+			</Routes>
+		</div>
+	</BrowserRouter>
 }
 
 export default App

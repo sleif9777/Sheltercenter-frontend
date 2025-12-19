@@ -15,11 +15,11 @@ import { WeeklyTemplateApp } from "../../apps/scheduling/pages/template/WeeklyTe
 export const AllRoutes = <>
     <Route
         element={<CalendarApp />}
-        path=""
+        index
     />
     <Route
         element={<CalendarApp />}
-        path="/calendar/"
+        path="/calendar"
     />
     <Route
         element={<WeeklyTemplateApp />}

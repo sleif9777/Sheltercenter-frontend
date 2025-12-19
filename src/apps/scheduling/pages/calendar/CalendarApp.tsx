@@ -50,8 +50,6 @@ export default function CalendarApp() {
         store.refresh(store.viewDate, dataToLoad, session.userID!)
     }, [])
 
-    if (session.userID == undefined) { return <></> }
-
     function CopyFromTemplateButton() {
         return <button 
             className="large-button" 
