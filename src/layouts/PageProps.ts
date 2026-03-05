@@ -1,4 +1,6 @@
+import { ReactNode } from "react"
+
 export interface PageProps {
-    title?: string | JSX.Element,
-    subtitle?: string
+	title?: ReactNode
+	subtitle?: string
 }

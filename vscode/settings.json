@@ -1,0 +1,48 @@
+{
+    // --- Indentation ---
+    "editor.insertSpaces": false,
+    "editor.tabSize": 1,
+    "editor.detectIndentation": false,
+    // --- Line wrapping ---
+    "editor.wordWrap": "on",
+    "editor.wordWrapColumn": 0,
+    // --- ESLint stability ---
+    "eslint.workingDirectories": [
+        {
+            "mode": "auto"
+        }
+    ],
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "eslint.run": "onType",
+    "eslint.alwaysShowStatus": true,
+    // --- Use ESLint (which runs Prettier) as the formatter ---
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "[typescript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    // --- Format on save ---
+    "editor.formatOnSave": true,
+    // --- Let ESLint fix what it can on save ---
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    // --- Disable standalone Prettier settings (ESLint handles it) ---
+    "prettier.enable": false,
+    "tailwindCSS.includeLanguages": {
+        "typescript": "javascript",
+        "typescriptreact": "javascript"
+    },
+    "tailwindCSS.experimental.classRegex": [
+        "className\\s*=\\s*\"([^\"]*)\""
+    ],
+    // --- Prevent TS server reload churn ---
+    "typescript.tsserver.experimental.enableProjectDiagnostics": false
+}

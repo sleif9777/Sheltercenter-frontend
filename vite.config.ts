@@ -1,14 +1,12 @@
-import { defineConfig } from 'vite'
-import { config } from 'dotenv'
-import react from '@vitejs/plugin-react'
+import tailwind from "@tailwindcss/vite"
+import react from "@vitejs/plugin-react"
+import { config } from "dotenv"
+import { defineConfig } from "vite"
 
 // Load environment variables from .env file
-config();
+config()
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  define: {
-    'process.env': process.env
-  }
+	plugins: [react(), tailwind()],
 })
