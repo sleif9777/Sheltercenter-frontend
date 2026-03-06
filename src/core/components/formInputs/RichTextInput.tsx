@@ -9,6 +9,7 @@ import { InputErrorLabel, InputLabel } from "./InputLabels"
 export function RichTextInput({
 	addlProps,
 	bgColor,
+	className,
 	defaultDirty = false,
 	errors,
 	fieldLabel,
@@ -84,6 +85,7 @@ export function RichTextInput({
 			<div className="quill-wrapper rounded border-2 border-gray-300 transition-all duration-200 focus-within:border-pink-500 focus-within:shadow-[0_0_0_2px_rgba(236,72,153,0.3)] hover:border-pink-500">
 				<ReactQuill
 					{...addlProps}
+					className={className}
 					modules={modules}
 					ref={quillRef}
 					style={{ backgroundColor: bgColor ?? "white", minHeight: "250px" }}

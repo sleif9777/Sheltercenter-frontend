@@ -120,7 +120,7 @@ function ReadBioButton({ dog }: { dog: IDog }) {
 						className="m-auto aspect-square max-h-50 w-[50%] max-w-50 rounded-3xl border-4 border-pink-700 shadow-2xl shadow-pink-200"
 						src={dog.photoURL}
 					/>
-					<div className="overflow-y-scroll rounded-2xl border-4 border-blue-900 bg-blue-100 p-3 shadow-md shadow-blue-200">
+					<div className="my-2 overflow-y-scroll rounded-2xl border-4 border-blue-900 bg-blue-100 p-3 shadow-md shadow-blue-200">
 						<span className="whitespace-pre-wrap">{dog.description}</span>
 					</div>
 				</div>
@@ -153,7 +153,6 @@ function AddDogButton({ dog }: { dog: IDog }) {
 	return (
 		<button
 			className="m-auto block rounded-lg border-2 border-gray-700 bg-gray-100 px-5 py-1 text-[16px] uppercase transition-colors hover:cursor-pointer hover:border-pink-700 hover:bg-pink-200 hover:text-pink-700 focus:ring-2 focus:ring-pink-700 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-100 disabled:hover:border-gray-700"
-			disabled={dog.description.length == 0}
 			onClick={handleClick}
 		>
 			<FontAwesomeIcon className="mr-1" icon={faHeartCirclePlus} /> Add to List

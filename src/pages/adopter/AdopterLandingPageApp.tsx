@@ -15,6 +15,7 @@ import UserInstructions from "../../assets/UserInstructions.jpg"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { faShieldDog } from "@fortawesome/free-solid-svg-icons"
 import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
+import { useScheduleState } from "../schedule/ScheduleAppState"
 
 export function AdopterLandingPageApp() {
 	const session = useSessionState()
@@ -94,13 +95,15 @@ function WelcomeTitle() {
 
 export function CancelAppointmentButton() {
 	const session = useSessionState(),
-		modalState = useModalState()
+		modalState = useModalState(),
+		schedule = useScheduleState()
 	const currentAppt = session.user?.currentAppt
 
 	const handleSubmit = useCallback(async () => {
 		await new AppointmentsAPI().CancelAppointment(currentAppt!.ID)
 		session.removeCurrentAppt()
-	}, [currentAppt, session])
+		schedule.refresh()
+	}, [currentAppt, session, schedule])
 
 	if (!currentAppt) {
 		return
@@ -197,11 +200,11 @@ function AdoptionProcess() {
 }
 
 export enum AdopterInquiryTemplate {
-	VISIT_MY_DOG = 0,
-	SURRENDER_MY_DOG = 1,
-	CALENDAR_ACCESS = 2,
-	PICK_UP_MY_DOG = 3,
-	BLANK = 4,
+	VISIT_MY_DOG = 1,
+	SURRENDER_MY_DOG = 2,
+	CALENDAR_ACCESS = 3,
+	PICK_UP_MY_DOG = 4,
+	BLANK = 0,
 }
 
 export const AdopterInquiryTemplateLabel: Record<AdopterInquiryTemplate, string> = {
@@ -215,11 +218,13 @@ export const AdopterInquiryTemplateLabel: Record<AdopterInquiryTemplate, string>
 export function getVisitMyDogContent(): ReactQuill.Value {
 	return {
 		ops: [
-			{ insert: "I would like to schedule a time to visit " },
+			{ insert: "I am requesting to visit my chosen dog " },
 			{ attributes: { bold: true }, insert: "$$$DOG NAME$$$" },
 			{ insert: ".\n\n" },
-			{ insert: "My preferred days/times are: " },
-			{ attributes: { bold: true }, insert: "$$$PREFERRED DATES/TIMES$$$" },
+			{ insert: "My preferred days/times are:\n" },
+			{ attributes: { bold: true }, insert: "$$$PREFERRED DATE/TIME 1$$$\n\n" },
+			{ attributes: { bold: true }, insert: "$$$PREFERRED DATE/TIME 2$$$\n\n" },
+			{ attributes: { bold: true }, insert: "$$$PREFERRED DATE/TIME 3$$$\n\n" },
 		],
 	} as ReactQuill.Value
 }
@@ -248,8 +253,6 @@ export function getSurrenderMyDogContent(): ReactQuill.Value {
 			{ attributes: { bold: true }, insert: "$$$MEDICAL ISSUES?$$$\n\n" },
 			{ insert: "Other Comments:\n" },
 			{ attributes: { bold: true }, insert: "$$$OTHER COMMENTS?$$$\n\n" },
-
-			// SG name, adoption date, mc#, good with cats/dogs/kids, behavioral, medical
 		],
 	} as ReactQuill.Value
 }

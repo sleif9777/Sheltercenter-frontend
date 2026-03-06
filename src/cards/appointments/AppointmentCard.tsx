@@ -91,7 +91,7 @@ export function AppointmentCard({ apptID, context }: AppointmentCardProps) {
 			{context == AppointmentCardContext.TIMESLOT && (
 				<>
 					{apptData.locked && <LockedAppointmentDisclaimer apptData={apptData} />}
-					{session.user?.currentAppt?.ID && <SingleBookingDisclaimer />}
+					{session.user?.currentAppt?.ID && session.user?.currentAppt?.ID != apptID && <SingleBookingDisclaimer />}
 					{session.adopterUser && !apptData.hasCurrentBooking && <AbleToMeet apptData={apptData} />}
 				</>
 			)}
@@ -271,7 +271,8 @@ export function LockedAppointmentDisclaimer({ apptData }: { apptData: IAppointme
 }
 
 export function BookingInfoSection({ apptData }: { apptData: IAppointment }) {
-	const { adopter } = unpackApptData(apptData)
+	const { adopter } = unpackApptData(apptData),
+		session = useSessionState()
 
 	if (!apptData.hasCurrentBooking || !adopter) {
 		return
@@ -282,7 +283,7 @@ export function BookingInfoSection({ apptData }: { apptData: IAppointment }) {
 			<ContactInfoSection demographics={adopter.demographics} />
 			<NotesSection apptData={apptData} />
 			<WatchlistSection apptData={apptData} />
-			<MessageSection apptData={apptData} />
+			{session.adminUser && <MessageSection apptData={apptData} />}
 		</>
 	)
 }

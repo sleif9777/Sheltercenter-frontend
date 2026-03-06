@@ -6,7 +6,7 @@ import {
 	IconDefinition,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { SetStateAction, useCallback, useEffect, useMemo, useState } from "react"
 import ReactQuill from "react-quill"
 
 import { StringInputProps } from "../../core/components/formInputs/InputHandlers"
@@ -57,7 +57,7 @@ export function MessageForm({
 	// --- form state ---
 	const formState = useMessageFormState(),
 		schedule = useScheduleState()
-	const { setField, errors, ...fields } = formState
+	const { reset, setField, errors, ...fields } = formState
 
 	// --- wildcard state ---
 	const [wildcardValues, setWildcardValues] = useState<Record<string, string>>({})
@@ -73,6 +73,8 @@ export function MessageForm({
 	}, [wildcardValues, selectedTemplate, isManuallyEdited, setField])
 
 	useEffect(() => {
+		reset()
+
 		if (templateFlag) {
 			setField("templateFlag", templateFlag)
 		}
@@ -104,6 +106,20 @@ export function MessageForm({
 		[apptID, fields, isMessageToAdoptions, schedule]
 	)
 
+	const handleManualEdit = useCallback(() => {
+		const isRO = isMessageToAdoptions && !!formState["templateFlag"]
+
+		if (!isRO) {
+			setIsManuallyEdited(true)
+		}
+	}, [formState, isMessageToAdoptions])
+
+	const handleTemplateChange = useCallback((template: SetStateAction<ReactQuill.Value | undefined>) => {
+		setSelectedTemplate(template)
+		setIsManuallyEdited(false)
+		setWildcardValues({})
+	}, [])
+
 	useEffect(() => {
 		setField("adopterID", adopterID)
 
@@ -134,12 +150,8 @@ export function MessageForm({
 				quickTextOptions={quickTextOptions}
 				selectedTemplate={selectedTemplate}
 				setField={setField}
-				onManualEdit={() => setIsManuallyEdited(true)}
-				onTemplateChange={(template) => {
-					setSelectedTemplate(template)
-					setIsManuallyEdited(false)
-					setWildcardValues({})
-				}}
+				onManualEdit={handleManualEdit}
+				onTemplateChange={handleTemplateChange}
 				onWildcardsChange={setWildcardValues}
 			/>
 		</FormProvider>
@@ -198,16 +210,18 @@ function Fieldset({
 				{hasWildcards && (
 					<div className="flex w-full flex-col gap-y-3 text-left md:w-1/2">
 						{/* Warning banner when manually edited */}
-						<EditModeHelp
-							color={isManuallyEdited ? "orange" : "green"}
-							header={isManuallyEdited ? "Manual Edit Mode" : "Wildcard Edit Mode"}
-							helpText={
-								isManuallyEdited
-									? "You've manually edited the message. Fill-in-the-blank fields are now disabled. Select a new template to reset."
-									: "Fill-in-the-blank fields are enabled until you manually edit the message."
-							}
-							icon={isManuallyEdited ? faExclamationCircle : faDollarSign}
-						/>
+						{!isMessageToAdoptions && (
+							<EditModeHelp
+								color={isManuallyEdited ? "orange" : "green"}
+								header={isManuallyEdited ? "Manual Edit Mode" : "Wildcard Edit Mode"}
+								helpText={
+									isManuallyEdited
+										? "You've manually edited the message. Fill-in-the-blank fields are now disabled. Select a new template to reset."
+										: "Fill-in-the-blank fields are enabled until you manually edit the message."
+								}
+								icon={isManuallyEdited ? faExclamationCircle : faDollarSign}
+							/>
+						)}
 
 						<WildcardFields
 							disabled={isManuallyEdited}
@@ -231,6 +245,7 @@ function Fieldset({
 									onManualEdit()
 								}
 							},
+							readOnly: isMessageToAdoptions && !!formData["templateFlag"],
 						}}
 						bgColor={quickTextOptions ? "#fafafa" : "white"}
 						fieldLabel="Message"
@@ -240,10 +255,16 @@ function Fieldset({
 			</div>
 
 			{isMessageToAdoptions && (
-				<div className="rounded border-2 border-orange-800 bg-orange-200 text-[12px] font-semibold text-orange-800 italic">
-					Friendly reminder! Our operating hours are 12pm-6pm (M/Tu/W/F), 1pm-6pm (Th), and 12pm-3pm (Sa). Please allow up to
-					24 hours for a response.
-				</div>
+				<>
+					<div className="rounded border-2 border-orange-800 bg-orange-200 text-[12px] font-semibold text-orange-800 italic">
+						Friendly reminder! Our operating hours are 12pm-6pm (M/Tu/W/F), 1pm-6pm (Th), and 12pm-3pm (Sa). Please allow up
+						to 24 hours for a response.
+					</div>
+					<div className="rounded border-2 border-orange-800 bg-orange-200 text-[12px] font-semibold text-orange-800 italic">
+						We allow visits with your chosen dog by appointment, Monday through Thursday during business hours. Please limit
+						yourself to one visit per week.
+					</div>
+				</>
 			)}
 		</div>
 	)

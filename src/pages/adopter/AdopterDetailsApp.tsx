@@ -1,5 +1,5 @@
 import { faDog } from "@fortawesome/free-solid-svg-icons"
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { useParams } from "react-router-dom"
 
 import { AppointmentCard } from "../../cards/appointments/AppointmentCard"
@@ -29,6 +29,7 @@ export default function AdopterDetailsApp() {
 	const context = UserFormContext.EDIT
 	const appState = useAdopterDetailsState(),
 		{ demo, apptID } = appState
+	const userFormDefaults = useMemo(() => ({ ...demo }), [demo])
 
 	const fetchData = useCallback(
 		async (intID: number) => {
@@ -59,12 +60,7 @@ export default function AdopterDetailsApp() {
 			<FullWidthPage smallerSubtitle subtitle={getSubtitle(demo)} title={getTitle(demo)}>
 				<div className="mx-5 mt-3 flex flex-row border-t-2 border-pink-700 py-2">
 					<div className="w-[50%]">
-						<UserForm
-							context={context}
-							defaults={{
-								...demo,
-							}}
-						/>
+						<UserForm context={context} defaults={userFormDefaults} />
 					</div>
 					<div className="w-[50%]">
 						<div className="flex flex-1 flex-row gap-x-2 pb-2">

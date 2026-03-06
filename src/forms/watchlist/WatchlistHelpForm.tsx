@@ -32,7 +32,7 @@ export function WatchlistHelpForm({ modalState }: { modalState: ModalState }) {
 		>
 			<div className="text-left">
 				<ul className="list-outside list-disc space-y-2 pl-5">
-					<li>This page updates every 30 minutes.</li>
+					<li>This page updates every 10 minutes.</li>
 					<li>
 						Click the <b>Add to List</b> button to add a dog to your watchlist. Click the <b>Remove from List</b> button to
 						remove a dog from your watchlist.

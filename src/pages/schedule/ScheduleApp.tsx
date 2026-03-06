@@ -393,15 +393,13 @@ function ScheduleTimeslot({ hash }: { hash: AppointmentHash }) {
 
 	// Filter appointments based on user type
 	const filteredAppointments: HashAppointment[] = session.adopterUser
-		? hash.value.filter((appt: HashAppointment) => !appt.isAdminAppt)
+		? hash.value.filter(
+				(appt: HashAppointment) =>
+					!appt.isAdminAppt && (!appt.hasCurrentBooking || appt.ID == session.user?.currentAppt?.ID)
+			)
 		: hash.value // Admin users see everything
 
 	const hasOpenAppt = filteredAppointments.some((appt) => !appt.hasCurrentBooking)
-
-	// Don't render the timeslot if no appointments after filtering
-	if (filteredAppointments.length === 0) {
-		return null
-	}
 
 	return (
 		<div className="pb-4" id={"timeslot-" + hash.key}>

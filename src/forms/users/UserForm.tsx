@@ -37,7 +37,8 @@ export function UserForm({ context, defaults }: { context: UserFormContext; defa
 		}
 
 		setField("context", context)
-	}, [context, defaults, reset, setAll, setField])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	return (
 		<div>

@@ -228,6 +228,8 @@ function CheckOutButton({ appt }: AppointmentCardActionProps) {
 	const apptID = appt.ID
 	const modalState = useModalState()
 
+	console.log(appt)
+
 	if (!appt.booking) {
 		return
 	}
@@ -235,7 +237,7 @@ function CheckOutButton({ appt }: AppointmentCardActionProps) {
 	return (
 		<>
 			<Modal modalState={modalState} modalTitle="Check Out">
-				<CheckOutForm apptID={apptID} modalState={modalState} />
+				<CheckOutForm apptID={apptID} defaults={{ dog: appt.chosenDog, outcome: appt.outcome }} modalState={modalState} />
 			</Modal>
 			<CardActionButton
 				primaryIcon={appt.checkOutTime ? faEdit : faSignOutAlt}

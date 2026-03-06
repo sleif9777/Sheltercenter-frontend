@@ -18,11 +18,19 @@ import { FormProvider } from "../FormProvider"
 import { ErrorMap } from "../FormState"
 import { CheckOutFormFieldUpdater, useCheckOutFormState } from "./CheckOutFormState"
 
-export function CheckOutForm({ apptID, modalState }: { apptID: number; modalState: ModalState }) {
+export function CheckOutForm({
+	apptID,
+	defaults,
+	modalState,
+}: {
+	apptID: number
+	defaults?: Partial<CheckOutAppointmentRequest>
+	modalState: ModalState
+}) {
 	// --- form state ---
 	const formState = useCheckOutFormState(),
 		schedule = useScheduleState()
-	const { setField, errors, ...fields } = formState
+	const { setAll, setField, errors, ...fields } = formState
 
 	// --- prepare POST request ---
 	const handleSubmit: FormSubmitHandler<CheckOutAppointmentRequest> = useCallback(
@@ -36,7 +44,11 @@ export function CheckOutForm({ apptID, modalState }: { apptID: number; modalStat
 	// --- initialize if booking exists ---
 	useEffect(() => {
 		setField("apptID", apptID)
-	}, [apptID, setField])
+
+		if (defaults) {
+			setAll(defaults)
+		}
+	}, [apptID, defaults, setAll, setField])
 
 	return (
 		<FormProvider formState={formState} modalState={modalState} onSubmit={handleSubmit}>
