@@ -1,5 +1,25 @@
-import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons"
+import {
+	faCalendar,
+	faCalendarWeek,
+	faChevronDown,
+	faChevronLeft,
+	faChevronRight,
+	faChevronUp,
+	faClipboardList,
+	faDashboard,
+	faEye,
+	faFileUpload,
+	faHeart,
+	faHome,
+	faList,
+	faLock,
+	faSignOutAlt,
+	faStar,
+	faUpload,
+	faUsers,
+} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core"
 import { ReactNode, useCallback, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
@@ -8,65 +28,114 @@ import { useSessionState } from "../session/SessionState"
 import { TooltipProvider } from "../components/messages/TooltipProvider"
 import React from "react"
 
-export function NavigationBar({ debug, onNavigate }: { debug?: boolean; onNavigate?: () => void }) {
+interface NavigationBarProps {
+	debug?: boolean
+	onNavigate?: () => void
+	/** Desktop-only: whether the sidebar is collapsed to icon-only mode */
+	collapsed?: boolean
+	/** Desktop-only: callback to toggle collapsed state */
+	onToggleCollapse?: () => void
+}
+
+export function NavigationBar({ debug, onNavigate, collapsed = false, onToggleCollapse }: NavigationBarProps) {
 	const session = useSessionState()
 
 	return (
-		<div className="z-10 h-screen w-full overflow-y-auto border-r border-gray-200">
-			<a className="flex w-full justify-center" href="https://savinggracenc.org/">
-				<img alt="Saving Grace logo" className="pb-4" src={Logo} />
-			</a>
-
-			<div className="flex flex-col">
-				{session.adopterUser && (
-					<>
-						<AdopterLandingPageButton onNavigate={onNavigate} />
-						<ScheduleButton onNavigate={onNavigate} />
-						<WatchlistButton onNavigate={onNavigate} />
-						<AdopterPreferencesButton onNavigate={onNavigate} />
-					</>
-				)}
-				{session.greeterUser && (
-					<>
-						<ScheduleButton onNavigate={onNavigate} />
-						<InProgressAppointmentsButton onNavigate={onNavigate} />
-					</>
-				)}
-				{session.adminUser && (
-					<>
-						<NavigationSection caption="Scheduling">
-							<ScheduleButton onNavigate={onNavigate} />
-							<WeeklyTemplateButton onNavigate={onNavigate} />
-							<InProgressAppointmentsButton onNavigate={onNavigate} />
-						</NavigationSection>
-						<NavigationSection caption="Adoptions">
-							<ChosenBoardButton onNavigate={onNavigate} />
-							<RecentAdoptionsButton onNavigate={onNavigate} />
-						</NavigationSection>
-						<NavigationSection caption="Adopters">
-							<AdopterDirectoryButton onNavigate={onNavigate} />
-							<UploadAdoptersButton onNavigate={onNavigate} />
-							<RecentUploadsButton onNavigate={onNavigate} />
-						</NavigationSection>
-						<NavigationSection caption="Dogs">
-							<WatchlistButton onNavigate={onNavigate} />
-						</NavigationSection>
-					</>
-				)}
-				<PrivacyPolicyButton onNavigate={onNavigate} />
-				<SignOutButton onNavigate={onNavigate} />
-			</div>
-			{debug && (
-				<div>
-					<pre>{JSON.stringify(session, null, 2)}</pre>
-				</div>
+		// Outer wrapper: flex column, no overflow — allows toggle button to escape the edge
+		<div className="relative z-10 flex h-screen w-full flex-col border-r border-gray-200">
+			{/* Desktop collapse toggle — anchored to outer wrapper, never clipped by scroll */}
+			{onToggleCollapse && (
+				<button
+					aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+					className="absolute top-3 -right-3 z-20 hidden h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-pink-700 shadow-sm transition-colors hover:bg-pink-50 md:flex"
+					title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+					onClick={onToggleCollapse}
+				>
+					<FontAwesomeIcon className="text-xs" icon={collapsed ? faChevronRight : faChevronLeft} />
+				</button>
 			)}
+
+			{/* Scrollable content */}
+			<div className="flex-1 overflow-y-auto">
+				{/* Logo — swap to heart icon when collapsed */}
+				<a className="flex w-full justify-center" href="https://savinggracenc.org/">
+					<img alt="Saving Grace logo" className="pb-4" src={Logo} />
+				</a>
+
+				<div className="flex flex-col">
+					{session.adopterUser && (
+						<>
+							<AdopterLandingPageButton collapsed={collapsed} onNavigate={onNavigate} />
+							<ScheduleButton collapsed={collapsed} onNavigate={onNavigate} />
+							<WatchlistButton collapsed={collapsed} onNavigate={onNavigate} />
+							<AdopterPreferencesButton collapsed={collapsed} onNavigate={onNavigate} />
+						</>
+					)}
+					{session.greeterUser && (
+						<>
+							<ScheduleButton collapsed={collapsed} onNavigate={onNavigate} />
+							<InProgressAppointmentsButton collapsed={collapsed} onNavigate={onNavigate} />
+						</>
+					)}
+					{session.adminUser && (
+						<>
+							<NavigationSection caption="Scheduling" collapsed={collapsed}>
+								<ScheduleButton collapsed={collapsed} onNavigate={onNavigate} />
+								<WeeklyTemplateButton collapsed={collapsed} onNavigate={onNavigate} />
+								<InProgressAppointmentsButton collapsed={collapsed} onNavigate={onNavigate} />
+							</NavigationSection>
+							<NavigationSection caption="Adoptions" collapsed={collapsed}>
+								<ChosenBoardButton collapsed={collapsed} onNavigate={onNavigate} />
+								<RecentAdoptionsButton collapsed={collapsed} onNavigate={onNavigate} />
+							</NavigationSection>
+							<NavigationSection caption="Adopters" collapsed={collapsed}>
+								<AdopterDirectoryButton collapsed={collapsed} onNavigate={onNavigate} />
+								<UploadAdoptersButton collapsed={collapsed} onNavigate={onNavigate} />
+								<RecentUploadsButton collapsed={collapsed} onNavigate={onNavigate} />
+							</NavigationSection>
+							<NavigationSection caption="Dogs" collapsed={collapsed}>
+								<WatchlistButton collapsed={collapsed} onNavigate={onNavigate} />
+								<DashboardsButton collapsed={collapsed} onNavigate={onNavigate} />
+							</NavigationSection>
+						</>
+					)}
+					<PrivacyPolicyButton collapsed={collapsed} onNavigate={onNavigate} />
+					<SignOutButton collapsed={collapsed} onNavigate={onNavigate} />
+				</div>
+
+				{debug && (
+					<div>
+						<pre>{JSON.stringify(session, null, 2)}</pre>
+					</div>
+				)}
+			</div>
 		</div>
 	)
 }
 
-function NavigationSection({ caption, children }: { caption: string; children: ReactNode }) {
+function NavigationSection({
+	caption,
+	children,
+	collapsed,
+}: {
+	caption: string
+	children: ReactNode
+	collapsed?: boolean
+}) {
 	const [open, setOpen] = useState(false)
+
+	// When collapsed on desktop, render children as flat icon buttons (no section header)
+	if (collapsed) {
+		return (
+			<div className="hidden w-full flex-col md:flex">
+				{React.Children.map(children, (child) =>
+					React.isValidElement(child)
+						? React.cloneElement(child as React.ReactElement, { collapsed: true, noBorder: true })
+						: child
+				)}
+			</div>
+		)
+	}
 
 	return (
 		<div className="w-full border-b border-pink-700">
@@ -91,19 +160,23 @@ function NavigationSection({ caption, children }: { caption: string; children: R
 function NavigationButton({
 	caption,
 	disabled,
+	icon,
 	isLast,
 	noBorder,
 	onClick,
 	route,
 	onNavigate,
+	collapsed,
 }: {
 	caption: string
 	disabled?: boolean
+	icon: IconDefinition
 	isLast?: boolean
 	noBorder?: boolean
 	onClick?: () => void
 	route?: string
 	onNavigate?: () => void
+	collapsed?: boolean
 }) {
 	const handleClick = useCallback(
 		(e: React.MouseEvent) => {
@@ -116,8 +189,33 @@ function NavigationButton({
 		[onClick, onNavigate]
 	)
 
+	const disabledTooltip = disabled ? "Calendar restricted after choosing a dog." : ""
+
+	// Collapsed: icon only, desktop only
+	if (collapsed) {
+		return (
+			<TooltipProvider tooltip={disabledTooltip || caption}>
+				<div className="hidden w-full md:block">
+					<Link
+						aria-label={caption}
+						className={`flex items-center justify-center py-3 transition-colors ${
+							disabled
+								? "pointer-events-none cursor-not-allowed text-gray-400"
+								: "cursor-pointer text-pink-700 hover:bg-pink-200"
+						}`}
+						to={route ?? "#"}
+						onClick={handleClick}
+					>
+						<FontAwesomeIcon className="text-lg" icon={icon} />
+					</Link>
+				</div>
+			</TooltipProvider>
+		)
+	}
+
+	// Expanded: text only, no icon (matches original design)
 	return (
-		<TooltipProvider tooltip={disabled ? "Calendar restricted after choosing a dog." : ""}>
+		<TooltipProvider tooltip={disabledTooltip}>
 			<div className={`w-full ${!isLast && !noBorder ? "border-b border-pink-700" : ""}`}>
 				<Link
 					className={`block px-4 py-3 text-center text-2xl font-medium uppercase transition-colors md:text-sm lg:text-lg xl:text-xl ${
@@ -138,19 +236,23 @@ function NavigationButton({
 interface NavigationButtonProps {
 	noBorder?: boolean
 	onNavigate?: () => void
+	collapsed?: boolean
 }
 
-function AdopterLandingPageButton({ onNavigate }: NavigationButtonProps) {
-	return <NavigationButton caption="Home" route="/my_home/" onNavigate={onNavigate} />
+function AdopterLandingPageButton({ collapsed, onNavigate }: NavigationButtonProps) {
+	return (
+		<NavigationButton caption="Home" collapsed={collapsed} icon={faHome} route="/my_home/" onNavigate={onNavigate} />
+	)
 }
 
-function ScheduleButton({ noBorder, onNavigate }: NavigationButtonProps) {
+function ScheduleButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
 	const session = useSessionState()
-
 	return (
 		<NavigationButton
 			caption={session.adopterUser ? "Book Appointment" : "Calendar"}
+			collapsed={collapsed}
 			disabled={session.user?.restrictCalendar}
+			icon={faCalendar}
 			noBorder={noBorder}
 			route="/calendar/"
 			onNavigate={onNavigate}
@@ -158,11 +260,13 @@ function ScheduleButton({ noBorder, onNavigate }: NavigationButtonProps) {
 	)
 }
 
-function WatchlistButton({ noBorder, onNavigate }: NavigationButtonProps) {
+function WatchlistButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
 	const session = useSessionState()
 	return (
 		<NavigationButton
 			caption={session.adopterUser ? "My Dog Watchlist" : "Available Dogs"}
+			collapsed={collapsed}
+			icon={faEye}
 			noBorder={noBorder}
 			route="/watchlist/"
 			onNavigate={onNavigate}
@@ -170,26 +274,63 @@ function WatchlistButton({ noBorder, onNavigate }: NavigationButtonProps) {
 	)
 }
 
-function AdopterPreferencesButton({ onNavigate }: NavigationButtonProps) {
-	return <NavigationButton caption="My Preferences" route="/preferences/" onNavigate={onNavigate} />
-}
-
-function WeeklyTemplateButton({ noBorder, onNavigate }: NavigationButtonProps) {
+function DashboardsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
 	return (
-		<NavigationButton caption="Weekly Template" noBorder={noBorder} route="/calendar_template/" onNavigate={onNavigate} />
+		<NavigationButton
+			caption="Dashboards"
+			collapsed={collapsed}
+			icon={faDashboard}
+			noBorder={noBorder}
+			route="/dashboards/"
+			onNavigate={onNavigate}
+		/>
 	)
 }
 
-function UploadAdoptersButton({ noBorder, onNavigate }: NavigationButtonProps) {
+function AdopterPreferencesButton({ collapsed, onNavigate }: NavigationButtonProps) {
 	return (
-		<NavigationButton caption="Upload Adopters" noBorder={noBorder} route="/adopters/upload/" onNavigate={onNavigate} />
+		<NavigationButton
+			caption="My Preferences"
+			collapsed={collapsed}
+			icon={faStar}
+			route="/preferences/"
+			onNavigate={onNavigate}
+		/>
 	)
 }
 
-function AdopterDirectoryButton({ noBorder, onNavigate }: NavigationButtonProps) {
+function WeeklyTemplateButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
+	return (
+		<NavigationButton
+			caption="Weekly Template"
+			collapsed={collapsed}
+			icon={faCalendarWeek}
+			noBorder={noBorder}
+			route="/calendar_template/"
+			onNavigate={onNavigate}
+		/>
+	)
+}
+
+function UploadAdoptersButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
+	return (
+		<NavigationButton
+			caption="Upload Adopters"
+			collapsed={collapsed}
+			icon={faUpload}
+			noBorder={noBorder}
+			route="/adopters/upload/"
+			onNavigate={onNavigate}
+		/>
+	)
+}
+
+function AdopterDirectoryButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
 	return (
 		<NavigationButton
 			caption="Adopter Directory"
+			collapsed={collapsed}
+			icon={faUsers}
 			noBorder={noBorder}
 			route="/adopters/directory/"
 			onNavigate={onNavigate}
@@ -197,33 +338,71 @@ function AdopterDirectoryButton({ noBorder, onNavigate }: NavigationButtonProps)
 	)
 }
 
-function ChosenBoardButton({ noBorder, onNavigate }: NavigationButtonProps) {
-	return <NavigationButton caption="Chosen Board" noBorder={noBorder} route="/chosen_board/" onNavigate={onNavigate} />
-}
-
-function InProgressAppointmentsButton({ noBorder, onNavigate }: NavigationButtonProps) {
+function ChosenBoardButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
 	return (
-		<NavigationButton caption="In Progress Appts" noBorder={noBorder} route="/in_progress/" onNavigate={onNavigate} />
+		<NavigationButton
+			caption="Chosen Board"
+			collapsed={collapsed}
+			icon={faClipboardList}
+			noBorder={noBorder}
+			route="/chosen_board/"
+			onNavigate={onNavigate}
+		/>
 	)
 }
 
-function PrivacyPolicyButton({ onNavigate }: NavigationButtonProps) {
-	return <NavigationButton caption="Privacy Policy" route="/privacy/" onNavigate={onNavigate} />
-}
-
-function RecentUploadsButton({ noBorder, onNavigate }: NavigationButtonProps) {
+function InProgressAppointmentsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
 	return (
-		<NavigationButton caption="Recent Uploads" noBorder={noBorder} route="/recent_uploads/" onNavigate={onNavigate} />
+		<NavigationButton
+			caption="In Progress Appts"
+			collapsed={collapsed}
+			icon={faList}
+			noBorder={noBorder}
+			route="/in_progress/"
+			onNavigate={onNavigate}
+		/>
 	)
 }
 
-function RecentAdoptionsButton({ noBorder, onNavigate }: NavigationButtonProps) {
+function PrivacyPolicyButton({ collapsed, onNavigate }: NavigationButtonProps) {
 	return (
-		<NavigationButton caption="Recent Adoptions" noBorder={noBorder} route="/recent_adoptions/" onNavigate={onNavigate} />
+		<NavigationButton
+			caption="Privacy Policy"
+			collapsed={collapsed}
+			icon={faLock}
+			route="/privacy/"
+			onNavigate={onNavigate}
+		/>
 	)
 }
 
-function SignOutButton({ onNavigate }: { onNavigate?: () => void }) {
+function RecentUploadsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
+	return (
+		<NavigationButton
+			caption="Recent Uploads"
+			collapsed={collapsed}
+			icon={faFileUpload}
+			noBorder={noBorder}
+			route="/recent_uploads/"
+			onNavigate={onNavigate}
+		/>
+	)
+}
+
+function RecentAdoptionsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
+	return (
+		<NavigationButton
+			caption="Recent Adoptions"
+			collapsed={collapsed}
+			icon={faHeart}
+			noBorder={noBorder}
+			route="/recent_adoptions/"
+			onNavigate={onNavigate}
+		/>
+	)
+}
+
+function SignOutButton({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: () => void }) {
 	const session = useSessionState()
 	const navigate = useNavigate()
 
@@ -232,5 +411,14 @@ function SignOutButton({ onNavigate }: { onNavigate?: () => void }) {
 		navigate("/")
 	}, [session, navigate])
 
-	return <NavigationButton caption="Sign Out" isLast onClick={handleClick} onNavigate={onNavigate} />
+	return (
+		<NavigationButton
+			caption="Sign Out"
+			collapsed={collapsed}
+			icon={faSignOutAlt}
+			isLast
+			onClick={handleClick}
+			onNavigate={onNavigate}
+		/>
+	)
 }

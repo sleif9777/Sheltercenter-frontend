@@ -1,5 +1,3 @@
-// import "./RadioInput.scss"
-
 import { useCallback, useState } from "react"
 
 import { Toggleable } from "./CheckboxInput"

@@ -228,8 +228,6 @@ function CheckOutButton({ appt }: AppointmentCardActionProps) {
 	const apptID = appt.ID
 	const modalState = useModalState()
 
-	console.log(appt)
-
 	if (!appt.booking) {
 		return
 	}

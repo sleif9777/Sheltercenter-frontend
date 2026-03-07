@@ -1,11 +1,20 @@
 import { AdopterIDRequest } from "../adopters/Requests"
 import { APIBase } from "../APIBase"
 import { DogIDRequest, ListModificationRequest } from "./Requests"
-import { DogDemographicsResponse, WatchlistContextResponse, WatchlistResponse } from "./Responses"
+import {
+	DashboardsContextResponse,
+	DogDemographicsResponse,
+	WatchlistContextResponse,
+	WatchlistResponse,
+} from "./Responses"
 
 export class DogsAPI extends APIBase {
 	constructor() {
 		super("Dogs")
+	}
+
+	async GetDashboardDogHash() {
+		return this.buildAndGetData<DashboardsContextResponse>("GetDashboardDogHash")
 	}
 
 	async GetDogDemographics(dogID: number) {

@@ -13,10 +13,13 @@ export interface IDog {
 	funSize: boolean
 	availableNow: boolean
 	availableDate?: string
+	unavailableDate?: string
 	interestCount: number
 }
 
 export type HashDog = Pick<IDog, "ID" | "name" | "ageMonths" | "interestCount" | "weight">
+
+export type DashboardDog = Pick<IDog, "ID" | "name" | "unavailableDate" | "photoURL">
 
 export type WatchlistDog = Pick<IDog, "ID" | "name" | "ageMonths" | "funSize" | "availableDate" | "availableNow">
 
@@ -27,6 +30,16 @@ export type DogHash = {
 		notAvailable: HashDog[]
 	}
 	notWatching: HashDog[]
+}
+
+export type DashboardDogHash = {
+	chosen: {
+		needsSN: DashboardDog[]
+		needsWC: DashboardDog[]
+		readyToRoll: DashboardDog[]
+	}
+	fta: DashboardDog[]
+	newlyInHome: DashboardDog[]
 }
 
 export type AdopterWatchlist = WatchlistDog[]

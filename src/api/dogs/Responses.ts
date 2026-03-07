@@ -1,4 +1,8 @@
-import { AdopterWatchlist, DogHash, IDog } from "../../models/DogModels"
+import { AdopterWatchlist, DashboardDogHash, DogHash, IDog } from "../../models/DogModels"
+
+export type DashboardsContextResponse = {
+	hash: DashboardDogHash
+}
 
 export type DogDemographicsResponse = {
 	dog: IDog

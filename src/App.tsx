@@ -31,10 +31,35 @@ import "@fontsource/roboto/700.css"
 import { WatchlistApp } from "./pages/watchlist/WatchlistApp.tsx"
 import { ToastProvider } from "./core/components/messages/ToastProvider.tsx"
 import RecentAdoptionsApp from "./pages/recentAdoptions/RecentAdoptionsApp.tsx"
+import DashboardsApp from "./pages/dashboards/DashboardsApp.tsx"
+
+const SIDEBAR_STORAGE_KEY = "sidebar_collapsed"
 
 function App() {
 	const session = useSessionState()
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+	// Desktop sidebar collapsed state — persisted to localStorage
+	const [desktopCollapsed, setDesktopCollapsed] = useState<boolean>(() => {
+		try {
+			const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY)
+			return stored ? JSON.parse(stored) : false
+		} catch {
+			return false
+		}
+	})
+
+	const toggleDesktopCollapsed = () => {
+		setDesktopCollapsed((prev) => {
+			const next = !prev
+			try {
+				localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(next))
+			} catch {
+				// ignore storage errors
+			}
+			return next
+		})
+	}
 
 	useEffect(() => {
 		session.validateSession()
@@ -54,19 +79,21 @@ function App() {
 					</button>
 				)}
 
-				{/* Backdrop */}
+				{/* Mobile backdrop */}
 				{session.isAuthenticated && mobileMenuOpen && (
 					<div className="fixed inset-0 z-30 bg-black/40 md:hidden" onClick={() => setMobileMenuOpen(false)} />
 				)}
 
-				{/* Sidebar - desktop always visible, mobile right drawer */}
+				{/* Sidebar */}
 				{session.isAuthenticated && (
 					<div
-						className={`fixed top-0 right-0 z-40 h-full w-64 bg-white transition-transform duration-300 md:static md:w-[15%] md:min-w-32 md:shrink-0 md:translate-x-0 print:hidden ${
-							mobileMenuOpen ? "translate-x-0" : "translate-x-full"
-						}`}
+						className={`fixed top-0 right-0 z-40 h-full w-64 bg-white transition-all duration-300 md:static md:h-screen md:shrink-0 md:translate-x-0 print:hidden ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"} ${desktopCollapsed ? "md:w-14" : "md:w-[15%] md:min-w-32"} `}
 					>
-						<NavigationBar onNavigate={() => setMobileMenuOpen(false)} />
+						<NavigationBar
+							collapsed={desktopCollapsed}
+							onNavigate={() => setMobileMenuOpen(false)}
+							onToggleCollapse={toggleDesktopCollapsed}
+						/>
 					</div>
 				)}
 
@@ -79,6 +106,7 @@ function App() {
 								<Route element={<AdopterLandingPageApp />} path="/my_home/" />
 								<Route element={<AdopterPreferencesApp />} path="/preferences/" />
 								<Route element={<WatchlistApp />} path="/watchlist/" />
+								<Route element={<DashboardsApp />} path="/dashboards/" />
 								<Route element={<AdopterUploadApp />} path="/adopters/upload/" />
 								<Route element={<ChosenBoardApp />} path="/chosen_board/" />
 								<Route element={<ScheduleApp />} index={!session.adopterUser} />
