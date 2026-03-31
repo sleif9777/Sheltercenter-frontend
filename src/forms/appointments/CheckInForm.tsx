@@ -149,7 +149,6 @@ function StreetAddressField({ errors, value, onChange }: OptionalValueInputProps
 			addlProps={{ autoComplete: "new-password" }}
 			errors={errors}
 			fieldLabel="Street Address"
-			showRequired
 			value={value ?? ""}
 			onChange={(e) => onChange(e)}
 		/>
@@ -162,7 +161,6 @@ function CityField({ errors, value, onChange }: OptionalValueInputProps<string>)
 			addlProps={{ autoComplete: "new-password" }}
 			errors={errors}
 			fieldLabel="City"
-			showRequired
 			value={value ?? ""}
 			onChange={(e) => onChange(e)}
 		/>
@@ -175,7 +173,6 @@ function PostalCodeField({ errors, value, onChange }: OptionalValueInputProps<st
 			addlProps={{ autoComplete: "new-password" }}
 			errors={errors}
 			fieldLabel="Postal Code"
-			showRequired
 			value={value ?? ""}
 			onChange={(e) => onChange(e)}
 		/>

@@ -83,9 +83,10 @@ export function AppointmentCardActions({
 }
 
 function MessageButton({ appt }: AppointmentCardActionProps) {
-	const modalState = useModalState()
+	const modalState = useModalState(),
+		session = useSessionState()
 
-	if (!appt.hasCurrentBooking) {
+	if (!appt.hasCurrentBooking || !session.adminUser) {
 		return
 	}
 

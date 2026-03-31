@@ -8,12 +8,7 @@ import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { ReportRowComponentProps, useReportingAppointment } from "../../core/components/report/UseReportingHook"
 import { AppointmentType } from "../../enums/AppointmentEnums"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
-import {
-	HashAppointment,
-	ReportingAdminAppointment,
-	ReportingAdoptionAppointment,
-	ReportingAppointment,
-} from "../../models/AppointmentModels"
+import { HashAppointment, ReportingAdminAppointment, ReportingAdoptionAppointment, ReportingAppointment } from "../../models/AppointmentModels"
 import { IBooking } from "../../models/BookingModels"
 import { DateTime } from "../../utils/DateTime"
 import { ScheduleAppTitle } from "../schedule/ScheduleApp"
@@ -40,10 +35,10 @@ export default function PrintViewApp() {
 						<tr>
 							<th>Time</th>
 							<th>Appointment</th>
-							<th className="hidden lg:table-cell">Notes</th>
-							<th className="hidden lg:table-cell">Check-In</th>
-							<th className="hidden lg:table-cell">Clothing Description</th>
-							<th className="hidden lg:table-cell">Counselor</th>
+							<th className="hidden lg:table-cell print:table-cell">Notes</th>
+							<th className="hidden lg:table-cell print:table-cell">Check-In</th>
+							<th className="hidden lg:table-cell print:table-cell">Clothing Description</th>
+							<th className="hidden lg:table-cell print:table-cell">Counselor</th>
 							<th>Check-Out</th>
 						</tr>
 					</thead>
@@ -78,10 +73,10 @@ function PrintViewAppointmentRow({ ID: apptID, isLast }: ReportRowComponentProps
 		<tr className={"align-top hover:bg-pink-200 " + (isLast ? "" : "border-b border-pink-700")}>
 			<ApptInstantCell appt={appt} />
 			<AdopterInfoCell appt={appt} />
-			<AdoptionNotesCell booking={appt.booking} className="hidden lg:table-cell" />
-			<td className="hidden lg:table-cell">{appt.checkInTime}</td>
-			<td className="hidden lg:table-cell">{appt.clothingDescription}</td>
-			<td className="hidden lg:table-cell">{appt.counselor}</td>
+			<AdoptionNotesCell booking={appt.booking} className="hidden lg:table-cell print:table-cell" />
+			<td className="hidden lg:table-cell print:table-cell">{appt.checkInTime}</td>
+			<td className="hidden lg:table-cell print:table-cell">{appt.clothingDescription}</td>
+			<td className="hidden lg:table-cell print:table-cell">{appt.counselor}</td>
 			<td>{appt.checkOutTime ?? ""}</td>
 		</tr>
 	)
@@ -99,9 +94,9 @@ function PrintViewAdminRow({ ID: apptID, isLast }: ReportRowComponentProps) {
 			<ApptInstantCell appt={appt} />
 			<AdminApptInfoCell appt={appt} />
 			<AdminNotesCell appt={appt} />
-			<td className="hidden lg:table-cell"></td>
-			<td className="hidden lg:table-cell"></td>
-			<td className="hidden lg:table-cell"></td>
+			<td className="hidden lg:table-cell print:table-cell"></td>
+			<td className="hidden lg:table-cell print:table-cell"></td>
+			<td className="hidden lg:table-cell print:table-cell"></td>
 			<td></td>
 		</tr>
 	)
@@ -193,11 +188,11 @@ function AdoptionNotesCell({ booking, className }: { booking: IBooking; classNam
 
 function AdminNotesCell({ appt }: { appt: ReportingAdminAppointment }) {
 	return appt.type == AppointmentType.DONATION_DROP_OFF ? (
-		<td className="hidden lg:table-cell">
+		<td className="hidden lg:table-cell print:table-cell">
 			<Note note={appt.notes} source="Appointment" />
 		</td>
 	) : (
-		<td className="hidden lg:table-cell"></td>
+		<td className="hidden lg:table-cell print:table-cell"></td>
 	)
 }
 

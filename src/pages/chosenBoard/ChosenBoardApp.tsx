@@ -152,8 +152,9 @@ function AdoptionCard({ adoption, cardColor }: { adoption: IPendingAdoption; car
 			label: "Status",
 			value:
 				PendingAdoptionStatusLabel[adoption.status as PendingAdoptionStatus] +
-				" (HW " +
-				(adoption.heartwormPositive ? "Pos)" : "Neg)"),
+				(adoption.status == PendingAdoptionStatus.READY_TO_ROLL
+					? " (HW " + (adoption.heartwormPositive ? "Pos)" : "Neg)")
+					: ""),
 		},
 		{ label: "Circumstance", value: CircumstanceOptionsLabel[adoption.circumstance as CircumstanceOptions] },
 		{ label: "Created", value: new DateTime(adoption.created).GetFullDateTime() },

@@ -31,25 +31,26 @@ export function WatchlistApp() {
 
 	const sortDogs = useCallback(
 		(a: HashDog, b: HashDog) => {
+			const tiebreak = a.name.localeCompare(b.name)
 			switch (sortMethod) {
 				case WatchlistSortMethod.NAME_ASC:
 					return a.name.localeCompare(b.name)
 				case WatchlistSortMethod.NAME_DESC:
 					return b.name.localeCompare(a.name)
 				case WatchlistSortMethod.AGE_ASC:
-					return a.ageMonths < b.ageMonths ? -1 : 1
+					return a.ageMonths !== b.ageMonths ? (a.ageMonths < b.ageMonths ? -1 : 1) : tiebreak
 				case WatchlistSortMethod.AGE_DESC:
-					return a.ageMonths < b.ageMonths ? 1 : -1
+					return a.ageMonths !== b.ageMonths ? (a.ageMonths < b.ageMonths ? 1 : -1) : tiebreak
 				case WatchlistSortMethod.SIZE_ASC:
-					return a.weight < b.weight ? -1 : 1
+					return a.weight !== b.weight ? (a.weight < b.weight ? -1 : 1) : tiebreak
 				case WatchlistSortMethod.SIZE_DESC:
-					return a.weight < b.weight ? 1 : -1
+					return a.weight !== b.weight ? (a.weight < b.weight ? 1 : -1) : tiebreak
 				case WatchlistSortMethod.POP_ASC:
-					return a.interestCount < b.interestCount ? 1 : -1
+					return a.interestCount !== b.interestCount ? (a.interestCount < b.interestCount ? 1 : -1) : tiebreak
 				case WatchlistSortMethod.POP_DESC:
-					return a.interestCount < b.interestCount ? -1 : 1
+					return a.interestCount !== b.interestCount ? (a.interestCount < b.interestCount ? -1 : 1) : tiebreak
 				default:
-					return 1
+					return tiebreak
 			}
 		},
 		[sortMethod]

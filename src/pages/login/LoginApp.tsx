@@ -2,7 +2,7 @@ import { LoginForm } from "../../forms/users/LoginForm"
 
 export function LoginApp() {
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center">
+		<div className="flex min-h-screen flex-col items-center justify-center px-4">
 			<div className="mb-4 block">
 				<img
 					alt="Saving Grace logo"
@@ -13,7 +13,7 @@ export function LoginApp() {
 				/>
 				<h1 className="mt-2 text-2xl">Appointment Scheduling Portal</h1>
 			</div>
-			<div className="w-lg border-t border-pink-700 pt-6">
+			<div className="w-full max-w-md border-t border-pink-700 pt-6 lg:max-w-lg">
 				<LoginForm />
 			</div>
 		</div>

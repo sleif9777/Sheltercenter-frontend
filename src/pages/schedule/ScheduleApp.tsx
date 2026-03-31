@@ -509,20 +509,22 @@ function EmptyDatesAlertCard() {
 	}, [fetchData])
 
 	return (
-		<StandardCard color={CardColor.RED} description="Empty Dates" maxWidth="max-w-xs" topIcon={faCalendar}>
-			<div className="px-1 text-left">
-				<b>Publish appointments or mark closed:</b>
-				<ul className="columns-2">
-					{emptyDates.map((dt, i) => (
-						<li key={i}>
-							<span className="hover:cursor-pointer hover:bg-red-400" onClick={() => schedule.refresh(dt.GetISODate())}>
-								{dt.GetShortDate(true)}
-							</span>
-						</li>
-					))}
-				</ul>
-			</div>
-		</StandardCard>
+		emptyDates.length > 0 && (
+			<StandardCard color={CardColor.RED} description="Empty Dates" maxWidth="max-w-xs" topIcon={faCalendar}>
+				<div className="px-1 text-left">
+					<b>Publish appointments or mark closed:</b>
+					<ul className="columns-2">
+						{emptyDates.map((dt, i) => (
+							<li key={i}>
+								<span className="hover:cursor-pointer hover:bg-red-400" onClick={() => schedule.refresh(dt.GetISODate())}>
+									{dt.GetShortDate(true)}
+								</span>
+							</li>
+						))}
+					</ul>
+				</div>
+			</StandardCard>
+		)
 	)
 }
 
