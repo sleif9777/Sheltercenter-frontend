@@ -34,9 +34,11 @@ export const useBookingFormState = createFormState<ScheduleAppointmentWithPrefer
 })
 
 function validateMaxWeight(state: ScheduleAppointmentWithPreferencesRequest) {
-	return (
-		state.maxWeightPreference == 0 ||
-		state.minWeightPreference == 0 ||
-		(state.maxWeightPreference ?? 0) >= (state.minWeightPreference ?? 0)
-	)
+	console.log(state.minWeightPreference, state.maxWeightPreference)
+
+	if (!state.maxWeightPreference) {
+		return true
+	}
+
+	return (state.maxWeightPreference ?? 0) > (state.minWeightPreference ?? 0)
 }

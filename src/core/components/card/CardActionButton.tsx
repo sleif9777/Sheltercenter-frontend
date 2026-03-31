@@ -7,6 +7,8 @@ import { TooltipProvider } from "../messages/TooltipProvider"
 export interface CardActionButtonProps {
 	className?: string
 	primaryIcon: IconProp
+	overlayIcon?: IconProp
+	overlayClassName?: string
 	disabled?: boolean
 	onClick?: () => void
 	onMouseEnter?: () => void
@@ -26,6 +28,8 @@ export function CardActionButton({
 	onMouseEnter,
 	onMouseLeave,
 	primaryIcon,
+	overlayClassName,
+	overlayIcon,
 	toggle,
 	onClick,
 	primaryTooltipContent,
@@ -55,7 +59,16 @@ export function CardActionButton({
 				onMouseEnter={onMouseEnter}
 				onMouseLeave={onMouseLeave}
 			>
-				<FontAwesomeIcon className="disabled:text-grey-200 cursor-pointer hover:opacity-70" icon={icon} />
+				<span className="relative inline-block">
+					<FontAwesomeIcon className="disabled:text-grey-200 cursor-pointer hover:opacity-70" icon={icon} />
+					{overlayIcon && (
+						<span
+							className={`absolute -right-1.5 -bottom-0.5 flex h-3 w-3 items-center justify-center rounded-full text-white ${overlayClassName ?? "bg-red-600"}`}
+						>
+							<FontAwesomeIcon className="text-[0.45rem]" icon={overlayIcon} />
+						</span>
+					)}
+				</span>
 			</button>
 		</TooltipProvider>
 	)

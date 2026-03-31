@@ -19,8 +19,11 @@ export type CreatePendingAdoptionRequest = {
 	circumstance: CircumstanceOptions
 } & AdopterIDRequest
 
+export type MarkHeartwormRequest = {
+	heartworm: boolean
+} & AdoptionIDRequest
+
 export type MarkStatusRequest = {
 	status: PendingAdoptionStatus
-	heartworm: boolean
 	message?: string
 } & AdoptionIDRequest

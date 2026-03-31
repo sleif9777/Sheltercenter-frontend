@@ -61,8 +61,8 @@ export default function SelectInput({
 				elemID={elemID}
 				fieldLabel={fieldLabel}
 				showError={dirty && (errors ?? []).length > 0}
-				showRecommended={!value && !dirty && showRecommended}
-				showRequired={!value && !dirty && showRequired}
+				showRecommended={!dirty && showRecommended}
+				showRequired={(value ?? "").length > 0 && !dirty && showRequired}
 			/>
 			<Autocomplete<SelectInputOption<string>, false, false, false>
 				disabled={disabled}

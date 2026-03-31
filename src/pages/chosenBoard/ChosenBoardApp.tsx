@@ -1,47 +1,29 @@
-import {
-	faCheckCircle,
-	faEnvelope,
-	faEraser,
-	faExclamationTriangle,
-	faPencil,
-	faShieldDog,
-	faSpinner,
-	faThermometer,
-	faUserDoctor,
-	faVirusSlash,
-	faWorm,
-	IconDefinition,
-} from "@fortawesome/free-solid-svg-icons"
+import { faCar, faCheckCircle, faEnvelope, faEraser, faExclamationTriangle, faPencil, faPlus, faShieldDog, faSpinner, faThermometer, faUserDoctor, faWorm, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { ReactNode, useCallback, useEffect } from "react"
+import { ReactNode, useCallback, useEffect, useState } from "react"
+import ReactQuill from "react-quill"
 
+import { PendingAdoptionsAPI } from "../../api/pendingAdoptions/PendingAdoptionsAPI"
 import { LargeButton } from "../../core/components/buttons/LargeButton"
 import { StandardCard } from "../../core/components/card/Card"
 import { CardActionAreYouSure } from "../../core/components/card/CardActionAreYouSure"
 import { CardActionButton } from "../../core/components/card/CardActionButton"
 import { CardActionSection } from "../../core/components/card/CardActionSection"
 import { CardColor } from "../../core/components/card/CardEnums"
+import { CardItem } from "../../core/components/card/CardListSection"
 import { CardTableSection } from "../../core/components/card/CardTableSection"
 import { ValueLabelPair } from "../../core/components/formInputs/SelectInput"
 import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
-import {
-	CircumstanceOptions,
-	CircumstanceOptionsLabel,
-	PendingAdoptionStatus,
-	PendingAdoptionStatusLabel,
-} from "../../enums/PendingAdoptionEnums"
+import { CircumstanceOptions, CircumstanceOptionsLabel, PendingAdoptionStatus, PendingAdoptionStatusLabel } from "../../enums/PendingAdoptionEnums"
 import { ChangeDogForm } from "../../forms/pendingAdoptions/ChangeDogForm"
 import { PendingAdoptionForm } from "../../forms/pendingAdoptions/PendingAdoptionForm"
 import { MessageForm, QuickText } from "../../forms/users/MessageForm"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { IPendingAdoption } from "../../models/PendingAdoptionModels"
-import { PendingAdoptionsAPI } from "../../api/pendingAdoptions/PendingAdoptionsAPI"
 import { DateTime } from "../../utils/DateTime"
 import { useChosenBoardState } from "./ChosenBoardAppState"
-import { CardItem } from "../../core/components/card/CardListSection"
-import ReactQuill from "react-quill"
 
 export function ChosenBoardApp() {
 	const boardState = useChosenBoardState()
@@ -152,9 +134,8 @@ function AdoptionCard({ adoption, cardColor }: { adoption: IPendingAdoption; car
 			label: "Status",
 			value:
 				PendingAdoptionStatusLabel[adoption.status as PendingAdoptionStatus] +
-				(adoption.status == PendingAdoptionStatus.READY_TO_ROLL
-					? " (HW " + (adoption.heartwormPositive ? "Pos)" : "Neg)")
-					: ""),
+				" (HW " +
+				(adoption.heartwormPositive ? "Pos)" : "Neg)"),
 		},
 		{ label: "Circumstance", value: CircumstanceOptionsLabel[adoption.circumstance as CircumstanceOptions] },
 		{ label: "Created", value: new DateTime(adoption.created).GetFullDateTime() },
@@ -206,7 +187,9 @@ function AdoptionCard({ adoption, cardColor }: { adoption: IPendingAdoption; car
 function AdoptionCardTitle({ adoption }: { adoption: IPendingAdoption }) {
 	return (
 		<div className="flex flex-row items-start gap-x-1">
-			<span>{adoption.dog}</span>
+			<span>
+				{adoption.dog} <HeartwormButton adoption={adoption} />
+			</span>
 		</div>
 	)
 }
@@ -234,8 +217,11 @@ function getOverdueForUpdate(adoption: IPendingAdoption) {
 	return new DateTime().DiffWithDate(compareInst) >= 7
 }
 
-interface AdoptionCardActionProps {
+interface AdoptionHeartwormActionProps {
 	adoption: IPendingAdoption
+}
+
+interface AdoptionCardActionProps extends AdoptionHeartwormActionProps {
 	heartworm?: boolean
 	icon: IconDefinition
 	message?: string
@@ -270,16 +256,9 @@ export function AdoptionCardActions({ adoption }: { adoption: IPendingAdoption }
 			/>
 			<StatusButton
 				{...actionProps}
-				heartworm
-				icon={faWorm}
+				icon={faCar}
 				status={PendingAdoptionStatus.READY_TO_ROLL}
-				titleAndTooltip="Ready to Roll - HW Pos"
-			/>
-			<StatusButton
-				{...actionProps}
-				icon={faVirusSlash}
-				status={PendingAdoptionStatus.READY_TO_ROLL}
-				titleAndTooltip="Ready to Roll - HW Neg"
+				titleAndTooltip="Ready to Roll"
 			/>
 			<StatusButton
 				{...actionProps}
@@ -366,7 +345,36 @@ function getQuickTextContent(adoption: IPendingAdoption, condition: string) {
 	} as ReactQuill.Value
 }
 
-function StatusButton({ adoption, heartworm, icon, status, titleAndTooltip }: AdoptionCardActionProps) {
+function HeartwormButton({ adoption }: AdoptionHeartwormActionProps) {
+	const adoptionID = adoption.ID
+	const heartworm = adoption.heartwormPositive
+	const boardState = useChosenBoardState()
+	const [hovered, setHovered] = useState(false)
+
+	const handleClick = useCallback(async () => {
+		if (!adoptionID) return
+		await new PendingAdoptionsAPI().MarkHeartworm(adoptionID, !heartworm)
+		boardState.refresh()
+	}, [adoptionID, boardState, heartworm])
+
+	const overlayIcon = hovered ? (heartworm ? faXmark : faPlus) : heartworm ? faPlus : undefined
+
+	const badgeClass = hovered ? (heartworm ? "bg-red-600" : "bg-green-600") : "bg-green-600"
+
+	return (
+		<CardActionButton
+			overlayClassName={badgeClass}
+			overlayIcon={overlayIcon}
+			primaryIcon={faWorm}
+			primaryTooltipContent={heartworm ? "Remove HW-Pos status" : "Mark HW-Pos"}
+			onClick={handleClick}
+			onMouseEnter={() => setHovered(true)}
+			onMouseLeave={() => setHovered(false)}
+		/>
+	)
+}
+
+function StatusButton({ adoption, icon, status, titleAndTooltip }: AdoptionCardActionProps) {
 	const adoptionID = adoption.ID
 	const boardState = useChosenBoardState()
 
@@ -375,16 +383,15 @@ function StatusButton({ adoption, heartworm, icon, status, titleAndTooltip }: Ad
 			return
 		}
 
-		await new PendingAdoptionsAPI().MarkStatus(adoptionID, status, heartworm)
+		await new PendingAdoptionsAPI().MarkStatus(adoptionID, status)
 		boardState.refresh()
-	}, [adoptionID, boardState, heartworm, status])
+	}, [adoptionID, boardState, status])
 
 	return <CardActionButton primaryIcon={icon} primaryTooltipContent={titleAndTooltip} onClick={handleClick} />
 }
 
 function StatusAreYouSureButton({
 	adoption,
-	heartworm,
 	icon,
 	titleAndTooltip: modalTitle,
 	status,
@@ -398,9 +405,9 @@ function StatusAreYouSureButton({
 			return
 		}
 
-		await new PendingAdoptionsAPI().MarkStatus(adoptionID, status, heartworm)
+		await new PendingAdoptionsAPI().MarkStatus(adoptionID, status)
 		boardState.refresh()
-	}, [adoptionID, boardState, heartworm, status])
+	}, [adoptionID, boardState, status])
 
 	return <CardActionAreYouSure icon={icon} modalTitle={modalTitle} youWantTo={youWantTo} onSubmit={handleDelete} />
 }

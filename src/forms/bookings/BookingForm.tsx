@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from "react"
 
+import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
+import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
+import { ScheduleAppointmentWithPreferencesRequest } from "../../api/appointments/Requests"
 import SelectInput, { SelectInputOption } from "../../core/components/formInputs/SelectInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
 import { ModalState } from "../../core/components/modal/Modal"
 import { SessionState } from "../../core/session/SessionState"
 import { IAppointment } from "../../models/AppointmentModels"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
-import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
-import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
-import { ScheduleAppointmentWithPreferencesRequest } from "../../api/appointments/Requests"
 import { AdopterPreferenceFieldset, AllFieldsOptionalMessage } from "../adopter/AdopterPreferenceForm"
 import { AdopterPreferencesFormFieldUpdater } from "../adopter/AdopterPreferenceFormState"
 import { FormProvider } from "../FormProvider"
@@ -107,14 +107,17 @@ export function AdopterSelectField({
 	onChange: (value: string | null) => Promise<void> // Updated signature
 }) {
 	const [options, setOptions] = useState<SelectInputOption<string>[]>([])
+	const [loadingOptions, setLoadingOptions] = useState(false)
 
 	const loadOptions = useCallback(async () => {
+		setLoadingOptions(true)
 		const resp = await new AdoptersAPI().GetAdopterSelectFieldOptions(false, false)
 		const loadedOptions: SelectInputOption<string>[] = resp.options.map((adopter) => ({
 			label: adopter.disambiguatedName,
 			value: String(adopter.ID),
 		}))
 		setOptions(loadedOptions)
+		setLoadingOptions(false)
 	}, [])
 
 	useEffect(() => {
@@ -123,12 +126,12 @@ export function AdopterSelectField({
 
 	return (
 		<SelectInput
-			disabled={apptData.hasCurrentBooking || session.adopterUser}
+			disabled={options.length == 0 || apptData.hasCurrentBooking || session.adopterUser}
 			errors={errors}
 			fieldLabel="Adopter"
 			hidden={apptData.hasCurrentBooking || session.adopterUser}
 			options={options}
-			placeholder="—CHOOSE ADOPTER—"
+			placeholder={loadingOptions ? "Loading options..." : "—CHOOSE ADOPTER—"}
 			showRequired
 			value={String(value ?? "")}
 			onChange={onChange}

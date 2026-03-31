@@ -1,6 +1,6 @@
 import { PendingAdoptionStatus } from "../../enums/PendingAdoptionEnums"
 import { APIBase } from "../APIBase"
-import { AddUpdateRequest, ChangeDogRequest, CreatePendingAdoptionRequest, MarkStatusRequest } from "./Requests"
+import { AddUpdateRequest, ChangeDogRequest, CreatePendingAdoptionRequest, MarkHeartwormRequest, MarkStatusRequest } from "./Requests"
 import { ActivePendingAdoptionsResponse, PendingAdoptionSelectFieldOptionsResponse } from "./Responses"
 
 export class PendingAdoptionsAPI extends APIBase {
@@ -28,7 +28,11 @@ export class PendingAdoptionsAPI extends APIBase {
 		return this.buildAndGetData<PendingAdoptionSelectFieldOptionsResponse>("GetPendingAdoptionSelectFieldOptions")
 	}
 
-	async MarkStatus(adoptionID: number, status: PendingAdoptionStatus, heartworm: boolean = false, message?: string) {
-		return this.buildAndPost<MarkStatusRequest>("MarkStatus", { adoptionID, heartworm, message, status })
+	async MarkHeartworm(adoptionID: number, heartworm: boolean) {
+		return this.buildAndPost<MarkHeartwormRequest>("MarkHeartworm", { adoptionID, heartworm })
+	}
+
+	async MarkStatus(adoptionID: number, status: PendingAdoptionStatus, message?: string) {
+		return this.buildAndPost<MarkStatusRequest>("MarkStatus", { adoptionID, message, status })
 	}
 }
