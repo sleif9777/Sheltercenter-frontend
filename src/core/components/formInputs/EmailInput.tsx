@@ -16,6 +16,7 @@ export function EmailInput({
 	return (
 		<TextInput
 			addlProps={{
+				autoCapitalize: "none",
 				autoComplete: "off",
 				error: value.length > 0 && !EmailValidator.validate(value),
 				margin: "dense",
@@ -30,7 +31,7 @@ export function EmailInput({
 			showRecommended={showRecommended}
 			showRequired={showRequired}
 			value={value}
-			onChange={(e) => onChange(e)}
+			onChange={(e: string) => onChange(e.toLocaleLowerCase().trim())}
 		/>
 	)
 }
