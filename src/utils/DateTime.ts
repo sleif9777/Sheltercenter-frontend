@@ -14,7 +14,7 @@ enum DateTimeFormat {
 	FullDateTime = "MMM D, YYYY, h:mm A", // January 1, 2026, 3:15 AM
 	MonthDay = "M/D", // 1/1
 	ShortDate = "M/D/YYYY", // 1/1/2026
-	ShortDateWithWeekday = "ddd M/D/YYYY",
+	ShortDateWithWeekday = "ddd M/D/YYYY", // Wed 1/1/2026
 	TimeOnly = "h:mm A", // 3:15 AM
 	Weekday = "dddd", // Saturday
 }
@@ -58,8 +58,14 @@ export class DateTime {
 		return this.Format(DateTimeFormat.MonthDay)
 	}
 
-	GetShortDate(includeWeekday: boolean = false): string {
-		return this.Format(includeWeekday ? DateTimeFormat.ShortDateWithWeekday : DateTimeFormat.ShortDate)
+	GetShortDate(includeWeekday: boolean = false, includeTime: boolean = false): string {
+		let dateStr = this.Format(includeWeekday ? DateTimeFormat.ShortDateWithWeekday : DateTimeFormat.ShortDate)
+
+		if (includeTime) {
+			dateStr += ", " + this.Format(DateTimeFormat.TimeOnly)
+		}
+
+		return dateStr
 	}
 
 	GetTimeOnly(): string {

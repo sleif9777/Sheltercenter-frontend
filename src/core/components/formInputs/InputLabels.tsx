@@ -27,7 +27,7 @@ export function InputLabel({
 		: ""
 
 	return (
-		<label className="text-left" htmlFor={elemID}>
+		<label className="text-left!" htmlFor={elemID}>
 			<span className="text-[16px] font-medium uppercase">{fieldLabel}</span>
 			<span className="ml-1.75">
 				{showError && (

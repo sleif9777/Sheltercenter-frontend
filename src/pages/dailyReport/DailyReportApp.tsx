@@ -2,8 +2,8 @@ import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
 import { ReportRowComponentProps, useReportingAppointment } from "../../core/components/report/UseReportingHook"
-import { ReportingAdoptionAppointment } from "../../models/AppointmentModels"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
+import { ReportingAdoptionAppointment } from "../../models/AppointmentModels"
 import { ApptInstantCell } from "../printView/PrintViewApp"
 import { ScheduleAppTitle } from "../schedule/ScheduleApp"
 import { useScheduleState } from "../schedule/ScheduleAppState"
@@ -63,9 +63,7 @@ export function DailyReportRow({ ID: apptID, isLast }: ReportRowComponentProps) 
 			<td>{appt.checkInTime ?? ""}</td>
 			<td>{appt.counselor}</td>
 			<td>{appt.checkOutTime ?? ""}</td>
-			<td>
-				{appt.outcomeDisplay} {appt.chosenDog && `${appt.chosenDog}`}
-			</td>
+			<td>{appt.outcomeDisplay}</td>
 		</tr>
 	)
 }

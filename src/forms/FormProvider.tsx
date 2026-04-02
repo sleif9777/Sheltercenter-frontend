@@ -87,7 +87,6 @@ export function FormProvider<T extends object>({
 					<div className="text-center text-[8pt]">
 						<pre className="wrap-break-word whitespace-normal">
 							<b>POST body: </b>
-							{JSON.stringify(getPostRequest(), null, 2)}
 						</pre>
 						<pre className="wrap-break-word whitespace-normal">
 							<b>Errors: </b>

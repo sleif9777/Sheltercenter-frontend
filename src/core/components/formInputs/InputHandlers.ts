@@ -54,6 +54,7 @@ export interface FileInputProps extends RequiredValueInputProps<File | null> {
 
 export interface DateInputProps extends OptionalValueInputProps<DateTime> {
 	addlProps?: DatePickerProps
+	container?: () => HTMLElement
 	currentYearOnly?: boolean
 	placeholder?: DateTime
 	size?: TypeAttributes.Size

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 
+import { ToastProvider } from "./core/components/messages/ToastProvider.tsx"
 import { NavigationBar } from "./core/navigation/NavigationBar.tsx"
 import { useSessionState } from "./core/session/SessionState.ts"
 import AdopterDetailsApp from "./pages/adopter/AdopterDetailsApp.tsx"
@@ -10,14 +11,17 @@ import { AdopterPreferencesApp } from "./pages/adopter/AdopterPreferencesApp.tsx
 import { AdopterUploadApp } from "./pages/adopter/AdopterUploadApp.tsx"
 import { ChosenBoardApp } from "./pages/chosenBoard/ChosenBoardApp.tsx"
 import DailyReportApp from "./pages/dailyReport/DailyReportApp.tsx"
+import DashboardsApp from "./pages/dashboards/DashboardsApp.tsx"
 import { ErrorApp } from "./pages/error/ErrorApp.tsx"
 import InProgressAppointmentsApp from "./pages/inProgressAppts/InProgressAppointmentsApp.tsx"
 import { LoginApp } from "./pages/login/LoginApp.tsx"
 import PrintViewApp from "./pages/printView/PrintViewApp.tsx"
 import { PrivacyPolicyApp } from "./pages/privacy/PrivacyPolicyApp.tsx"
+import RecentAdoptionsApp from "./pages/recentAdoptions/RecentAdoptionsApp.tsx"
 import RecentUploadsApp from "./pages/recentUploads/RecentUploadsApp.tsx"
 import { ScheduleApp } from "./pages/schedule/ScheduleApp.tsx"
 import TemplateApp from "./pages/template/TemplateApp.tsx"
+import { WatchlistApp } from "./pages/watchlist/WatchlistApp.tsx"
 
 import "./App.scss"
 import "@fontsource-variable/inter/wght-italic.css"
@@ -28,10 +32,6 @@ import "@fontsource/roboto/300.css"
 import "@fontsource/roboto/400.css"
 import "@fontsource/roboto/500.css"
 import "@fontsource/roboto/700.css"
-import { WatchlistApp } from "./pages/watchlist/WatchlistApp.tsx"
-import { ToastProvider } from "./core/components/messages/ToastProvider.tsx"
-import RecentAdoptionsApp from "./pages/recentAdoptions/RecentAdoptionsApp.tsx"
-import DashboardsApp from "./pages/dashboards/DashboardsApp.tsx"
 
 const SIDEBAR_STORAGE_KEY = "sidebar_collapsed"
 
@@ -68,7 +68,7 @@ function App() {
 
 	return (
 		<BrowserRouter>
-			<div className="flex h-screen w-screen flex-col overflow-hidden md:flex-row">
+			<div className="flex h-screen w-screen flex-col overflow-hidden md:flex-row print:h-auto print:overflow-visible">
 				{/* Mobile menu button */}
 				{session.isAuthenticated && (
 					<button
@@ -99,7 +99,7 @@ function App() {
 
 				{/* Main column */}
 				<div className="flex flex-1 flex-col not-print:min-h-screen lg:w-[85%] print:w-full">
-					<div className="flex-1 overflow-auto">
+					<div className="flex-1 overflow-auto print:overflow-visible">
 						{session.isAuthenticated ? (
 							<Routes>
 								<Route element={<AdopterLandingPageApp />} index={session.adopterUser} />

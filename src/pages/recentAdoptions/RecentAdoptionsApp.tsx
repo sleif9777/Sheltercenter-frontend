@@ -1,10 +1,10 @@
 import { faFileLines } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useCallback, useEffect, useState } from "react"
 
+import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import ReportTable, { ColumnDef, ColumnFormatCallback, Row, Value } from "../../core/components/report/Report"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { RecentAdoption } from "../../models/AppointmentModels"
 import { DateTime } from "../../utils/DateTime"
 
@@ -96,7 +96,7 @@ function constructRows(adoptions: RecentAdoption[]): Row[] {
 			date: new DateTime(a.instant).GetShortDate(),
 			dog: a.dog,
 			email: a.adopter.primaryEmail,
-			fullAddress: `${a.adopter.streetAddress}, ${a.adopter.city}, ${a.adopter.state} ${a.adopter.postalCode}`,
+			fullAddress: `${(a.adopter.streetAddress ?? "").length > 0 ? `${a.adopter.streetAddress},` : ""} ${a.adopter.city}, ${a.adopter.state} ${a.adopter.postalCode ?? ""}`,
 			name: a.adopter.firstName + " " + a.adopter.lastName + "^" + a.adopter.ID,
 			shelterluv: a.adopter.shelterluvAppID ?? "",
 		}

@@ -1,6 +1,3 @@
-// import "rsuite/dist/rsuite.min.css"
-
-// import "./DateInput.scss"
 import { useId, useState } from "react"
 import { DatePicker } from "rsuite"
 
@@ -8,7 +5,10 @@ import { DateTime } from "../../../utils/DateTime"
 import { DateInputProps } from "./InputHandlers"
 import { InputErrorLabel, InputLabel } from "./InputLabels"
 
+import "rsuite/DatePicker/styles/index.css"
+
 export function DateInput({
+	container,
 	fieldLabel,
 	onChange,
 	placeholder,
@@ -35,6 +35,7 @@ export function DateInput({
 			/>
 			<DatePicker
 				className="modal-date-picker"
+				container={container}
 				format="MM/dd/yyyy"
 				id={elemID}
 				limitStartYear={currentYearOnly ? value?.instant.get("year") : undefined}

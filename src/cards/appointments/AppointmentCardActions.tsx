@@ -13,10 +13,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { useCallback } from "react"
 
+import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { CardActionAreYouSure } from "../../core/components/card/CardActionAreYouSure"
 import { CardActionButton } from "../../core/components/card/CardActionButton"
 import { CardActionSection } from "../../core/components/card/CardActionSection"
 import { CardColor } from "../../core/components/card/CardEnums"
+import { MessageLevel } from "../../core/components/messages/Message"
+import { showToast } from "../../core/components/messages/ToastProvider"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
 import { Outcome } from "../../enums/AppointmentEnums"
@@ -27,7 +30,6 @@ import { BookingForm } from "../../forms/bookings/BookingForm"
 import { MessageForm } from "../../forms/users/MessageForm"
 import { IAppointment } from "../../models/AppointmentModels"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
-import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { AppointmentCardActionProps, AppointmentCardContext } from "./Types"
 import { getCanViewBookingForm, unpackApptData } from "./Utils"
 
@@ -301,6 +303,8 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 			adopterID: session.user.adopterID ?? 0,
 			apptID: appt.ID,
 		})
+
+		showToast({ level: MessageLevel.Success, message: "Appointment confirmed!" })
 
 		session.setCurrentAppt(appt)
 		schedule.refresh()

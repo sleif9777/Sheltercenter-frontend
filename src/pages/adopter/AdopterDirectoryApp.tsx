@@ -1,7 +1,8 @@
 import { faAddressCard, faBan, faHourglassHalf, faSpinner, IconDefinition } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
+import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
 import { CheckboxInput } from "../../core/components/formInputs/CheckboxInput"
 import { TextInput } from "../../core/components/formInputs/TextInput"
 import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
@@ -9,7 +10,6 @@ import { AdopterApprovalStatus } from "../../enums/AdopterEnums"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { DirectoryAdopter } from "../../models/AdopterModels"
-import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
 import { StringUtils } from "../../utils/StringUtils"
 
 let debounceTimeout: NodeJS.Timeout
@@ -19,54 +19,51 @@ export default function AdopterDirectoryApp() {
 	const [filterText, setFilterText] = useState<string>("")
 	const [includeArchived, setIncludeArchived] = useState<boolean>(false)
 	const [loading, setLoading] = useState<boolean>(false)
+	const abortControllerRef = useRef<AbortController | null>(null)
 
-	const fetchNewResult = useCallback(
-		async (filterText: string) => {
-			if (filterText.length < 3) {
-				setAdopters([])
-				return
-			}
+	const fetchNewResult = useCallback(async (filterText: string, archived: boolean) => {
+		if (filterText.length < 3) {
+			setAdopters([])
+			return
+		}
 
-			const loadingTimer: number | undefined = window.setTimeout(() => {
-				setLoading(true)
-			}, 2000)
+		// Abort any in-flight request
+		abortControllerRef.current?.abort()
+		abortControllerRef.current = new AbortController()
 
-			try {
-				const response = await new AdoptersAPI().GetAdopterDirectoryListing(filterText.toLowerCase(), includeArchived)
-				setAdopters(response.adopters)
-			} finally {
-				clearTimeout(loadingTimer)
-				setLoading(false)
-			}
-		},
-		[includeArchived]
-	)
+		const loadingTimer = window.setTimeout(() => {
+			setLoading(true)
+		}, 50)
+
+		try {
+			const response = await new AdoptersAPI().GetAdopterDirectoryListing(filterText.toLowerCase(), archived)
+			setAdopters(response.adopters)
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (e: any) {
+			if (e?.name !== "AbortError") throw e
+		} finally {
+			clearTimeout(loadingTimer)
+			setLoading(false)
+		}
+	}, [])
 
 	const handleFilterChange = useCallback(
 		(value: string) => {
 			setFilterText(value)
 			clearTimeout(debounceTimeout)
 			debounceTimeout = setTimeout(() => {
-				fetchNewResult(value)
-			}, 750)
+				fetchNewResult(value, includeArchived)
+			}, 250)
 		},
-		[fetchNewResult]
+		[fetchNewResult, includeArchived]
 	)
-
-	const triggerNewSearch = useCallback(() => {
-		fetchNewResult(filterText)
-	}, [fetchNewResult, filterText])
-
-	useEffect(() => {
-		fetchNewResult(filterText)
-	}, [fetchNewResult, filterText, includeArchived])
 
 	const handleArchivedChange = useCallback(
 		(checked: boolean) => {
 			setIncludeArchived(checked)
-			triggerNewSearch()
+			fetchNewResult(filterText, checked)
 		},
-		[triggerNewSearch]
+		[fetchNewResult, filterText]
 	)
 
 	return (
@@ -76,8 +73,8 @@ export default function AdopterDirectoryApp() {
 					<TextInput
 						addlProps={{
 							autoComplete: "off",
-							onBlur: triggerNewSearch,
-							onKeyDown: triggerNewSearch,
+							onBlur: () => fetchNewResult(filterText, includeArchived),
+							onKeyDown: () => fetchNewResult(filterText, includeArchived),
 						}}
 						fieldLabel="Filter Adopters"
 						value={filterText}

@@ -7,9 +7,9 @@ import SelectInput, { SelectChangeHandler, SelectInputOption } from "../../core/
 import { Modal, useModalState } from "../../core/components/modal/Modal"
 import { Weekday, WeekdayLabel } from "../../enums/TemplateEnums"
 import { TemplateForm } from "../../forms/templates/TemplateForm"
-import { TemplateHash } from "../../models/TemplateModels"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
+import { TemplateHash } from "../../models/TemplateModels"
 import { useTemplateState } from "./TemplateAppState"
 
 export default function TemplateApp() {
@@ -97,7 +97,6 @@ function TemplateTimeslot({ hash }: { hash: TemplateHash }) {
 	return (
 		<div className="pb-4" id={"timeslot-" + hash.key}>
 			<div className="pb-1 pl-2 text-left text-2xl">{hash.label}</div>
-			{/* <pre>{JSON.stringify(hash, null, 2)}</pre> */}
 			<ul className="columns-1 md:columns-2">
 				{hash.value.map((template, i) => (
 					<TemplateCard key={i} template={template} timeDisplay={hash.label} />

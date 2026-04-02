@@ -16,6 +16,7 @@ export interface IPendingAdoption {
 	circumstance: CircumstanceOptions
 
 	readyToRollInstant?: string
+	paperworkAppointmentInst?: string
 	heartwormPositive: boolean
 	updates?: PendingAdoptionUpdate[]
 	created: string

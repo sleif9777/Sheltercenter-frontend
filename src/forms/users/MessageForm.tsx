@@ -9,6 +9,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { SetStateAction, useCallback, useEffect, useMemo, useState } from "react"
 import ReactQuill from "react-quill"
 
+import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
+import { SendMessageRequest } from "../../api/adopters/Requests"
+import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { StringInputProps } from "../../core/components/formInputs/InputHandlers"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import { RichTextInput } from "../../core/components/formInputs/RichTextInput"
@@ -18,14 +21,11 @@ import { TextInput } from "../../core/components/formInputs/TextInput"
 import { MessageLevel } from "../../core/components/messages/Message"
 import { showToast } from "../../core/components/messages/ToastProvider"
 import { ModalState } from "../../core/components/modal/Modal"
-import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
-import { SendMessageRequest } from "../../api/adopters/Requests"
-import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
+import { BookingMessageTemplate } from "../../enums/BookingEnums"
+import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
 import { FormProvider } from "../FormProvider"
 import { ErrorMap } from "../FormState"
 import { MessageAdopterFormFieldUpdater, useMessageFormState } from "./MessageFormState"
-import { BookingMessageTemplate } from "../../enums/BookingEnums"
-import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
 
 export type QuickText = ValueLabelPair<number> & {
 	templateContent: ReactQuill.Value
@@ -226,7 +226,6 @@ function Fieldset({
 						<WildcardFields
 							disabled={isManuallyEdited}
 							initialValues={initialWildcardValues ?? {}}
-							key={JSON.stringify(selectedTemplate)}
 							templateContent={selectedTemplate}
 							onWildcardsChange={onWildcardsChange}
 						/>

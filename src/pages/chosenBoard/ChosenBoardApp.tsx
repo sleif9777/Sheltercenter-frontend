@@ -1,4 +1,19 @@
-import { faCar, faCheckCircle, faEnvelope, faEraser, faExclamationTriangle, faPencil, faPlus, faShieldDog, faSpinner, faThermometer, faUserDoctor, faWorm, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons"
+import {
+	faCarSide,
+	faCheckCircle,
+	faEnvelope,
+	faEraser,
+	faExclamationTriangle,
+	faPencil,
+	faPlus,
+	faShieldDog,
+	faSpinner,
+	faThermometer,
+	faUserDoctor,
+	faWorm,
+	faXmark,
+	IconDefinition,
+} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { ReactNode, useCallback, useEffect, useState } from "react"
 import ReactQuill from "react-quill"
@@ -15,7 +30,12 @@ import { CardTableSection } from "../../core/components/card/CardTableSection"
 import { ValueLabelPair } from "../../core/components/formInputs/SelectInput"
 import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
-import { CircumstanceOptions, CircumstanceOptionsLabel, PendingAdoptionStatus, PendingAdoptionStatusLabel } from "../../enums/PendingAdoptionEnums"
+import {
+	CircumstanceOptions,
+	CircumstanceOptionsLabel,
+	PendingAdoptionStatus,
+	PendingAdoptionStatusLabel,
+} from "../../enums/PendingAdoptionEnums"
 import { ChangeDogForm } from "../../forms/pendingAdoptions/ChangeDogForm"
 import { PendingAdoptionForm } from "../../forms/pendingAdoptions/PendingAdoptionForm"
 import { MessageForm, QuickText } from "../../forms/users/MessageForm"
@@ -137,6 +157,21 @@ function AdoptionCard({ adoption, cardColor }: { adoption: IPendingAdoption; car
 				" (HW " +
 				(adoption.heartwormPositive ? "Pos)" : "Neg)"),
 		},
+		{
+			label: "Paperwork",
+			value:
+				adoption.status == PendingAdoptionStatus.READY_TO_ROLL ? (
+					adoption.paperworkAppointmentInst ? (
+						new DateTime(adoption.paperworkAppointmentInst).GetShortDate(false, true)
+					) : (
+						<b>
+							<FontAwesomeIcon icon={faExclamationTriangle} /> Unscheduled
+						</b>
+					)
+				) : (
+					""
+				),
+		},
 		{ label: "Circumstance", value: CircumstanceOptionsLabel[adoption.circumstance as CircumstanceOptions] },
 		{ label: "Created", value: new DateTime(adoption.created).GetFullDateTime() },
 		{
@@ -256,7 +291,7 @@ export function AdoptionCardActions({ adoption }: { adoption: IPendingAdoption }
 			/>
 			<StatusButton
 				{...actionProps}
-				icon={faCar}
+				icon={faCarSide}
 				status={PendingAdoptionStatus.READY_TO_ROLL}
 				titleAndTooltip="Ready to Roll"
 			/>

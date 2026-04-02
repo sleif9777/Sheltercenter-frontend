@@ -55,7 +55,7 @@ export function getAppointmentCardTopDetails(apptData: IAppointment, session: Se
 		},
 		{
 			node: apptData.outcomeDisplay,
-			showIf: session.adminUser,
+			showIf: !session.adopterUser,
 		},
 	]
 }

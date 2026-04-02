@@ -50,7 +50,12 @@ function Fieldset({
 
 	return (
 		<div className="flex max-w-2xs flex-col gap-y-3">
-			<DateInput fieldLabel="Select a date" {...bindField("newDate")} onChange={(v) => setField("newDate", v)} />
+			<DateInput
+				container={() => document.querySelector(".font-lato.relative.z-10") as HTMLElement}
+				fieldLabel="Select a date"
+				{...bindField("newDate")}
+				onChange={(v) => setField("newDate", v)}
+			/>
 		</div>
 	)
 }

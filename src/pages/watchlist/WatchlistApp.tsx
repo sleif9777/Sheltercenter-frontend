@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useState } from "react"
-import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
-import { useWatchlistState } from "./WatchlistAppState"
-import { Modal, ModalState, useModalState } from "../../core/components/modal/Modal"
-import { ToolbarModal } from "../../layouts/Toolbar/Toolbar"
-import { useSessionState } from "../../core/session/SessionState"
-import { WatchlistHelpForm } from "../../forms/watchlist/WatchlistHelpForm"
+
+import { DogCard } from "../../cards/appointments/DogCard"
 import { StandardCard } from "../../core/components/card/Card"
 import { CardColor } from "../../core/components/card/CardEnums"
-import { DogCard } from "../../cards/appointments/DogCard"
 import RadioInput from "../../core/components/formInputs/RadioInput"
+import { Modal, ModalState, useModalState } from "../../core/components/modal/Modal"
+import { useSessionState } from "../../core/session/SessionState"
 import { WatchlistSortMethod, WatchlistSortMethodLabel } from "../../enums/DogEnums"
+import { WatchlistHelpForm } from "../../forms/watchlist/WatchlistHelpForm"
+import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
+import { ToolbarModal } from "../../layouts/Toolbar/Toolbar"
 import { HashDog } from "../../models/DogModels"
+import { useWatchlistState } from "./WatchlistAppState"
 
 export function WatchlistApp() {
 	const watchlist = useWatchlistState(),
@@ -88,7 +89,8 @@ export function WatchlistApp() {
 						value={sortMethod}
 						onChange={(v: WatchlistSortMethod) => setSortMethod(v)}
 					/>
-					<ul className={session.adopterUser ? "" : "mt-2 columns-1 lg:columns-2"}>
+					<ul className={session.adopterUser ? "" : "mt-2 grid grid-cols-1 gap-x-4 lg:grid-cols-2"}>
+						{" "}
 						{watchlist.dogHash?.notWatching.sort(sortDogs).map((dog, i) => (
 							<li key={i}>
 								<DogCard dogID={dog.ID} inWatchlist={false} />

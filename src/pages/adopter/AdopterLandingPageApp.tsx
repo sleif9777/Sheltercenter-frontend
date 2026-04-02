@@ -1,20 +1,22 @@
+import { faShieldDog } from "@fortawesome/free-solid-svg-icons"
 import { useCallback } from "react"
 import ReactQuill from "react-quill"
 
-import { AppointmentCard } from "../../cards/appointments/AppointmentCard"
-import { AppointmentCardContext } from "../../cards/appointments/Types"
-import { LargeButton } from "../../core/components/buttons/LargeButton"
-import { AreYouSure } from "../../core/components/modal/AreYouSure"
-import { Modal, useModalState } from "../../core/components/modal/Modal"
-import { useSessionState } from "../../core/session/SessionState"
-import { QuickText, MessageForm } from "../../forms/users/MessageForm"
-import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import Logo from "../../assets/logo.png"
 import UserInstructions from "../../assets/UserInstructions.jpg"
-import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
-import { faShieldDog } from "@fortawesome/free-solid-svg-icons"
+import { AppointmentCard } from "../../cards/appointments/AppointmentCard"
+import { AppointmentCardContext } from "../../cards/appointments/Types"
+import { LargeButton } from "../../core/components/buttons/LargeButton"
+import { MessageLevel } from "../../core/components/messages/Message"
+import { showToast } from "../../core/components/messages/ToastProvider"
 import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
+import { AreYouSure } from "../../core/components/modal/AreYouSure"
+import { Modal, useModalState } from "../../core/components/modal/Modal"
+import { useSessionState } from "../../core/session/SessionState"
+import { MessageForm, QuickText } from "../../forms/users/MessageForm"
+import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
+import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { useScheduleState } from "../schedule/ScheduleAppState"
 
 export function AdopterLandingPageApp() {
@@ -101,6 +103,7 @@ export function CancelAppointmentButton() {
 
 	const handleSubmit = useCallback(async () => {
 		await new AppointmentsAPI().CancelAppointment(currentAppt!.ID)
+		showToast({ level: MessageLevel.Error, message: "Appointment cancelled." })
 		session.removeCurrentAppt()
 		schedule.refresh()
 	}, [currentAppt, session, schedule])
@@ -111,10 +114,10 @@ export function CancelAppointmentButton() {
 
 	return (
 		<>
-			<LargeButton label="Cancel My Appointment" onClick={modalState.open} />
+			<LargeButton label={`Cancel My Appointment (${currentAppt.instantDisplay})`} onClick={modalState.open} />
 			<AreYouSure
 				modalState={modalState}
-				modalTitle={"Cancel My Appointment"}
+				modalTitle={"Cancel Appointment"}
 				youWantTo={"cancel your appointment"}
 				onSubmit={handleSubmit}
 			/>

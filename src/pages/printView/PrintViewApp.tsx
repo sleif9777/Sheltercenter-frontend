@@ -8,7 +8,12 @@ import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { ReportRowComponentProps, useReportingAppointment } from "../../core/components/report/UseReportingHook"
 import { AppointmentType } from "../../enums/AppointmentEnums"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
-import { HashAppointment, ReportingAdminAppointment, ReportingAdoptionAppointment, ReportingAppointment } from "../../models/AppointmentModels"
+import {
+	HashAppointment,
+	ReportingAdminAppointment,
+	ReportingAdoptionAppointment,
+	ReportingAppointment,
+} from "../../models/AppointmentModels"
 import { IBooking } from "../../models/BookingModels"
 import { DateTime } from "../../utils/DateTime"
 import { ScheduleAppTitle } from "../schedule/ScheduleApp"
@@ -29,17 +34,17 @@ export default function PrintViewApp() {
 
 	return (
 		<FullWidthPage title={<ScheduleAppTitle />}>
-			<div className="mx-2 mt-3 border-t border-pink-700 pt-3">
+			<div className="mx-2 mt-3 pt-3 not-print:border-t not-print:border-pink-700">
 				<table className="w-full text-left">
 					<thead className="text-lg underline">
-						<tr>
-							<th>Time</th>
-							<th>Appointment</th>
-							<th className="hidden lg:table-cell print:table-cell">Notes</th>
-							<th className="hidden lg:table-cell print:table-cell">Check-In</th>
-							<th className="hidden lg:table-cell print:table-cell">Clothing Description</th>
-							<th className="hidden lg:table-cell print:table-cell">Counselor</th>
-							<th>Check-Out</th>
+						<tr className="print:border-b print:border-pink-700">
+							<th className="print:pl-0.5">Time</th>
+							<th className="print:pl-0.5">Appointment</th>
+							<th className="hidden lg:table-cell print:table-cell print:pl-0.5">Notes</th>
+							<th className="hidden lg:table-cell print:table-cell print:pl-0.5">Check-In</th>
+							<th className="hidden lg:table-cell print:table-cell print:pl-0.5">Clothing Description</th>
+							<th className="hidden lg:table-cell print:table-cell print:pl-0.5">Counselor</th>
+							<th className="print:pl-0.5">Check-Out</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -73,11 +78,20 @@ function PrintViewAppointmentRow({ ID: apptID, isLast }: ReportRowComponentProps
 		<tr className={"align-top hover:bg-pink-200 " + (isLast ? "" : "border-b border-pink-700")}>
 			<ApptInstantCell appt={appt} />
 			<AdopterInfoCell appt={appt} />
-			<AdoptionNotesCell booking={appt.booking} className="hidden lg:table-cell print:table-cell" />
-			<td className="hidden lg:table-cell print:table-cell">{appt.checkInTime}</td>
-			<td className="hidden lg:table-cell print:table-cell">{appt.clothingDescription}</td>
-			<td className="hidden lg:table-cell print:table-cell">{appt.counselor}</td>
-			<td>{appt.checkOutTime ?? ""}</td>
+			<AdoptionNotesCell
+				booking={appt.booking}
+				className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5"
+			/>
+			<td className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5">
+				{appt.checkInTime}
+			</td>
+			<td className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5">
+				{appt.clothingDescription}
+			</td>
+			<td className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5">
+				{appt.counselor}
+			</td>
+			<td className="print:border-l print:border-pink-700 print:p-0.5">{appt.checkOutTime ?? ""}</td>
 		</tr>
 	)
 }
@@ -104,12 +118,12 @@ function PrintViewAdminRow({ ID: apptID, isLast }: ReportRowComponentProps) {
 
 // NOTE: also used in DailyReportApp
 export function ApptInstantCell({ appt }: { appt: ReportingAppointment }) {
-	return <td>{appt.timeDisplay}</td>
+	return <td className="print:border-r print:border-pink-700 print:p-0.5">{appt.timeDisplay}</td>
 }
 
 function AdminApptInfoCell({ appt }: { appt: ReportingAdminAppointment }) {
 	return (
-		<td>
+		<td className="print:border-x print:border-pink-700 print:p-0.5">
 			<b>{appt.description}</b>
 			<div className="text-xs italic">({appt.typeDisplay})</div>
 		</td>
@@ -121,7 +135,7 @@ function AdopterInfoCell({ appt }: { appt: ReportingAdoptionAppointment }) {
 		adopter = booking.adopter
 
 	return (
-		<td>
+		<td className="print:border-x print:border-pink-700 print:p-0.5">
 			<div>
 				<b>
 					{appt.description}
@@ -188,7 +202,7 @@ function AdoptionNotesCell({ booking, className }: { booking: IBooking; classNam
 
 function AdminNotesCell({ appt }: { appt: ReportingAdminAppointment }) {
 	return appt.type == AppointmentType.DONATION_DROP_OFF ? (
-		<td className="hidden lg:table-cell print:table-cell">
+		<td className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5">
 			<Note note={appt.notes} source="Appointment" />
 		</td>
 	) : (

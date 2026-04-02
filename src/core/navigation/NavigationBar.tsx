@@ -1,32 +1,38 @@
+import { IconDefinition, IconProp } from "@fortawesome/fontawesome-svg-core"
 import {
 	faCalendar,
 	faCalendarWeek,
+	faCarSide,
 	faChevronDown,
 	faChevronLeft,
 	faChevronRight,
 	faChevronUp,
 	faClipboardList,
+	faClock,
+	faClockRotateLeft,
 	faDashboard,
+	faDog,
 	faEye,
 	faFileUpload,
-	faHeart,
+	faHammer,
 	faHome,
-	faList,
 	faLock,
+	faPersonWalking,
+	faSearch,
 	faSignOutAlt,
 	faStar,
+	faTag,
 	faUpload,
 	faUsers,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core"
 import { ReactNode, useCallback, useState } from "react"
+import React from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 import Logo from "../../assets/logo.png"
-import { useSessionState } from "../session/SessionState"
 import { TooltipProvider } from "../components/messages/TooltipProvider"
-import React from "react"
+import { useSessionState } from "../session/SessionState"
 
 interface NavigationBarProps {
 	debug?: boolean
@@ -167,6 +173,8 @@ function NavigationButton({
 	route,
 	onNavigate,
 	collapsed,
+	overlayIcon,
+	overlayClassName,
 }: {
 	caption: string
 	disabled?: boolean
@@ -177,6 +185,8 @@ function NavigationButton({
 	route?: string
 	onNavigate?: () => void
 	collapsed?: boolean
+	overlayIcon?: IconProp
+	overlayClassName?: string
 }) {
 	const handleClick = useCallback(
 		(e: React.MouseEvent) => {
@@ -206,7 +216,16 @@ function NavigationButton({
 						to={route ?? "#"}
 						onClick={handleClick}
 					>
-						<FontAwesomeIcon className="text-lg" icon={icon} />
+						<span className="relative inline-block">
+							<FontAwesomeIcon className="text-lg" icon={icon} />
+							{overlayIcon && (
+								<span
+									className={`absolute -right-1.5 -bottom-0.5 flex h-3 w-3 items-center justify-center rounded-full ${overlayClassName ?? "bg-red-600 text-white"}`}
+								>
+									<FontAwesomeIcon className="text-[0.45rem]" icon={overlayIcon} />
+								</span>
+							)}
+						</span>
 					</Link>
 				</div>
 			</TooltipProvider>
@@ -266,8 +285,10 @@ function WatchlistButton({ noBorder, collapsed, onNavigate }: NavigationButtonPr
 		<NavigationButton
 			caption={session.adopterUser ? "My Dog Watchlist" : "Available Dogs"}
 			collapsed={collapsed}
-			icon={faEye}
+			icon={session.adopterUser ? faEye : faDog}
 			noBorder={noBorder}
+			overlayClassName="bg-white text-pink-700"
+			overlayIcon={session.adopterUser ? faStar : faTag}
 			route="/watchlist/"
 			onNavigate={onNavigate}
 		/>
@@ -306,6 +327,8 @@ function WeeklyTemplateButton({ noBorder, collapsed, onNavigate }: NavigationBut
 			collapsed={collapsed}
 			icon={faCalendarWeek}
 			noBorder={noBorder}
+			overlayClassName="bg-white text-pink-700"
+			overlayIcon={faHammer}
 			route="/calendar_template/"
 			onNavigate={onNavigate}
 		/>
@@ -332,6 +355,8 @@ function AdopterDirectoryButton({ noBorder, collapsed, onNavigate }: NavigationB
 			collapsed={collapsed}
 			icon={faUsers}
 			noBorder={noBorder}
+			overlayClassName="bg-none text-pink-700"
+			overlayIcon={faSearch}
 			route="/adopters/directory/"
 			onNavigate={onNavigate}
 		/>
@@ -356,8 +381,10 @@ function InProgressAppointmentsButton({ noBorder, collapsed, onNavigate }: Navig
 		<NavigationButton
 			caption="In Progress Appts"
 			collapsed={collapsed}
-			icon={faList}
+			icon={faPersonWalking}
 			noBorder={noBorder}
+			overlayClassName="bg-white text-pink-700"
+			overlayIcon={faClock}
 			route="/in_progress/"
 			onNavigate={onNavigate}
 		/>
@@ -383,6 +410,8 @@ function RecentUploadsButton({ noBorder, collapsed, onNavigate }: NavigationButt
 			collapsed={collapsed}
 			icon={faFileUpload}
 			noBorder={noBorder}
+			overlayClassName="bg-white text-pink-700"
+			overlayIcon={faClockRotateLeft}
 			route="/recent_uploads/"
 			onNavigate={onNavigate}
 		/>
@@ -394,8 +423,10 @@ function RecentAdoptionsButton({ noBorder, collapsed, onNavigate }: NavigationBu
 		<NavigationButton
 			caption="Recent Adoptions"
 			collapsed={collapsed}
-			icon={faHeart}
+			icon={faCarSide}
 			noBorder={noBorder}
+			overlayClassName="bg-white text-pink-700"
+			overlayIcon={faClockRotateLeft}
 			route="/recent_adoptions/"
 			onNavigate={onNavigate}
 		/>
