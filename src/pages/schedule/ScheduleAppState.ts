@@ -55,7 +55,7 @@ export const useScheduleState = create<ScheduleState>((set, get) => {
 		isPastCloseTime: () => {
 			const { dateUtil, isToday } = get()
 
-			return isToday() && dateUtil.CloseTime().isAfter(dateUtil.instant)
+			return isToday() && dateUtil.CloseTime().isBefore(dateUtil.instant)
 		},
 
 		isToday: () => {

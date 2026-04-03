@@ -221,7 +221,13 @@ export function AbleToMeet({ apptData }: { apptData: IAppointment }) {
 
 	const { adults, funSize, puppies } = getAvailableTypes(apptData.type, schedule.dateUtil.GetWeekday())
 
-	const unavailableDogs = getNotYetAvailableDogsFromWatchlist(watchlist ?? [], schedule.dateUtil, funSize, puppies)
+	const unavailableDogs = getNotYetAvailableDogsFromWatchlist(
+		watchlist ?? [],
+		schedule.dateUtil,
+		funSize,
+		puppies,
+		adults
+	)
 
 	return (
 		<>
@@ -411,8 +417,14 @@ export function MessageSection({ apptData }: { apptData: IAppointment }) {
 		return
 	}
 
-	const { funSize, puppies } = getAvailableTypes(apptData.type, schedule.dateUtil.GetWeekday())
-	const notYetAvailableDogs = getNotYetAvailableDogsFromWatchlist(adopter.watchlist, schedule.dateUtil, funSize, puppies)
+	const { funSize, puppies, adults } = getAvailableTypes(apptData.type, schedule.dateUtil.GetWeekday())
+	const notYetAvailableDogs = getNotYetAvailableDogsFromWatchlist(
+		adopter.watchlist,
+		schedule.dateUtil,
+		funSize,
+		puppies,
+		adults
+	)
 	const noLongerAvailableDogs = adopter.watchlist
 		.filter((d) => !d.availableNow)
 		.map((d) => d.name)
@@ -459,9 +471,15 @@ function WatchlistSection({ apptData }: { apptData: IAppointment }) {
 	}
 
 	const watchlistTable: ValueLabelPair<ReactNode>[] = []
-	const { funSize, puppies } = getAvailableTypes(apptData.type, schedule.dateUtil.GetWeekday())
+	const { funSize, puppies, adults } = getAvailableTypes(apptData.type, schedule.dateUtil.GetWeekday())
 
-	const notYetAvailableDogs = getNotYetAvailableDogsFromWatchlist(adopter.watchlist, schedule.dateUtil, funSize, puppies)
+	const notYetAvailableDogs = getNotYetAvailableDogsFromWatchlist(
+		adopter.watchlist,
+		schedule.dateUtil,
+		funSize,
+		puppies,
+		adults
+	)
 
 	const noLongerAvailableDogs = adopter.watchlist
 		.filter((dog) => !dog.availableNow)
@@ -535,7 +553,8 @@ function getNotYetAvailableDogsFromWatchlist(
 	watchlist: AdopterWatchlist,
 	scheduleDateUtil: DateTime,
 	funSize: boolean,
-	puppies: boolean
+	puppies: boolean,
+	adults: boolean
 ) {
 	watchlist = watchlist.filter((dog) => dog.availableNow)
 
@@ -550,8 +569,13 @@ function getNotYetAvailableDogsFromWatchlist(
 	}
 
 	if (!puppies) {
-		const puppies: string[] = watchlist?.filter((dog) => dog.ageMonths <= 6).map((dog) => dog.name) ?? []
-		notYetAvailableDogs = notYetAvailableDogs.concat(puppies)
+		const puppyDogs: string[] = watchlist?.filter((dog) => dog.ageMonths <= 6).map((dog) => dog.name) ?? []
+		notYetAvailableDogs = notYetAvailableDogs.concat(puppyDogs)
+	}
+
+	if (!adults) {
+		const adultDogs: string[] = watchlist?.filter((dog) => dog.ageMonths > 6 && !dog.funSize).map((dog) => dog.name) ?? []
+		notYetAvailableDogs = notYetAvailableDogs.concat(adultDogs)
 	}
 
 	return [...new Set(notYetAvailableDogs)].sort((a, b) => a.localeCompare(b))

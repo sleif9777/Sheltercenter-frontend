@@ -389,7 +389,12 @@ function WalkInFormModal() {
 }
 
 function ScheduleTimeslot({ hash }: { hash: AppointmentHash }) {
-	const session = useSessionState()
+	const session = useSessionState(),
+		schedule = useScheduleState()
+
+	if (session.adopterUser && schedule.isToday() && DateTime.IsTimekeyInPast(hash.key)) {
+		return
+	}
 
 	// Filter appointments based on user type
 	const filteredAppointments: HashAppointment[] = session.adopterUser

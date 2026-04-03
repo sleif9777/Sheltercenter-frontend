@@ -12,14 +12,14 @@ import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { DirectoryAdopter } from "../../models/AdopterModels"
 import { StringUtils } from "../../utils/StringUtils"
 
-let debounceTimeout: NodeJS.Timeout
-
 export default function AdopterDirectoryApp() {
 	const [adopters, setAdopters] = useState<DirectoryAdopter[]>([])
 	const [filterText, setFilterText] = useState<string>("")
 	const [includeArchived, setIncludeArchived] = useState<boolean>(false)
 	const [loading, setLoading] = useState<boolean>(false)
+	const [hasSearched, setHasSearched] = useState<boolean>(false)
 	const abortControllerRef = useRef<AbortController | null>(null)
+	const isLoadingRef = useRef<boolean>(false)
 
 	const fetchNewResult = useCallback(async (filterText: string, archived: boolean) => {
 		if (filterText.length < 3) {
@@ -27,7 +27,10 @@ export default function AdopterDirectoryApp() {
 			return
 		}
 
-		// Abort any in-flight request
+		if (isLoadingRef.current) return
+
+		isLoadingRef.current = true
+
 		abortControllerRef.current?.abort()
 		abortControllerRef.current = new AbortController()
 
@@ -42,21 +45,11 @@ export default function AdopterDirectoryApp() {
 		} catch (e: any) {
 			if (e?.name !== "AbortError") throw e
 		} finally {
+			isLoadingRef.current = false
 			clearTimeout(loadingTimer)
 			setLoading(false)
 		}
 	}, [])
-
-	const handleFilterChange = useCallback(
-		(value: string) => {
-			setFilterText(value)
-			clearTimeout(debounceTimeout)
-			debounceTimeout = setTimeout(() => {
-				fetchNewResult(value, includeArchived)
-			}, 250)
-		},
-		[fetchNewResult, includeArchived]
-	)
 
 	const handleArchivedChange = useCallback(
 		(checked: boolean) => {
@@ -73,12 +66,20 @@ export default function AdopterDirectoryApp() {
 					<TextInput
 						addlProps={{
 							autoComplete: "off",
-							onBlur: () => fetchNewResult(filterText, includeArchived),
-							onKeyDown: () => fetchNewResult(filterText, includeArchived),
+							onKeyDown: (e: React.KeyboardEvent) => {
+								if (e.key === "Enter" && !isLoadingRef.current) {
+									setHasSearched(true)
+									fetchNewResult(filterText, includeArchived)
+								}
+							},
 						}}
+						errors={!hasSearched && filterText.length >= 3 ? ["Press Enter to search."] : undefined}
 						fieldLabel="Filter Adopters"
 						value={filterText}
-						onChange={(e) => handleFilterChange(e)}
+						onChange={(e) => {
+							setFilterText(e)
+							setHasSearched(false)
+						}}
 					/>
 					<CheckboxInput
 						addlProps={{

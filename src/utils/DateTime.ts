@@ -9,7 +9,7 @@ export type ISODateDict = {
 }
 
 enum DateTimeFormat {
-	ISODate = "yyyy-MM-DD", // 2026-01-01
+	ISODate = "YYYY-MM-DD", // 2026-01-01
 	FullDate = "MMM D, YYYY", // January 1, 2026
 	FullDateTime = "MMM D, YYYY, h:mm A", // January 1, 2026, 3:15 AM
 	MonthDay = "M/D", // 1/1
@@ -32,6 +32,10 @@ export class DateTime {
 		const d = this.instant.clone()
 		d.set("hour", this.GetWeekday() == Weekday.SATURDAY ? 15 : 18)
 		d.set("minute", 0)
+
+		// DEBUG: Set close time to 11:59 PM on the date of the appointment, since we don't have a way to know the actual close time for each date
+		// d.set("hour", 23)
+		// d.set("minute", 59)
 
 		return d
 	}
@@ -95,5 +99,17 @@ export class DateTime {
 
 	IsTodayOrLater(): boolean {
 		return this.instant.isSameOrAfter(moment(), "day")
+	}
+
+	static IsTimekeyInPast(key: number): boolean {
+		const hours = Math.floor(key / 100)
+		const minutes = key % 100
+
+		const slotTime = new DateTime()
+		slotTime.instant.set("hour", hours)
+		slotTime.instant.set("minute", minutes)
+		slotTime.instant.set("second", 0)
+
+		return slotTime.instant.isBefore(moment())
 	}
 }
