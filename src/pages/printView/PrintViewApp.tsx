@@ -115,11 +115,11 @@ function PrintViewAdminRow({ ID: apptID, isLast }: ReportRowComponentProps) {
 			<ApptInstantCell appt={appt} />
 			<AdminApptInfoCell appt={appt} />
 			<AdminNotesCell appt={appt} />
-			<td className="hidden lg:table-cell print:table-cell"></td>
-			<td className="hidden lg:table-cell print:table-cell"></td>
-			<td className="hidden lg:table-cell print:table-cell"></td>
-			<td className="hidden lg:table-cell print:table-cell"></td>
-			<td></td>
+			<td className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5"></td>
+			<td className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5"></td>
+			<td className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5"></td>
+			<td className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5"></td>
+			<td className="print:border-l print:border-pink-700 print:p-0.5"></td>
 		</tr>
 	)
 }
