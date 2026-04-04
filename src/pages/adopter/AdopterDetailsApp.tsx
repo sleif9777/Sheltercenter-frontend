@@ -31,20 +31,12 @@ export default function AdopterDetailsApp() {
 		{ demo, apptID } = appState
 	const userFormDefaults = useMemo(() => ({ ...demo }), [demo])
 
-	const fetchData = useCallback(
-		async (intID: number) => {
-			if (!intID) {
-				return
-			}
-
-			appState.refresh(intID)
-		},
-		[appState]
-	)
-
 	useEffect(() => {
-		fetchData(intID)
-	}, [fetchData, intID])
+		if (intID) {
+			appState.refresh(intID)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [intID])
 
 	if (!id || !demo) {
 		return (
