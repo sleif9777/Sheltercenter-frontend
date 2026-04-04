@@ -54,10 +54,11 @@ function sortByName(dogs: DashboardDog[]) {
 
 function sortByUnavailableDateThenName(dogs: DashboardDog[]) {
 	return [...dogs].sort((a, b) => {
-		const dateA = new DateTime(a.unavailableDate ?? "")
-		const dateB = new DateTime(b.unavailableDate ?? "")
-		if (dateA !== dateB) {
-			return dateB.DiffWithDate(dateA) > 0 ? 1 : -1
+		const dateA = new DateTime(a.unavailableDate)
+		const dateB = new DateTime(b.unavailableDate)
+		const diff = dateB.DiffWithDate(dateA)
+		if (diff !== 0) {
+			return diff > 0 ? -1 : 1
 		}
 		return a.name.localeCompare(b.name)
 	})

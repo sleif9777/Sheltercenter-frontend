@@ -524,7 +524,7 @@ function WatchlistSection({ apptData }: { apptData: IAppointment }) {
 	return <CardTableSection items={watchlistTable} showBorder title="Watchlist" />
 }
 
-function getAvailableTypes(apptType: AppointmentType, weekday: Weekday) {
+export function getAvailableTypes(apptType: AppointmentType, weekday: Weekday) {
 	let adults = false,
 		funSize = false,
 		puppies = false
@@ -549,7 +549,7 @@ function getAvailableTypes(apptType: AppointmentType, weekday: Weekday) {
 	return { adults, funSize, puppies }
 }
 
-function getNotYetAvailableDogsFromWatchlist(
+export function getNotYetAvailableDogsFromWatchlist(
 	watchlist: AdopterWatchlist,
 	scheduleDateUtil: DateTime,
 	funSize: boolean,

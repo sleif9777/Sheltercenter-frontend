@@ -18,6 +18,8 @@ import { IBooking } from "../../models/BookingModels"
 import { DateTime } from "../../utils/DateTime"
 import { ScheduleAppTitle } from "../schedule/ScheduleApp"
 import { useScheduleState } from "../schedule/ScheduleAppState"
+import { AdopterWatchlist } from "../../models/DogModels"
+import { getAvailableTypes, getNotYetAvailableDogsFromWatchlist } from "../../cards/appointments/AppointmentCard"
 
 export default function PrintViewApp() {
 	const { date } = useParams()
@@ -41,6 +43,7 @@ export default function PrintViewApp() {
 							<th className="print:pl-0.5">Time</th>
 							<th className="print:pl-0.5">Appointment</th>
 							<th className="hidden lg:table-cell print:table-cell print:pl-0.5">Notes</th>
+							<th className="hidden lg:table-cell print:table-cell print:pl-0.5">Watchlist</th>
 							<th className="hidden lg:table-cell print:table-cell print:pl-0.5">Check-In</th>
 							<th className="hidden lg:table-cell print:table-cell print:pl-0.5">Clothing Description</th>
 							<th className="hidden lg:table-cell print:table-cell print:pl-0.5">Counselor</th>
@@ -82,6 +85,10 @@ function PrintViewAppointmentRow({ ID: apptID, isLast }: ReportRowComponentProps
 				booking={appt.booking}
 				className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5"
 			/>
+			<WatchlistCell
+				appointment={appt}
+				className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5"
+			/>
 			<td className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5">
 				{appt.checkInTime}
 			</td>
@@ -108,6 +115,7 @@ function PrintViewAdminRow({ ID: apptID, isLast }: ReportRowComponentProps) {
 			<ApptInstantCell appt={appt} />
 			<AdminApptInfoCell appt={appt} />
 			<AdminNotesCell appt={appt} />
+			<td className="hidden lg:table-cell print:table-cell"></td>
 			<td className="hidden lg:table-cell print:table-cell"></td>
 			<td className="hidden lg:table-cell print:table-cell"></td>
 			<td className="hidden lg:table-cell print:table-cell"></td>
@@ -173,28 +181,27 @@ function AdopterInfoCell({ appt }: { appt: ReportingAdoptionAppointment }) {
 }
 
 function AdoptionNotesCell({ booking, className }: { booking: IBooking; className?: string }) {
-	const adopter = booking.adopter,
-		history = adopter.demographics.bookingHistory
+	const adopter = booking.adopter
 
 	const notesDict = [
 		{
-			note: history.completed + history.noShow == 0 ? adopter.preferences.applicationComments : "",
-			source: "Shelterluv",
+			note: adopter.preferences.applicationComments ?? "",
+			source: "From Shelterluv",
 		},
 		{
 			note: adopter.preferences.adopterNotes,
-			source: adopter.demographics.firstName,
+			source: "From " + adopter.demographics.firstName,
 		},
 		{
 			note: adopter.demographics.internalNotes,
-			source: "Adoptions",
+			source: "From Adoptions",
 		},
 	]
 
 	return (
-		<td className={"max-w-32 " + className}>
+		<td className={"max-w-32 text-sm " + className}>
 			{notesDict.map((n, i) => (
-				<Note key={i} note={n.note} source={n.source} />
+				<Note key={i} label={n.source} note={n.note} />
 			))}
 		</td>
 	)
@@ -203,22 +210,75 @@ function AdoptionNotesCell({ booking, className }: { booking: IBooking; classNam
 function AdminNotesCell({ appt }: { appt: ReportingAdminAppointment }) {
 	return appt.type == AppointmentType.DONATION_DROP_OFF ? (
 		<td className="hidden lg:table-cell print:table-cell print:border-x print:border-pink-700 print:p-0.5">
-			<Note note={appt.notes} source="Appointment" />
+			<Note label="Appointment" note={appt.notes} />
 		</td>
 	) : (
 		<td className="hidden lg:table-cell print:table-cell"></td>
 	)
 }
 
-function Note({ source, note }: { source: string; note?: string }) {
+function Note({ label, note, noteClass }: { label: string; note?: string; noteClass?: string }) {
 	if (!note) {
 		return null
 	}
 
 	return (
 		<div>
-			<b>From {source}: </b>
-			{note}
+			<b>{label}: </b>
+			<span className={noteClass}>{note}</span>
 		</div>
+	)
+}
+
+function WatchlistCell({ appointment, className }: { appointment: ReportingAdoptionAppointment; className?: string }) {
+	const schedule = useScheduleState()
+
+	if (!appointment.booking) {
+		return <td className={"max-w-32 text-sm " + className}></td>
+	}
+
+	const { funSize, puppies, adults } = getAvailableTypes(appointment.type, schedule.dateUtil.GetWeekday())
+	const watchlist: AdopterWatchlist = appointment.booking.adopter.watchlist
+
+	const notYetAvailableDogs = getNotYetAvailableDogsFromWatchlist(watchlist, schedule.dateUtil, funSize, puppies, adults)
+
+	const noLongerAvailableDogs = watchlist
+		.filter((dog) => !dog.availableNow)
+		.map((dog) => dog.name)
+		.sort((a, b) => a.localeCompare(b))
+
+	const stillAvailableDogs = watchlist
+		.filter(
+			(dog) => !notYetAvailableDogs.some((d) => d === dog.name) && !noLongerAvailableDogs.some((d) => d === dog.name)
+		)
+		.map((dog) => dog.name)
+		.sort((a, b) => a.localeCompare(b))
+
+	const watchlistDict = [
+		{
+			label: "Available",
+			note: stillAvailableDogs.join(", "),
+		},
+		{
+			label: "Not Yet Available",
+			note: notYetAvailableDogs.join(", "),
+		},
+		{
+			label: "No Longer Available",
+			note: noLongerAvailableDogs.join(", "),
+		},
+	]
+
+	return (
+		<td className={"max-w-32 text-sm " + className}>
+			{watchlistDict.map((wl, i) => (
+				<Note
+					key={i}
+					label={wl.label}
+					note={wl.note}
+					noteClass={wl.label === "Not Yet Available" ? "italic" : wl.label === "No Longer Available" ? "line-through" : ""}
+				/>
+			))}
+		</td>
 	)
 }

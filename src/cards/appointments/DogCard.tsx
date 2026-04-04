@@ -38,7 +38,9 @@ export function DogCard({ dogID, inWatchlist }: { dogID: number; inWatchlist: bo
 			color={dogCardColor}
 			description={
 				<>
-					{dog.name}
+					<TooltipProvider tooltip={session.adminUser ? `ID: ${dog.ID}` : ""}>
+						<span>{dog.name}</span>
+					</TooltipProvider>
 					{dog.availableNow && (
 						<span className="ml-2">
 							(

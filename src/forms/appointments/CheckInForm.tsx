@@ -103,7 +103,7 @@ function Fieldset({
 								autoComplete: false,
 							}}
 							errors={errors["state"]}
-							showRequired
+							showRequired={(formData.streetAddress ?? "").length > 0}
 							value={formData["state"] ?? "--"}
 							onChange={handleStateProvinceChange}
 						/>
