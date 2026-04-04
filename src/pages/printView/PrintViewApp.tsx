@@ -37,8 +37,8 @@ export default function PrintViewApp() {
 	return (
 		<FullWidthPage title={<ScheduleAppTitle />}>
 			<div className="mx-2 mt-3 pt-3 not-print:border-t not-print:border-pink-700">
-				<table className="w-full text-left">
-					<thead className="text-lg underline">
+				<table className="w-full text-left print:text-xs print:leading-tight">
+					<thead className="text-lg underline print:text-xs">
 						<tr className="print:border-b print:border-pink-700">
 							<th className="print:pl-0.5">Time</th>
 							<th className="print:pl-0.5">Appointment</th>
@@ -199,7 +199,7 @@ function AdoptionNotesCell({ booking, className }: { booking: IBooking; classNam
 	]
 
 	return (
-		<td className={"max-w-32 text-sm " + className}>
+		<td className={"max-w-32 text-xs print:max-w-20 " + className}>
 			{notesDict.map((n, i) => (
 				<Note key={i} label={n.source} note={n.note} />
 			))}
@@ -223,7 +223,7 @@ function Note({ label, note, noteClass }: { label: string; note?: string; noteCl
 	}
 
 	return (
-		<div>
+		<div className="flex flex-col gap-y-0.5 text-[11px]">
 			<b>{label}: </b>
 			<span className={noteClass}>{note}</span>
 		</div>
@@ -234,7 +234,7 @@ function WatchlistCell({ appointment, className }: { appointment: ReportingAdopt
 	const schedule = useScheduleState()
 
 	if (!appointment.booking) {
-		return <td className={"max-w-32 text-sm " + className}></td>
+		return <td className={"max-w-32 text-xs " + className}></td>
 	}
 
 	const { funSize, puppies, adults } = getAvailableTypes(appointment.type, schedule.dateUtil.GetWeekday())
@@ -270,13 +270,19 @@ function WatchlistCell({ appointment, className }: { appointment: ReportingAdopt
 	]
 
 	return (
-		<td className={"max-w-32 text-sm " + className}>
+		<td className={"max-w-32 text-xs print:max-w-20 " + className}>
 			{watchlistDict.map((wl, i) => (
 				<Note
 					key={i}
 					label={wl.label}
 					note={wl.note}
-					noteClass={wl.label === "Not Yet Available" ? "italic" : wl.label === "No Longer Available" ? "line-through" : ""}
+					noteClass={
+						wl.label === "Not Yet Available"
+							? "italic"
+							: wl.label === "No Longer Available"
+								? "line-through"
+								: "font-bold uppercase"
+					}
 				/>
 			))}
 		</td>
