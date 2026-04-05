@@ -355,7 +355,7 @@ function AdopterDirectoryButton({ noBorder, collapsed, onNavigate }: NavigationB
 			collapsed={collapsed}
 			icon={faUsers}
 			noBorder={noBorder}
-			overlayClassName="bg-none text-pink-700"
+			overlayClassName="bg-white text-pink-700"
 			overlayIcon={faSearch}
 			route="/adopters/directory/"
 			onNavigate={onNavigate}

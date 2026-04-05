@@ -62,7 +62,7 @@ export default function AdopterDirectoryApp() {
 	return (
 		<FullWidthPage title="Manage Adopters">
 			<div className="mx-5 mt-3 border-t border-pink-700 py-2">
-				<div className="m-auto flex w-sm flex-col gap-y-1">
+				<div className="m-auto flex w-xs flex-col gap-y-1 sm:w-sm">
 					<TextInput
 						addlProps={{
 							autoComplete: "off",

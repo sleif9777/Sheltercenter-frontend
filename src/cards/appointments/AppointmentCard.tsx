@@ -161,7 +161,9 @@ export function AppointmentDescription({ context, apptData }: AppointmentDescrip
 
 	return (
 		<>
-			{context == AppointmentCardContext.TIMESLOT ? apptData.description : apptData.instantDisplay}
+			<span className="whitespace-normal">
+				{context == AppointmentCardContext.TIMESLOT ? apptData.description : apptData.instantDisplay}
+			</span>
 			<span className="ml-1.5 space-x-0.5 whitespace-nowrap">
 				{apptData.locked && <Icon def={faLock} />}
 				{adopter?.preferences.mobility && <TooltippedIcon icon={faWheelchair} tooltip="Mobility assistance requested" />}

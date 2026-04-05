@@ -31,7 +31,9 @@ export function AreYouSure({ youWantTo, modalState, modalTitle, onSubmit }: AreY
 				onCancel={modalState.close}
 				onSubmit={onSubmit}
 			>
-				<div className="text-left text-[16px] text-black">Are you sure you want to {youWantTo}?</div>
+				<div className="text-left text-[16px] font-normal text-black normal-case">
+					Are you sure you want to {youWantTo}?
+				</div>
 			</FormProvider>
 		</Modal>
 	)

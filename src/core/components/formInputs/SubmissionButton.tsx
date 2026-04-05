@@ -52,7 +52,7 @@ export function SubmissionButton({ addlProps, colorOverride, disabled, onClick, 
 
 	return (
 		<button
-			className={`rounded-sm px-5 py-1 text-sm uppercase ${allClasses}`}
+			className={`rounded-sm px-5 py-1 text-sm font-normal uppercase ${allClasses}`}
 			disabled={disabled}
 			onClick={(e) => onClick?.(e)}
 			{...addlProps}

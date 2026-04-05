@@ -14,6 +14,7 @@ import { faPencil } from "@fortawesome/free-solid-svg-icons"
 import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { StateProvinceInput } from "../../core/components/formInputs/StateProvinceInput"
 import { ErrorMap } from "../FormState"
+import { StringUtils } from "../../utils/StringUtils"
 
 export function CheckInForm({
 	apptID,
@@ -53,7 +54,7 @@ export function CheckInForm({
 	}, [apptID, defaultValues, setField])
 
 	return (
-		<FormProvider formState={formData} modalState={modalState} onSubmit={handleSubmit}>
+		<FormProvider debug formState={formData} modalState={modalState} onSubmit={handleSubmit}>
 			<Fieldset errors={errors} formData={fields} setField={setField} />
 		</FormProvider>
 	)
@@ -70,11 +71,18 @@ function Fieldset({
 }) {
 	// helper to bind formData fields to value + onChange
 	const bindField = <K extends keyof CheckInAppointmentRequest>(field: K) => ({
+		addressValue: formData.streetAddress,
 		errors: errors[field],
 		onChange: (v: CheckInAppointmentRequest[K]) => setField(field, v),
 		value: formData[field],
 	})
-	const [editAddressMode, setEditAddressMode] = useState<boolean>(true)
+	const defaultAddressMode =
+		StringUtils.isNotNull(formData.streetAddress) ||
+		StringUtils.isNotNull(formData.city) ||
+		StringUtils.isNotNull(formData.state) ||
+		StringUtils.isNotNull(formData.postalCode)
+
+	const [editAddressMode, setEditAddressMode] = useState<boolean>(defaultAddressMode)
 
 	const handleStateProvinceChange = useCallback(
 		async (value: string | null) => {
@@ -83,10 +91,6 @@ function Fieldset({
 		},
 		[setField]
 	)
-
-	useEffect(() => {
-		setEditAddressMode(addressFixRequired(formData))
-	}, [formData])
 
 	return (
 		<div className="flex flex-col gap-y-1">
@@ -143,47 +147,45 @@ function ClothingDescriptionField({ value, onChange }: OptionalValueInputProps<s
 	)
 }
 
-function StreetAddressField({ errors, value, onChange }: OptionalValueInputProps<string>) {
+interface AddressFieldProps extends OptionalValueInputProps<string> {
+	addressValue?: string
+}
+
+function StreetAddressField({ addressValue, errors, value, onChange }: AddressFieldProps) {
 	return (
 		<TextInput
 			addlProps={{ autoComplete: "new-password" }}
 			errors={errors}
 			fieldLabel="Street Address"
+			showRequired={(addressValue ?? "").length > 0}
 			value={value ?? ""}
 			onChange={(e) => onChange(e)}
 		/>
 	)
 }
 
-function CityField({ errors, value, onChange }: OptionalValueInputProps<string>) {
+function CityField({ addressValue, errors, value, onChange }: AddressFieldProps) {
 	return (
 		<TextInput
 			addlProps={{ autoComplete: "new-password" }}
 			errors={errors}
 			fieldLabel="City"
+			showRequired={(addressValue ?? "").length > 0}
 			value={value ?? ""}
 			onChange={(e) => onChange(e)}
 		/>
 	)
 }
 
-function PostalCodeField({ errors, value, onChange }: OptionalValueInputProps<string>) {
+function PostalCodeField({ addressValue, errors, value, onChange }: AddressFieldProps) {
 	return (
 		<TextInput
 			addlProps={{ autoComplete: "new-password" }}
 			errors={errors}
 			fieldLabel="Postal Code"
+			showRequired={(addressValue ?? "").length > 0}
 			value={value ?? ""}
 			onChange={(e) => onChange(e)}
 		/>
-	)
-}
-
-function addressFixRequired(formData: CheckInAppointmentRequest) {
-	return (
-		(formData.streetAddress ?? "").length == 0 ||
-		(formData.city ?? "").length == 0 ||
-		(formData.state ?? "").length == 0 ||
-		(formData.postalCode ?? "").length == 0
 	)
 }

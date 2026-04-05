@@ -62,7 +62,7 @@ export function DogCard({ dogID, inWatchlist }: { dogID: number; inWatchlist: bo
 			<div className="my-2 flex flex-row gap-x-1">
 				<div>
 					<img
-						className={`m-auto aspect-square max-w-40 rounded-full ` + (!dog.availableNow ? "grayscale" : "")}
+						className={`m-auto aspect-square max-w-30 rounded-full md:max-w-40 ` + (!dog.availableNow ? "grayscale" : "")}
 						src={dog.photoURL}
 					/>
 				</div>

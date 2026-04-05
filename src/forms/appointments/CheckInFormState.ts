@@ -9,8 +9,7 @@ const initialState: CheckInAppointmentRequest = {
 }
 
 export const useCheckInFormState = createFormState<CheckInAppointmentRequest>(initialState, {
-	city: [(s) => (s.city ?? "").length > 0 || "This field is required."],
-	postalCode: [(s) => (s.postalCode ?? "").length > 0 || "This field is required."],
-	state: [(s) => (s.state != "--" && (s.state ?? "").length > 0) || "This field is required."],
-	streetAddress: [(s) => (s.streetAddress ?? "").length > 0 || "This field is required."],
+	city: [(s) => (s.city ?? "").length > 0 || !s.streetAddress || "This field is required."],
+	postalCode: [(s) => (s.postalCode ?? "").length > 0 || !s.streetAddress || "This field is required."],
+	state: [(s) => (s.state != "--" && (s.state ?? "").length > 0) || !s.streetAddress || "This field is required."],
 })

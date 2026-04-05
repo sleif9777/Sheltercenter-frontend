@@ -1,8 +1,8 @@
 import {
 	faCarSide,
 	faCheckCircle,
+	faCircleXmark,
 	faEnvelope,
-	faEraser,
 	faExclamationTriangle,
 	faPencil,
 	faPlus,
@@ -126,7 +126,7 @@ function AdoptionGrouper({ adoptions, index, key }: { adoptions: IPendingAdoptio
 			<div className={"pb-2 text-left text-2xl font-medium uppercase " + textColor}>
 				{PendingAdoptionStatusLabel[adoptions[0].status as PendingAdoptionStatus]}
 			</div>
-			<div className="columns-2 lg:columns-3">
+			<div className="columns-1 sm:columns-2 lg:columns-3">
 				{adoptions
 					.sort((a, b) => a.dog.localeCompare(b.dog))
 					.map((a) => (
@@ -299,11 +299,11 @@ export function AdoptionCardActions({ adoption }: { adoption: IPendingAdoption }
 				{...actionProps}
 				icon={faCheckCircle}
 				status={PendingAdoptionStatus.COMPLETED}
-				titleAndTooltip="Completed"
+				titleAndTooltip="Complete Adoption"
 			/>
 			<StatusAreYouSureButton
 				{...actionProps}
-				icon={faEraser}
+				icon={faCircleXmark}
 				status={PendingAdoptionStatus.CANCELED}
 				titleAndTooltip="Cancel Adoption"
 				youWantTo="cancel this adoption"
@@ -365,6 +365,7 @@ function getQuickTextContent(adoption: IPendingAdoption, condition: string) {
 					condition +
 					" — a common sign of an upper respiratory infection. Not the best news, but the good news is we've got them on new meds, and they'll be seeing the vet again next week for a follow-up.",
 			},
+			{ insert: "\n\n" },
 
 			// Sign-off in teal
 			{ attributes: { color: "#1e6c80" }, insert: "Kind regards," },
@@ -397,14 +398,15 @@ function HeartwormButton({ adoption }: AdoptionHeartwormActionProps) {
 	const badgeClass = hovered ? (heartworm ? "bg-red-600" : "bg-green-600") : "bg-green-600"
 
 	return (
-		<CardActionButton
+		<CardActionAreYouSure
+			icon={faWorm}
+			modalTitle={heartworm ? "Remove HW-Pos status" : "Mark HW-Pos"}
 			overlayClassName={badgeClass}
 			overlayIcon={overlayIcon}
-			primaryIcon={faWorm}
-			primaryTooltipContent={heartworm ? "Remove HW-Pos status" : "Mark HW-Pos"}
-			onClick={handleClick}
+			youWantTo="change this dog's heartworm status"
 			onMouseEnter={() => setHovered(true)}
 			onMouseLeave={() => setHovered(false)}
+			onSubmit={handleClick}
 		/>
 	)
 }

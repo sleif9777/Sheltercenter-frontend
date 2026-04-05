@@ -411,7 +411,7 @@ function ScheduleTimeslot({ hash }: { hash: AppointmentHash }) {
 			<div className="pb-1 pl-2 text-left text-2xl">
 				{hash.label} {!hasOpenAppt && session.adopterUser && <>- FULLY BOOKED</>}
 			</div>
-			<ul className="columns-1 sm:columns-2">
+			<ul className="columns-1 sm:columns-2 xl:columns-3">
 				{filteredAppointments.map((appt, i) => (
 					<AppointmentCard apptID={appt.ID} context={AppointmentCardContext.TIMESLOT} key={i} />
 				))}
