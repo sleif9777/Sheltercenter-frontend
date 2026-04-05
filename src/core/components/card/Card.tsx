@@ -32,7 +32,7 @@ interface PhotoCardProps extends CardComponentProps {
 export function getCardColorClasses(color: CardColor): { bg: string; border: string; text: string } {
 	return {
 		[CardColor.RED]: { bg: "bg-red-200", border: "border-red-800", text: "text-red-800" },
-		[CardColor.GRAY]: { bg: "bg-gray-100", border: "border-cyan-700", text: "text-cyan-700" },
+		[CardColor.GRAY]: { bg: "bg-gray-100", border: "border-cyan-700", text: "text-gray-900" },
 		[CardColor.BLUE]: { bg: "bg-blue-100", border: "border-blue-900", text: "text-blue-900" },
 		[CardColor.PINK]: { bg: "bg-pink-100", border: "border-pink-800", text: "text-pink-800" },
 		[CardColor.PURPLE]: { bg: "bg-purple-100", border: "border-purple-800", text: "text-purple-800" },
