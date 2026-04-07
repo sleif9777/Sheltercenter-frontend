@@ -72,8 +72,10 @@ export default function AdopterDirectoryApp() {
 									fetchNewResult(filterText, includeArchived)
 								}
 							},
+							placeholder: "Search by name or email...",
 						}}
-						errors={!hasSearched && filterText.length >= 3 ? ["Press Enter to search."] : undefined}
+						defaultDirty
+						errors={filterText.length >= 3 ? ["Press Enter to search."] : undefined}
 						fieldLabel="Filter Adopters"
 						value={filterText}
 						onChange={(e) => {
