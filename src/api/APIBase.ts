@@ -1,4 +1,14 @@
 import axios, { AxiosRequestConfig, AxiosResponse, HttpStatusCode } from "axios"
+import { useSessionState } from "../core/session/SessionState"
+
+axios.interceptors.request.use((config) => {
+	const token = useSessionState.getState().accessToken
+	if (token) {
+		config.headers = config.headers ?? {}
+		config.headers["Authorization"] = `Bearer ${token}`
+	}
+	return config
+})
 
 export abstract class APIBase {
 	rootPath: string = import.meta.env.VITE_BACKEND_API_ROOT

@@ -8,6 +8,6 @@ config()
 export default defineConfig({
 	plugins: [react(), tailwind()],
 	server: {
-		allowedHosts: ["savinggracencscheduler.com"],
+		allowedHosts: ["savinggracencscheduler.com", "localhost"],
 	},
 })
