@@ -17,7 +17,6 @@ export default function AdopterDirectoryApp() {
 	const [filterText, setFilterText] = useState<string>("")
 	const [includeArchived, setIncludeArchived] = useState<boolean>(false)
 	const [loading, setLoading] = useState<boolean>(false)
-	const [hasSearched, setHasSearched] = useState<boolean>(false)
 	const abortControllerRef = useRef<AbortController | null>(null)
 	const isLoadingRef = useRef<boolean>(false)
 
@@ -68,7 +67,6 @@ export default function AdopterDirectoryApp() {
 							autoComplete: "off",
 							onKeyDown: (e: React.KeyboardEvent) => {
 								if (e.key === "Enter" && !isLoadingRef.current) {
-									setHasSearched(true)
 									fetchNewResult(filterText, includeArchived)
 								}
 							},
@@ -80,7 +78,6 @@ export default function AdopterDirectoryApp() {
 						value={filterText}
 						onChange={(e) => {
 							setFilterText(e)
-							setHasSearched(false)
 						}}
 					/>
 					<CheckboxInput

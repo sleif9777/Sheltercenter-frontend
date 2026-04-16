@@ -101,7 +101,7 @@ export class DateTime {
 		return this.instant.isSameOrAfter(moment(), "day")
 	}
 
-	static IsTimekeyInPast(key: number): boolean {
+	static IsClosedForBooking(key: number): boolean {
 		const hours = Math.floor(key / 100)
 		const minutes = key % 100
 
@@ -110,6 +110,8 @@ export class DateTime {
 		slotTime.instant.set("minute", minutes)
 		slotTime.instant.set("second", 0)
 
-		return slotTime.instant.isBefore(moment())
+		const cutoffTime = slotTime.instant.clone().subtract(2, "hours")
+
+		return new DateTime().instant.isAfter(cutoffTime)
 	}
 }

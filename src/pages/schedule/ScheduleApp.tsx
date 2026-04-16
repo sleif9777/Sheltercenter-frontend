@@ -392,7 +392,7 @@ function ScheduleTimeslot({ hash }: { hash: AppointmentHash }) {
 	const session = useSessionState(),
 		schedule = useScheduleState()
 
-	if (session.adopterUser && schedule.isToday() && DateTime.IsTimekeyInPast(hash.key)) {
+	if (session.adopterUser && schedule.isToday() && DateTime.IsClosedForBooking(hash.key)) {
 		return
 	}
 
