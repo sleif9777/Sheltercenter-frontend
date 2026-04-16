@@ -113,7 +113,7 @@ function UpdatePrimaryEmailButton({ primaryEmail }: { primaryEmail: string }) {
 function RestoreAccessButton({ demo }: { demo: AdopterDemographics }) {
 	const handleRestoreAccess = useCallback(async () => {
 		try {
-			await new AdoptersAPI().ResendApproval(demo.ID)
+			await new AdoptersAPI().RestoreCalendarAccess(demo.ID)
 			showToast({ level: MessageLevel.Success, message: "Calendar access restored" })
 		} catch {
 			showToast({ level: MessageLevel.Error, message: "Could not restore access" })
@@ -122,7 +122,7 @@ function RestoreAccessButton({ demo }: { demo: AdopterDemographics }) {
 
 	return (
 		<TooltipProvider tooltip={demo.restrictedCalendar ? "" : "This adopter already has active calendar access"}>
-			<ActionButton demo={demo} disabled={true} label="Restore Access" onClick={handleRestoreAccess} />
+			<ActionButton demo={demo} disabled={!demo.restrictedCalendar} label="Restore Access" onClick={handleRestoreAccess} />
 		</TooltipProvider>
 	)
 }
