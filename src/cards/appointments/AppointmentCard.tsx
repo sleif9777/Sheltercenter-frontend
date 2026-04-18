@@ -122,6 +122,9 @@ function QuickTextItem({
 }) {
 	const modalState = useModalState()
 	const alreadySent = templateFlags.includes(qt.value)
+	const session = useSessionState()
+
+	const hoverStyle = session.greeterUser ? "" : "cursor-pointer hover:bg-gray-300"
 
 	return (
 		<>
@@ -139,10 +142,10 @@ function QuickTextItem({
 			<TooltipProvider tooltip={alreadySent ? "This template was already sent" : ""}>
 				<button
 					className={
-						"cursor-pointer hover:bg-gray-300 disabled:cursor-auto disabled:bg-transparent disabled:text-gray-500 disabled:line-through"
+						"disabled:cursor-auto disabled:bg-transparent disabled:text-gray-500 disabled:line-through " + hoverStyle
 					}
 					disabled={alreadySent}
-					onClick={modalState.open}
+					onClick={session.greeterUser ? undefined : modalState.open}
 				>
 					{qt.label}
 				</button>
@@ -291,7 +294,7 @@ export function BookingInfoSection({ apptData }: { apptData: IAppointment }) {
 			<ContactInfoSection demographics={adopter.demographics} />
 			<NotesSection apptData={apptData} />
 			<WatchlistSection apptData={apptData} />
-			{session.adminUser && <MessageSection apptData={apptData} />}
+			{!session.adopterUser && <MessageSection apptData={apptData} />}
 		</>
 	)
 }
@@ -324,7 +327,7 @@ function NotesSection({ apptData }: { apptData: IAppointment }) {
 		})
 	}
 
-	if (session.adminUser) {
+	if (!session.adopterUser) {
 		allNotes.push({
 			label: "From Adoptions",
 			value: adopter.demographics.internalNotes,
@@ -415,7 +418,7 @@ export function MessageSection({ apptData }: { apptData: IAppointment }) {
 		session = useSessionState(),
 		schedule = useScheduleState()
 
-	if (!adopter || apptData.outcome || session.greeterUser) {
+	if (!adopter || apptData.outcome) {
 		return
 	}
 

@@ -1,11 +1,11 @@
 export enum BookingMessageTemplate {
-	LIMITED_PUPPIES = 0,
-	LIMITED_SMALL_PUPPIES = 1,
-	LIMITED_HYPO = 2,
-	LIMITED_FUN_SIZE = 3,
-	DOGS_WERE_ADOPTED = 4,
-	DOGS_NOT_HERE_YET = 5,
-	X_IN_QUEUE = 6,
+	LIMITED_PUPPIES = 1,
+	LIMITED_SMALL_PUPPIES = 2,
+	LIMITED_HYPO = 3,
+	LIMITED_FUN_SIZE = 4,
+	DOGS_WERE_ADOPTED = 5,
+	DOGS_NOT_HERE_YET = 6,
+	X_IN_QUEUE = 7,
 }
 
 export const BookingMessageTemplateLabel: Record<BookingMessageTemplate, string> = {

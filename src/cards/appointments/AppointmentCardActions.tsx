@@ -293,22 +293,26 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 	const session = useSessionState()
 	const modalState = useModalState()
 	const schedule = useScheduleState()
+	const apptID = appt.ID
 
 	const handleBookClick = useCallback(async () => {
+		schedule.setNowBookingAppt(apptID)
+
 		if (!session.user?.adopterID) {
 			return
 		}
 
 		await new AppointmentsAPI().ScheduleAppointment({
 			adopterID: session.user.adopterID ?? 0,
-			apptID: appt.ID,
+			apptID: apptID,
 		})
 
 		showToast({ level: MessageLevel.Success, message: "Appointment confirmed!" })
 
 		session.setCurrentAppt(appt)
 		schedule.refresh()
-	}, [appt, schedule, session])
+		schedule.setNowBookingAppt(0)
+	}, [appt, apptID, schedule, session])
 
 	if (!session.user?.adopterID || session.user.currentAppt) {
 		return
@@ -338,10 +342,13 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 
 	return (
 		<button
-			className="cursor-pointer rounded-md bg-pink-700 px-3 py-1 text-sm font-medium text-white hover:bg-pink-400"
+			className={`cursor-pointer rounded-md px-3 py-1 text-sm font-medium text-white transition-colors ${
+				schedule.nowBookingAppt == apptID ? "cursor-not-allowed bg-pink-300" : "bg-pink-700 hover:bg-pink-400"
+			}`}
+			disabled={schedule.nowBookingAppt > 0}
 			onClick={handleBookClick}
 		>
-			Click to Book
+			{schedule.nowBookingAppt == apptID ? "Booking..." : schedule.nowBookingAppt > 0 ? "Please Wait..." : "Click to Book"}
 		</button>
 	)
 }

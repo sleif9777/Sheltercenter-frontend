@@ -19,6 +19,7 @@ export interface ScheduleState extends ScheduleContext {
 	dateUtil: DateTime
 	failedLoadResp?: AxiosError
 	loadingAppointments: boolean
+	nowBookingAppt: number
 	getDayDiff: () => number
 	isToday: () => boolean
 	isUnschedulable: () => boolean
@@ -26,6 +27,7 @@ export interface ScheduleState extends ScheduleContext {
 	isPastCloseTime: () => boolean
 	isUserCurrentApptDate: () => boolean
 	refresh: (newDateISO?: string) => void
+	setNowBookingAppt: (apptID: number) => void
 }
 
 export const useScheduleState = create<ScheduleState>((set, get) => {
@@ -38,6 +40,7 @@ export const useScheduleState = create<ScheduleState>((set, get) => {
 		isClosedDate: false,
 		isoDate: today.GetISODate(),
 		loadingAppointments: false,
+		nowBookingAppt: 0,
 
 		// eslint-disable-next-line sort-keys
 		getDayDiff: (compareDate?: DateTime) => {
@@ -122,5 +125,7 @@ export const useScheduleState = create<ScheduleState>((set, get) => {
 				}
 			}
 		},
+
+		setNowBookingAppt: (apptID: number = 0) => set({ nowBookingAppt: apptID }),
 	}
 })
