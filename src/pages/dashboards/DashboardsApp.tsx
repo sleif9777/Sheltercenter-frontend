@@ -22,8 +22,8 @@ const DASHBOARD_MODE_TITLES: Record<DashboardMode, string> = {
 }
 
 const DAY_OF_WEEK_COLORS: Record<number, string> = {
-	0: "bg-purple-100 border-purple-800 text-purple-800", // Sun (just in case)
-	1: "bg-red-100 border-red-800 text-red-800", // Mon
+	0: "bg-rose-200 border-rose-800 text-rose-800", // Sun (just in case)
+	1: "bg-red-200 border-red-800 text-red-800", // Mon
 	2: "bg-orange-100 border-orange-800 text-orange-800", // Tue
 	3: "bg-yellow-100 border-yellow-800 text-yellow-800", // Wed
 	4: "bg-green-100 border-green-800 text-green-800", // Thu
@@ -97,7 +97,7 @@ export default function DashboardsApp() {
 
 				{mode === DashboardMode.WHO_WENT_HOME && (
 					<DashboardSection
-						className="columns-7"
+						className="columns-5"
 						dogs={sortByUnavailableDateThenName(dogHash.newlyInHome)}
 						hashKey="newlyInHome"
 						mode={mode}
@@ -131,7 +131,7 @@ export default function DashboardsApp() {
 				)}
 
 				{mode === DashboardMode.FTA && (
-					<DashboardSection className="columns-7" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />
+					<DashboardSection className="columns-5" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />
 				)}
 			</div>
 		</FullWidthPage>
