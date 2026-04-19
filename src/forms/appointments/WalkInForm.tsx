@@ -155,7 +155,7 @@ function AdopterSearchField({
 	const loadOptions = useCallback(async () => {
 		setIsLoading(true)
 		try {
-			const resp = await new AdoptersAPI().GetAdopterSelectFieldOptions(true, false) // includeWalkIns = true
+			const resp = await new AdoptersAPI().GetAdopterSelectFieldOptions(false, true) // includeWalkIns = true
 			const loadedOptions: SelectInputOption<string>[] = resp.options.map((adopter) => ({
 				label: adopter.disambiguatedName,
 				value: String(adopter.ID),

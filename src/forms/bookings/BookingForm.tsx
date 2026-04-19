@@ -111,7 +111,7 @@ export function AdopterSelectField({
 
 	const loadOptions = useCallback(async () => {
 		setLoadingOptions(true)
-		const resp = await new AdoptersAPI().GetAdopterSelectFieldOptions(false, false)
+		const resp = await new AdoptersAPI().GetAdopterSelectFieldOptions(false, true)
 		const loadedOptions: SelectInputOption<string>[] = resp.options.map((adopter) => ({
 			label: adopter.disambiguatedName,
 			value: String(adopter.ID),
