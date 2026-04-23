@@ -30,7 +30,7 @@ import {
 	HousingOwnershipLabel,
 	HousingTypeLabel,
 } from "../../enums/AdopterEnums"
-import { AppointmentType } from "../../enums/AppointmentEnums"
+import { AppointmentType, Outcome } from "../../enums/AppointmentEnums"
 import { BookingMessageTemplate } from "../../enums/BookingEnums"
 import { EnumLabel } from "../../enums/EnumLabel"
 import { Weekday } from "../../enums/TemplateEnums"
@@ -85,7 +85,7 @@ export function AppointmentCard({ apptID, context }: AppointmentCardProps) {
 			actions={<AppointmentCardActions appt={apptData} context={context} session={session} />}
 			color={CardColor.GRAY}
 			description={<AppointmentDescription apptData={apptData} context={context} />}
-			hideTitleBorder={!apptData.hasCurrentBooking || !!apptData.checkOutTime}
+			hideTitleBorder={!apptData.hasCurrentBooking || !!apptData.checkOutTime || apptData.outcome == Outcome.NO_SHOW}
 			twoColItems={getAppointmentCardTopDetails(apptData, session)}
 		>
 			{context == AppointmentCardContext.TIMESLOT && (
@@ -95,7 +95,7 @@ export function AppointmentCard({ apptID, context }: AppointmentCardProps) {
 					{session.adopterUser && !apptData.hasCurrentBooking && <AbleToMeet apptData={apptData} />}
 				</>
 			)}
-			{!apptData.checkOutTime && (
+			{!apptData.checkOutTime && apptData.outcome != Outcome.NO_SHOW && (
 				<>
 					<BookingInfoSection apptData={apptData} />
 					<AboutSection apptData={apptData} />
