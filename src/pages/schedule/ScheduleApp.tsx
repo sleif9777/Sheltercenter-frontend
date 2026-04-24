@@ -629,7 +629,7 @@ function AdopterAlertCard() {
 				<ul>
 					{alerts.map((alert, i) => (
 						<li key={i}>
-							<b>{alert.name}</b> - {alert.alerts}
+							<b>{alert.name}</b> - {alert.alerts.join(", ")}
 						</li>
 					))}
 				</ul>
