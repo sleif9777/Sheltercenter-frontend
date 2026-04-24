@@ -51,5 +51,5 @@ export type CheckInAppointmentRequest = Pick<IAppointment, "clothingDescription"
 export type CheckOutAppointmentRequest = {
 	outcome: Outcome
 	sendSleepoverInfo: boolean
-	dog?: string
+	dogID?: string
 } & AppointmentIDRequest

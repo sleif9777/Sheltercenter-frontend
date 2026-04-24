@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import { Toggleable } from "../../core/components/formInputs/CheckboxInput"
 import {
@@ -17,6 +17,9 @@ import { CheckOutAppointmentRequest } from "../../api/appointments/Requests"
 import { FormProvider } from "../FormProvider"
 import { ErrorMap } from "../FormState"
 import { CheckOutFormFieldUpdater, useCheckOutFormState } from "./CheckOutFormState"
+import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
+import SelectInput, { SelectInputOption } from "../../core/components/formInputs/SelectInput"
+import { DogsAPI } from "../../api/dogs/DogsAPI"
 
 export function CheckOutForm({
 	apptID,
@@ -51,7 +54,7 @@ export function CheckOutForm({
 	}, [apptID, defaults, setAll, setField])
 
 	return (
-		<FormProvider formState={formState} modalState={modalState} onSubmit={handleSubmit}>
+		<FormProvider debug formState={formState} modalState={modalState} onSubmit={handleSubmit}>
 			<Fieldset errors={errors} formData={fields} setField={setField} />
 		</FormProvider>
 	)
@@ -78,8 +81,15 @@ function Fieldset({
 			setField("outcome", v)
 
 			if (!isDogChoiceOutcome(v)) {
-				setField("dog", "")
+				setField("dogID", "")
 			}
+		},
+		[setField]
+	)
+
+	const handleDogChange = useCallback(
+		async (value: string | null) => {
+			setField("dogID", value ?? undefined)
 		},
 		[setField]
 	)
@@ -87,7 +97,10 @@ function Fieldset({
 	return (
 		<div className="flex flex-col gap-y-3">
 			<OutcomeField value={formData["outcome"]} onChange={handleOutcomeChange} />
-			{isDogChoiceOutcome(formData["outcome"]) && <ChosenDogField {...bindField("dog")} />}
+			{/* {isDogChoiceOutcome(formData["outcome"]) && <ChosenDogField {...bindField("dog")} />} */}
+			{isDogChoiceOutcome(formData["outcome"]) && (
+				<DogSelectField errors={errors["dogID"]} value={formData["dogID"]} onChange={handleDogChange} />
+			)}
 			{formData["outcome"] == Outcome.NO_DECISION && <SendSleepoverInfoField {...bindField("sendSleepoverInfo")} />}
 		</div>
 	)
@@ -110,6 +123,46 @@ function OutcomeField({ value, onChange }: RequiredEnumInputProps<Outcome>) {
 function ChosenDogField({ errors, value, onChange }: OptionalValueInputProps<string>) {
 	return (
 		<TextInput errors={errors} fieldLabel="Chosen Dog" showRequired value={value ?? ""} onChange={(e) => onChange(e)} />
+	)
+}
+
+export function DogSelectField({
+	errors,
+	value,
+	onChange,
+}: {
+	errors?: string[]
+	value: string | undefined
+	onChange: (value: string | null) => Promise<void>
+}) {
+	const [options, setOptions] = useState<SelectInputOption<string>[]>([])
+	const [loadingOptions, setLoadingOptions] = useState(false)
+
+	const loadOptions = useCallback(async () => {
+		setLoadingOptions(true)
+		const resp = await new DogsAPI().GetDogSelectFieldOptions()
+		const loadedOptions: SelectInputOption<string>[] = resp.options.map((dog) => ({
+			label: dog.name,
+			value: String(dog.ID),
+		}))
+		setOptions(loadedOptions)
+		setLoadingOptions(false)
+	}, [])
+
+	useEffect(() => {
+		loadOptions()
+	}, [loadOptions])
+
+	return (
+		<SelectInput
+			errors={errors}
+			fieldLabel="Chosen Dog"
+			options={options}
+			placeholder={loadingOptions ? "Loading options..." : "— CHOOSE DOG —"}
+			showRequired
+			value={value ?? null}
+			onChange={onChange}
+		/>
 	)
 }
 

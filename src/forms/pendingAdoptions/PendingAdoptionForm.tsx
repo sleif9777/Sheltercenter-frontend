@@ -14,6 +14,7 @@ import { FormProvider } from "../FormProvider"
 import { ErrorMap } from "../FormState"
 import { PendingAdoptionFormFieldUpdater, usePendingAdoptionFormState } from "./PendingAdoptionFormState"
 import { CircumstanceOptions } from "../../enums/PendingAdoptionEnums"
+import { DogSelectField } from "../appointments/CheckOutForm"
 
 export function PendingAdoptionForm({ modalState }: { modalState: ModalState }) {
 	// --- form state ---
@@ -36,7 +37,7 @@ export function PendingAdoptionForm({ modalState }: { modalState: ModalState }) 
 	const { setField, ...fields } = formState
 
 	return (
-		<FormProvider formState={formState} modalState={modalState} onSubmit={handleSubmit}>
+		<FormProvider debug formState={formState} modalState={modalState} onSubmit={handleSubmit}>
 			<Fieldset errors={formState.errors} formData={fields} setField={setField} />
 		</FormProvider>
 	)
@@ -66,6 +67,13 @@ function Fieldset({
 		[setField]
 	)
 
+	const handleDogChange = useCallback(
+		async (value: string | null) => {
+			setField("dogID", parseInt(value ?? "0"))
+		},
+		[setField]
+	)
+
 	return (
 		<div className="flex flex-col gap-y-1">
 			<AdopterSelectField
@@ -73,7 +81,8 @@ function Fieldset({
 				value={formData.adopterID.toString()}
 				onChange={handleAdopterChange}
 			/>
-			<ChosenDogField {...bindField("dog")} />
+			{/* <ChosenDogField {...bindField("dog")} /> */}
+			<DogSelectField errors={errors["dogID"]} value={formData.dogID.toString()} onChange={handleDogChange} />
 			<CircumstanceField {...bindField("circumstance")} />
 		</div>
 	)

@@ -15,7 +15,7 @@ export type ChangeDogRequest = {
 } & AdoptionIDRequest
 
 export type CreatePendingAdoptionRequest = {
-	dog: string
+	dogID: number
 	circumstance: CircumstanceOptions
 } & AdopterIDRequest
 

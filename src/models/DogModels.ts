@@ -17,6 +17,8 @@ export interface IDog {
 	interestCount: number
 }
 
+export type DogSelectFieldOption = Pick<IDog, "ID" | "name">
+
 export type HashDog = Pick<IDog, "ID" | "name" | "ageMonths" | "interestCount" | "weight">
 
 export type DashboardDog = Pick<IDog, "ID" | "name" | "unavailableDate" | "photoURL">

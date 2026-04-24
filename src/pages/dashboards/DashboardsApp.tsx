@@ -154,7 +154,9 @@ function DashboardSection({
 	return (
 		<div className="mx-3 flex flex-col gap-2">
 			{title && <h2 className="text-2xl font-semibold text-gray-700">{title}</h2>}
-			<h3 className="text-xl font-normal text-gray-700 uppercase">Total: {dogs.length} dogs</h3>
+			<h3 className="text-xl font-normal text-gray-700 uppercase">
+				Total: {dogs.length} {dogs.length == 1 ? "dog" : "dogs"}
+			</h3>
 			{dogs.length > 0 && (
 				<ul className={className ?? "flex flex-col gap-1"}>
 					{dogs.map((dog, i) => (

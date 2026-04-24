@@ -4,6 +4,7 @@ import { DogIDRequest, ListModificationRequest } from "./Requests"
 import {
 	DashboardsContextResponse,
 	DogDemographicsResponse,
+	DogSelectFieldOptionsResponse,
 	WatchlistContextResponse,
 	WatchlistResponse,
 } from "./Responses"
@@ -19,6 +20,10 @@ export class DogsAPI extends APIBase {
 
 	async GetDogDemographics(dogID: number) {
 		return this.buildAndGetData<DogDemographicsResponse, DogIDRequest>("GetDogDemographics", { dogID })
+	}
+
+	async GetDogSelectFieldOptions() {
+		return this.buildAndGetData<DogSelectFieldOptionsResponse>("GetDogSelectFieldOptions")
 	}
 
 	async GetPublishableDogs() {

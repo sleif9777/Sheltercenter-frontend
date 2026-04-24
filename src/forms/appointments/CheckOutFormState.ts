@@ -12,8 +12,10 @@ const initialState: CheckOutAppointmentRequest = {
 
 export const useCheckOutFormState = createFormState<CheckOutAppointmentRequest>(initialState, {
 	apptID: [(s) => s.apptID > 0 || "Must select an appointment"],
-	dog: [
+	dogID: [
 		(s) =>
-			s.outcome >= Outcome.NO_DECISION || (s.dog ?? "").length > 1 || "Must select a dog for adoption/chosen/FTA outcome",
+			s.outcome >= Outcome.NO_DECISION ||
+			(s.dogID ?? "").length > 1 ||
+			"Must select a dog for adoption/chosen/FTA outcome",
 	],
 })
