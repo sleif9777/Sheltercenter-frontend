@@ -1,14 +1,9 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { Toggleable } from "../../core/components/formInputs/CheckboxInput"
-import {
-	BooleanInputProps,
-	OptionalValueInputProps,
-	RequiredEnumInputProps,
-} from "../../core/components/formInputs/InputHandlers"
+import { BooleanInputProps, RequiredEnumInputProps } from "../../core/components/formInputs/InputHandlers"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
-import { TextInput } from "../../core/components/formInputs/TextInput"
 import { ModalState } from "../../core/components/modal/Modal"
 import { Outcome } from "../../enums/AppointmentEnums"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
@@ -17,7 +12,6 @@ import { CheckOutAppointmentRequest } from "../../api/appointments/Requests"
 import { FormProvider } from "../FormProvider"
 import { ErrorMap } from "../FormState"
 import { CheckOutFormFieldUpdater, useCheckOutFormState } from "./CheckOutFormState"
-import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
 import SelectInput, { SelectInputOption } from "../../core/components/formInputs/SelectInput"
 import { DogsAPI } from "../../api/dogs/DogsAPI"
 
@@ -54,7 +48,7 @@ export function CheckOutForm({
 	}, [apptID, defaults, setAll, setField])
 
 	return (
-		<FormProvider debug formState={formState} modalState={modalState} onSubmit={handleSubmit}>
+		<FormProvider formState={formState} modalState={modalState} onSubmit={handleSubmit}>
 			<Fieldset errors={errors} formData={fields} setField={setField} />
 		</FormProvider>
 	)
@@ -117,12 +111,6 @@ function OutcomeField({ value, onChange }: RequiredEnumInputProps<Outcome>) {
 
 	return (
 		<RadioInput fieldLabel="Gender Preference" options={options} value={value} onChange={(v: Outcome) => onChange(v)} />
-	)
-}
-
-function ChosenDogField({ errors, value, onChange }: OptionalValueInputProps<string>) {
-	return (
-		<TextInput errors={errors} fieldLabel="Chosen Dog" showRequired value={value ?? ""} onChange={(e) => onChange(e)} />
 	)
 }
 

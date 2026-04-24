@@ -54,7 +54,7 @@ export function CheckInForm({
 	}, [apptID, defaultValues, setField])
 
 	return (
-		<FormProvider debug formState={formData} modalState={modalState} onSubmit={handleSubmit}>
+		<FormProvider formState={formData} modalState={modalState} onSubmit={handleSubmit}>
 			<Fieldset errors={errors} formData={fields} setField={setField} />
 		</FormProvider>
 	)

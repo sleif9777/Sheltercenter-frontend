@@ -238,7 +238,7 @@ function CheckOutButton({ appt }: AppointmentCardActionProps) {
 	return (
 		<>
 			<Modal modalState={modalState} modalTitle="Check Out">
-				<CheckOutForm apptID={apptID} defaults={{ dog: appt.chosenDog, outcome: appt.outcome }} modalState={modalState} />
+				<CheckOutForm apptID={apptID} defaults={{ outcome: appt.outcome }} modalState={modalState} />
 			</Modal>
 			<CardActionButton
 				primaryIcon={appt.checkOutTime ? faEdit : faSignOutAlt}

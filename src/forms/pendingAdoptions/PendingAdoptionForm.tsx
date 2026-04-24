@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from "react"
 
-import { RequiredEnumInputProps, StringInputProps } from "../../core/components/formInputs/InputHandlers"
+import { RequiredEnumInputProps } from "../../core/components/formInputs/InputHandlers"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import SelectInput, { SelectInputOption } from "../../core/components/formInputs/SelectInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
-import { TextInput } from "../../core/components/formInputs/TextInput"
 import { ModalState } from "../../core/components/modal/Modal"
 import { useChosenBoardState } from "../../pages/chosenBoard/ChosenBoardAppState"
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
@@ -37,7 +36,7 @@ export function PendingAdoptionForm({ modalState }: { modalState: ModalState }) 
 	const { setField, ...fields } = formState
 
 	return (
-		<FormProvider debug formState={formState} modalState={modalState} onSubmit={handleSubmit}>
+		<FormProvider formState={formState} modalState={modalState} onSubmit={handleSubmit}>
 			<Fieldset errors={formState.errors} formData={fields} setField={setField} />
 		</FormProvider>
 	)
@@ -123,10 +122,6 @@ function AdopterSelectField({
 			onChange={onChange}
 		/>
 	)
-}
-
-function ChosenDogField({ errors, value, onChange }: StringInputProps) {
-	return <TextInput errors={errors} fieldLabel="Chosen Dog" showRequired value={value} onChange={(e) => onChange(e)} />
 }
 
 function CircumstanceField({ value, onChange }: RequiredEnumInputProps<CircumstanceOptions>) {
