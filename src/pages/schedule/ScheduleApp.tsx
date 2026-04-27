@@ -2,14 +2,11 @@ import {
 	faAnglesLeft,
 	faAnglesRight,
 	faCalendar,
-	faPencil,
 	faPerson,
 	faShieldDog,
 	faShopLock,
 	faSpinner,
-	faTrash,
 	faTurnDown,
-	faWandMagicSparkles,
 	IconDefinition,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -84,16 +81,9 @@ function UserInstructions() {
 		<div>
 			<b style={{ fontSize: "large", textDecoration: "underline" }}>Using the Scheduler</b>
 			<ul>
-				<li>The scheduler works best on desktops and laptops.</li>
 				<li>
-					Click the <FontAwesomeIcon icon={faWandMagicSparkles} /> magic wand icon to open the booking form.
-				</li>
-				<li>Fill the booking form out and press Accept to confirm.</li>
-				<li>
-					Click the <FontAwesomeIcon icon={faPencil} /> trash can icon to edit your appointment.
-				</li>
-				<li>
-					Click the <FontAwesomeIcon icon={faTrash} /> trash can icon to cancel your appointment.
+					Click the <FontAwesomeIcon icon={faAnglesLeft} /> <FontAwesomeIcon icon={faAnglesRight} /> double-arrow icons to
+					switch between dates.
 				</li>
 			</ul>
 			<b style={{ fontSize: "large", textDecoration: "underline" }}>Appointment Types</b>
@@ -106,7 +96,8 @@ function UserInstructions() {
 					). These dogs are available to meet Fridays and Saturdays.
 				</li>
 				<li>
-					<b>"Puppies"</b> appointments are for all available puppies (regardless of size).
+					<b>"Puppies"</b> appointments are for most available puppies. Chihuahua puppies and other small breeds may be
+					considered Fun Size instead, so check the dog profiles for details.
 				</li>
 				<li>
 					<b>"All Ages"</b> appointments are for all available puppies and adults above 20 pounds not listed as "by

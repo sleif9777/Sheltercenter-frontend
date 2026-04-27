@@ -15,7 +15,7 @@ export const useCheckOutFormState = createFormState<CheckOutAppointmentRequest>(
 	dogID: [
 		(s) =>
 			s.outcome >= Outcome.NO_DECISION ||
-			(s.dogID ?? "").length > 1 ||
+			(s.dogID ?? "").length > 0 ||
 			"Must select a dog for adoption/chosen/FTA outcome",
 	],
 })

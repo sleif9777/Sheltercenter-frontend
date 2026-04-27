@@ -574,7 +574,7 @@ export function getNotYetAvailableDogsFromWatchlist(
 	}
 
 	if (!puppies) {
-		const puppyDogs: string[] = watchlist?.filter((dog) => dog.ageMonths <= 6).map((dog) => dog.name) ?? []
+		const puppyDogs: string[] = watchlist?.filter((dog) => dog.ageMonths <= 6 && !dog.funSize).map((dog) => dog.name) ?? []
 		notYetAvailableDogs = notYetAvailableDogs.concat(puppyDogs)
 	}
 

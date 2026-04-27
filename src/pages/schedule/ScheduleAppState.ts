@@ -58,7 +58,12 @@ export const useScheduleState = create<ScheduleState>((set, get) => {
 		isPastCloseTime: () => {
 			const { dateUtil, isToday } = get()
 
-			return isToday() && dateUtil.CloseTime().isBefore(dateUtil.instant)
+			const now = new DateTime() // fresh current time
+
+			console.log(isToday(), dateUtil.CloseTime().isBefore(now.instant))
+			console.log(dateUtil.CloseTime().toISOString(), now.instant.toISOString())
+
+			return isToday() && dateUtil.CloseTime().isBefore(now.instant)
 		},
 
 		isToday: () => {
