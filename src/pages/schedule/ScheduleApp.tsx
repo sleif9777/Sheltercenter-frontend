@@ -306,7 +306,7 @@ function CalendarContent() {
 			return <PlaceholderText iconDef={faShieldDog} text="Appointments will be open for booking two weeks in advance." />
 		}
 
-		if (schedule.isPast() || schedule.isPastCloseTime()) {
+		if (schedule.isPast()) {
 			return <PlaceholderText iconDef={faShieldDog} text="This date is now closed." />
 		}
 	}
