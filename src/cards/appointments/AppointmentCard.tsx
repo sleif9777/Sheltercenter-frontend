@@ -1,35 +1,21 @@
-import {
-	faCat,
-	faCheck,
-	faDog,
-	faHorse,
-	faInfoCircle,
-	faLock,
-	faWheelchair,
-	faXmark,
-	IconDefinition,
-} from "@fortawesome/free-solid-svg-icons"
+import { faCat, faCheck, faDog, faHorse, faInfoCircle, faLock, faWheelchair, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { ReactNode, useCallback, useEffect, useState } from "react"
 import { useStore } from "zustand"
 
+import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
+import { AppointmentCardDataResponse } from "../../api/appointments/Responses"
+import { DogsAPI } from "../../api/dogs/DogsAPI"
 import { StandardCard } from "../../core/components/card/Card"
 import { CardColor } from "../../core/components/card/CardEnums"
 import { CardItem, CardListSection } from "../../core/components/card/CardListSection"
 import { CardTableSection } from "../../core/components/card/CardTableSection"
 import { ValueLabelPair } from "../../core/components/formInputs/SelectInput"
+import { Message, MessageLevel } from "../../core/components/messages/Message"
 import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
-import {
-	ActivityLevelLabel,
-	AgePreference,
-	AgePreferenceLabel,
-	GenderPreference,
-	GenderPreferenceLabel,
-	HousingOwnershipLabel,
-	HousingTypeLabel,
-} from "../../enums/AdopterEnums"
+import { ActivityLevelLabel, AgePreference, AgePreferenceLabel, GenderPreference, GenderPreferenceLabel, HousingOwnershipLabel, HousingTypeLabel } from "../../enums/AdopterEnums"
 import { AppointmentType, Outcome } from "../../enums/AppointmentEnums"
 import { BookingMessageTemplate } from "../../enums/BookingEnums"
 import { EnumLabel } from "../../enums/EnumLabel"
@@ -38,18 +24,14 @@ import { isAdoptionAppointment } from "../../forms/appointments/AppointmentForm"
 import { MessageForm, QuickText, WildcardDefaults } from "../../forms/users/MessageForm"
 import { AdopterDemographics } from "../../models/AdopterModels"
 import { IAppointment } from "../../models/AppointmentModels"
+import { AdopterWatchlist } from "../../models/DogModels"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
-import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
-import { AppointmentCardDataResponse } from "../../api/appointments/Responses"
+import { DateTime } from "../../utils/DateTime"
+import { StringUtils } from "../../utils/StringUtils"
 import { AppointmentCardActions } from "./AppointmentCardActions"
 import { createQuickTexts } from "./MessageTemplates"
 import { AppointmentCardContext, AppointmentCardProps } from "./Types"
 import { getAppointmentCardTopDetails, getPetsInHomeListing, getWeightPreferenceListing, unpackApptData } from "./Utils"
-import { AdopterWatchlist } from "../../models/DogModels"
-import { DogsAPI } from "../../api/dogs/DogsAPI"
-import { DateTime } from "../../utils/DateTime"
-import { Message, MessageLevel } from "../../core/components/messages/Message"
-import { StringUtils } from "../../utils/StringUtils"
 
 export function AppointmentCard({ apptID, context }: AppointmentCardProps) {
 	const session = useSessionState()
@@ -141,9 +123,7 @@ function QuickTextItem({
 			</Modal>
 			<TooltipProvider tooltip={alreadySent ? "This template was already sent" : ""}>
 				<button
-					className={
-						"disabled:cursor-auto disabled:bg-transparent disabled:text-gray-500 disabled:line-through " + hoverStyle
-					}
+					className={"disabled:cursor-auto disabled:bg-transparent disabled:text-gray-500 disabled:line-through " + hoverStyle}
 					disabled={alreadySent}
 					onClick={session.greeterUser ? undefined : modalState.open}
 				>
@@ -164,17 +144,13 @@ export function AppointmentDescription({ context, apptData }: AppointmentDescrip
 
 	return (
 		<>
-			<span className="whitespace-normal">
-				{context == AppointmentCardContext.TIMESLOT ? apptData.description : apptData.instantDisplay}
-			</span>
+			<span className="whitespace-normal">{context == AppointmentCardContext.TIMESLOT ? apptData.description : apptData.instantDisplay}</span>
 			<span className="ml-1.5 space-x-0.5 whitespace-nowrap">
 				{apptData.locked && <Icon def={faLock} />}
 				{adopter?.preferences.mobility && <TooltippedIcon icon={faWheelchair} tooltip="Mobility assistance requested" />}
 				{adopter?.preferences.bringingDog && <TooltippedIcon icon={faDog} tooltip="Bringing dog" />}
 				{adopter?.preferences.hasCats && <TooltippedIcon icon={faCat} tooltip="Has a cat" />}
-				{adopter?.preferences.hasOtherPets && (
-					<TooltippedIcon icon={faHorse} tooltip={`Has other pets: ${adopter.preferences.otherPetsComment}`} />
-				)}
+				{adopter?.preferences.hasOtherPets && <TooltippedIcon icon={faHorse} tooltip={`Has other pets: ${adopter.preferences.otherPetsComment}`} />}
 			</span>
 		</>
 	)
@@ -226,29 +202,20 @@ export function AbleToMeet({ apptData }: { apptData: IAppointment }) {
 
 	const { adults, funSize, puppies } = getAvailableTypes(apptData.type, schedule.dateUtil.GetWeekday())
 
-	const unavailableDogs = getNotYetAvailableDogsFromWatchlist(
-		watchlist ?? [],
-		schedule.dateUtil,
-		funSize,
-		puppies,
-		adults
-	)
+	const unavailableDogs = getNotYetAvailableDogsFromWatchlist(watchlist ?? [], schedule.dateUtil, funSize, puppies, adults)
 
 	return (
 		<>
 			<CardListSection
 				items={[
-					AbleToMeetItem({ canMeet: puppies, label: "Puppies (Any Size)" }),
-					AbleToMeetItem({ canMeet: funSize, label: "Fun Size (Adults 20 lbs. and under)" }),
-					AbleToMeetItem({ canMeet: adults, label: "Adults over 20 lbs." }),
+					AbleToMeetItem({ canMeet: puppies, label: "Puppies" }),
+					AbleToMeetItem({ canMeet: funSize, label: "Fun Size (est. adult size under 25 lbs)" }),
+					AbleToMeetItem({ canMeet: adults, label: "Adults over 25 lbs." }),
 				]}
 				title="You Can Meet..."
 			/>
 			{unavailableDogs.length > 0 && (
-				<Message
-					level={MessageLevel.Warning}
-					message={"These dogs will not be available to meet: " + unavailableDogs.join(", ")}
-				/>
+				<Message level={MessageLevel.Warning} message={"These dogs will not be available to meet: " + unavailableDogs.join(", ")} />
 			)}
 		</>
 	)
@@ -276,9 +243,7 @@ export function LockedAppointmentDisclaimer({ apptData }: { apptData: IAppointme
 		return
 	}
 
-	return (
-		<Disclaimer text="This appointment is restricted from open booking. If you are interested in this appointment, message us." />
-	)
+	return <Disclaimer text="This appointment is restricted from open booking. If you are interested in this appointment, message us." />
 }
 
 export function BookingInfoSection({ apptData }: { apptData: IAppointment }) {
@@ -349,13 +314,7 @@ export function AboutSection({ apptData }: { apptData: IAppointment }) {
 	const items: CardItem<ReactNode>[] = [
 		{ node: `Booked ${booking.bookedInstant}` },
 		{
-			node: (
-				<EnumLabel
-					appendText=" activity household"
-					labelMap={ActivityLevelLabel}
-					value={adopter.preferences.activityLevel}
-				/>
-			),
+			node: <EnumLabel appendText=" activity household" labelMap={ActivityLevelLabel} value={adopter.preferences.activityLevel} />,
 		},
 		{
 			node: `From ${adopter.demographics.city}, ${adopter.demographics.state}`,
@@ -365,12 +324,7 @@ export function AboutSection({ apptData }: { apptData: IAppointment }) {
 			node: (
 				<>
 					<EnumLabel labelMap={HousingTypeLabel} value={adopter.preferences.housingType} />
-					<EnumLabel
-						appendText=")"
-						labelMap={HousingOwnershipLabel}
-						prependText=" ("
-						value={adopter.preferences.housingOwnership}
-					/>
+					<EnumLabel appendText=")" labelMap={HousingOwnershipLabel} prependText=" (" value={adopter.preferences.housingOwnership} />
 				</>
 			),
 		},
@@ -423,13 +377,7 @@ export function MessageSection({ apptData }: { apptData: IAppointment }) {
 	}
 
 	const { funSize, puppies, adults } = getAvailableTypes(apptData.type, schedule.dateUtil.GetWeekday())
-	const notYetAvailableDogs = getNotYetAvailableDogsFromWatchlist(
-		adopter.watchlist,
-		schedule.dateUtil,
-		funSize,
-		puppies,
-		adults
-	)
+	const notYetAvailableDogs = getNotYetAvailableDogsFromWatchlist(adopter.watchlist, schedule.dateUtil, funSize, puppies, adults)
 	const noLongerAvailableDogs = adopter.watchlist
 		.filter((d) => !d.availableNow)
 		.map((d) => d.name)
@@ -478,13 +426,7 @@ function WatchlistSection({ apptData }: { apptData: IAppointment }) {
 	const watchlistTable: ValueLabelPair<ReactNode>[] = []
 	const { funSize, puppies, adults } = getAvailableTypes(apptData.type, schedule.dateUtil.GetWeekday())
 
-	const notYetAvailableDogs = getNotYetAvailableDogsFromWatchlist(
-		adopter.watchlist,
-		schedule.dateUtil,
-		funSize,
-		puppies,
-		adults
-	)
+	const notYetAvailableDogs = getNotYetAvailableDogsFromWatchlist(adopter.watchlist, schedule.dateUtil, funSize, puppies, adults)
 
 	const noLongerAvailableDogs = adopter.watchlist
 		.filter((dog) => !dog.availableNow)
@@ -492,9 +434,7 @@ function WatchlistSection({ apptData }: { apptData: IAppointment }) {
 		.sort((a, b) => a.localeCompare(b))
 
 	const stillAvailableDogs = adopter.watchlist
-		.filter(
-			(dog) => !notYetAvailableDogs.some((d) => d === dog.name) && !noLongerAvailableDogs.some((d) => d === dog.name)
-		)
+		.filter((dog) => !notYetAvailableDogs.some((d) => d === dog.name) && !noLongerAvailableDogs.some((d) => d === dog.name))
 		.map((dog) => dog.name)
 		.sort((a, b) => a.localeCompare(b))
 
@@ -564,9 +504,7 @@ export function getNotYetAvailableDogsFromWatchlist(
 	watchlist = watchlist.filter((dog) => dog.availableNow)
 
 	let notYetAvailableDogs: string[] =
-		watchlist
-			?.filter((dog) => dog.availableDate && new DateTime(dog.availableDate).DiffWithDate(scheduleDateUtil) > 0)
-			.map((dog) => dog.name) ?? []
+		watchlist?.filter((dog) => dog.availableDate && new DateTime(dog.availableDate).DiffWithDate(scheduleDateUtil) > 0).map((dog) => dog.name) ?? []
 
 	if (!funSize) {
 		const funSizeDogs: string[] = watchlist?.filter((dog) => dog.funSize).map((dog) => dog.name) ?? []
