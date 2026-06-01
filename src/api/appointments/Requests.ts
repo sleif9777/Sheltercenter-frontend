@@ -1,7 +1,7 @@
 import { Outcome } from "../../enums/AppointmentEnums"
-import { AdopterDemographics, IAdopter } from "../../models/AdopterModels"
+import { AdopterDemographics } from "../../models/AdopterModels"
 import { IAppointment } from "../../models/AppointmentModels"
-import { ISODateDict } from "../../utils/DateTime"
+import { ISODateDict, TimeRequest } from "../../utils/DateTime"
 import { AdopterIDRequest, AdopterPreferencesRequest } from "../adopters/Requests"
 
 export type AppointmentIDRequest = {
@@ -19,7 +19,9 @@ export type ToggleLockRequest = {
 export type CreateWalkInRequest = {
 	adopterID: number | "*"
 } & Pick<AdopterDemographics, "firstName" | "lastName" | "primaryEmail"> &
-	Pick<IAppointment, "type">
+	Pick<IAppointment, "type"> &
+	ISODateRequest &
+	TimeRequest
 
 export type ISODateRequest = ISODateDict
 
@@ -34,19 +36,16 @@ export type MarkTemplateSentRequest = {
 } & AppointmentIDRequest
 
 export type CreateAppointmentRequest = Pick<IAppointment, "type" | "locked" | "notes"> & {
-	hour: number
-	minute: number
 	fka?: string
 	pendingAdoptionID: number
-} & ISODateRequest
+} & ISODateRequest &
+	TimeRequest
 
 export type ScheduleAppointmentRequest = AppointmentIDRequest & AdopterIDRequest
 
 export type ScheduleAppointmentWithPreferencesRequest = AdopterPreferencesRequest & ScheduleAppointmentRequest
 
-export type CheckInAppointmentRequest = Pick<IAppointment, "clothingDescription" | "counselor"> &
-	AppointmentIDRequest &
-	Pick<IAdopter, "streetAddress" | "city" | "state" | "postalCode">
+export type CheckInAppointmentRequest = Pick<IAppointment, "clothingDescription" | "counselor"> & AppointmentIDRequest
 
 export type CheckOutAppointmentRequest = {
 	outcome: Outcome

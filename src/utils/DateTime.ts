@@ -8,6 +8,13 @@ export type ISODateDict = {
 	isoDate: string
 }
 
+export type TimeDict = {
+	hour: number
+	minute: number
+}
+
+export type TimeRequest = TimeDict
+
 enum DateTimeFormat {
 	ISODate = "YYYY-MM-DD", // 2026-01-01
 	FullDate = "MMM D, YYYY", // January 1, 2026

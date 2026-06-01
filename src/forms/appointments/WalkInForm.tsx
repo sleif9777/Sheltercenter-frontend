@@ -6,6 +6,7 @@ import { EmailInput } from "../../core/components/formInputs/EmailInput"
 import SelectInput, { SelectInputOption } from "../../core/components/formInputs/SelectInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
 import { TextInput } from "../../core/components/formInputs/TextInput"
+import { TimeInput, TimeChangeHandler } from "../../core/components/formInputs/TimeInput"
 import { Message, MessageLevel } from "../../core/components/messages/Message"
 import { ModalState } from "../../core/components/modal/Modal"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
@@ -22,6 +23,38 @@ export function WalkInForm({ modalState }: { modalState: ModalState }) {
 	const formState = useWalkInFormState()
 	const schedule = useScheduleState()
 	const { setField, setAll, errors } = formState
+
+	// --- set default time to next 30-minute boundary on mount ---
+	useEffect(() => {
+		const now = new Date()
+		const h = now.getHours()
+		const m = now.getMinutes()
+
+		let nextHour = h
+		let nextMinute: number
+
+		if (m === 0) {
+			nextMinute = 0
+		} else if (m <= 30) {
+			nextMinute = 30
+		} else {
+			nextMinute = 0
+			nextHour = h + 1
+		}
+
+		// handle midnight rollover
+		if (nextHour >= 24) {
+			nextHour = 0
+		}
+
+		setField("hour", nextHour)
+		setField("minute", nextMinute)
+	}, [setField])
+
+	// --- sync calendar view date ---
+	useEffect(() => {
+		setField("isoDate", schedule.isoDate)
+	}, [schedule.isoDate, setField])
 
 	// --- prepare POST request ---
 	const handleSubmit: FormSubmitHandler<CreateWalkInRequest> = useCallback(
@@ -88,19 +121,17 @@ function Fieldset({
 		})
 	}, [setAll])
 
+	const timeErrors = [...(errors["hour"] ?? []), ...(errors["minute"] ?? [])]
+
 	return (
 		<div className="flex flex-col gap-y-3">
 			<WalkInInstructions />
+			<WalkInTimeField errors={timeErrors} hour={formData["hour"] ?? 0} minute={formData["minute"] ?? 0} setField={setField} />
 			<AppointmentTypeField {...bindField("type")} isTemplate />
 
 			{/* Step 1: Search for existing adopter */}
 			{!isCreatingNew && (
-				<AdopterSearchField
-					errors={errors["adopterID"]}
-					value={selectedAdopterId}
-					onChange={handleAdopterChange}
-					onCreateNew={handleCreateNew}
-				/>
+				<AdopterSearchField errors={errors["adopterID"]} value={selectedAdopterId} onChange={handleAdopterChange} onCreateNew={handleCreateNew} />
 			)}
 
 			{/* Step 2: If creating new, show new adopter fields */}
@@ -134,6 +165,31 @@ function WalkInInstructions() {
 		<Message
 			level={MessageLevel.Default}
 			message="Search for an existing adopter by name or email. If they're not in the system, create a new profile."
+		/>
+	)
+}
+
+function WalkInTimeField({ hour, minute, setField, errors }: { hour: number; minute: number; setField: WalkInFormFieldUpdater; errors: string[] }) {
+	const handleTimeChange = useCallback<TimeChangeHandler>(
+		(m) => {
+			if (m) {
+				setField("hour", m.hours())
+				setField("minute", m.minutes())
+			}
+		},
+		[setField]
+	)
+
+	return (
+		<TimeInput
+			addlProps={{ minutesStep: 30 }}
+			defaultDirty
+			errors={errors}
+			fieldLabel="Time"
+			hour={hour}
+			minute={minute}
+			showRequired
+			onChange={handleTimeChange}
 		/>
 	)
 }
@@ -222,27 +278,12 @@ function NewAdopterFields({
 			</div>
 
 			<div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-				<TextInput
-					addlProps={{ style: { backgroundColor: "white" } }}
-					{...bindField("firstName")}
-					fieldLabel="First Name"
-					showRequired
-				/>
-				<TextInput
-					addlProps={{ style: { backgroundColor: "white" } }}
-					{...bindField("lastName")}
-					fieldLabel="Last Name"
-					showRequired
-				/>
+				<TextInput addlProps={{ style: { backgroundColor: "white" } }} {...bindField("firstName")} fieldLabel="First Name" showRequired />
+				<TextInput addlProps={{ style: { backgroundColor: "white" } }} {...bindField("lastName")} fieldLabel="Last Name" showRequired />
 			</div>
 
 			<div className="mt-3">
-				<EmailInput
-					addlProps={{ style: { backgroundColor: "white" } }}
-					{...bindField("primaryEmail")}
-					fieldLabel="Email Address"
-					showRequired
-				/>
+				<EmailInput addlProps={{ style: { backgroundColor: "white" } }} {...bindField("primaryEmail")} fieldLabel="Email Address" showRequired />
 			</div>
 		</div>
 	)

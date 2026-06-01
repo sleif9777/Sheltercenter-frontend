@@ -1,3 +1,4 @@
+import { TimeRequest } from "../../utils/DateTime"
 import { Weekday } from "../../enums/TemplateEnums"
 
 export type WeekdayRequest = {
@@ -5,7 +6,6 @@ export type WeekdayRequest = {
 }
 
 export type CreateTemplateRequest = {
-	hour: number
-	minute: number
 	type: number
-} & WeekdayRequest
+} & WeekdayRequest &
+	TimeRequest

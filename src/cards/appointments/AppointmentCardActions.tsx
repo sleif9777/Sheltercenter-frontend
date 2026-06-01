@@ -31,7 +31,7 @@ import { MessageForm } from "../../forms/users/MessageForm"
 import { IAppointment } from "../../models/AppointmentModels"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
 import { AppointmentCardActionProps, AppointmentCardContext } from "./Types"
-import { getCanViewBookingForm, unpackApptData } from "./Utils"
+import { getCanViewBookingForm } from "./Utils"
 
 export function AppointmentCardActions({
 	appt,
@@ -100,12 +100,7 @@ function MessageButton({ appt }: AppointmentCardActionProps) {
 				onClick={modalState.open}
 			/>
 			<Modal modalState={modalState} modalTitle={"Message " + appt.booking?.adopter.demographics.firstName}>
-				<MessageForm
-					adopterID={appt.booking?.adopter.demographics.ID ?? 0}
-					apptID={appt.ID}
-					hideSubject
-					modalState={modalState}
-				/>
+				<MessageForm adopterID={appt.booking?.adopter.demographics.ID ?? 0} apptID={appt.ID} hideSubject modalState={modalState} />
 			</Modal>
 		</>
 	)
@@ -129,14 +124,7 @@ function DeleteButton({ appt }: AppointmentCardActionProps) {
 		return
 	}
 
-	return (
-		<CardActionAreYouSure
-			icon={faTrash}
-			modalTitle="Delete Appointment"
-			youWantTo="delete this appointment"
-			onSubmit={handleDelete}
-		/>
-	)
+	return <CardActionAreYouSure icon={faTrash} modalTitle="Delete Appointment" youWantTo="delete this appointment" onSubmit={handleDelete} />
 }
 
 function CancelButton({ appt }: AppointmentCardActionProps) {
@@ -159,14 +147,7 @@ function CancelButton({ appt }: AppointmentCardActionProps) {
 		return
 	}
 
-	return (
-		<CardActionAreYouSure
-			icon={faTrash}
-			modalTitle="Cancel Appointment"
-			youWantTo="cancel this appointment"
-			onSubmit={handleCancel}
-		/>
-	)
+	return <CardActionAreYouSure icon={faTrash} modalTitle="Cancel Appointment" youWantTo="cancel this appointment" onSubmit={handleCancel} />
 }
 
 function GhostButton({ appt }: AppointmentCardActionProps) {
@@ -183,19 +164,11 @@ function GhostButton({ appt }: AppointmentCardActionProps) {
 		return
 	}
 
-	return (
-		<CardActionAreYouSure
-			icon={faGhost}
-			modalTitle="No Show"
-			youWantTo="mark this appointment as a no-show"
-			onSubmit={handleGhost}
-		/>
-	)
+	return <CardActionAreYouSure icon={faGhost} modalTitle="No Show" youWantTo="mark this appointment as a no-show" onSubmit={handleGhost} />
 }
 
 function CheckInButton({ appt }: AppointmentCardActionProps) {
-	const apptID = appt.ID,
-		{ adopter } = unpackApptData(appt)
+	const apptID = appt.ID
 	const modalState = useModalState()
 
 	if (!appt.hasCurrentBooking || (appt.outcome && appt.outcome != Outcome.NO_SHOW)) {
@@ -208,12 +181,8 @@ function CheckInButton({ appt }: AppointmentCardActionProps) {
 				<CheckInForm
 					apptID={apptID}
 					defaultValues={{
-						city: adopter?.demographics.city,
 						clothingDescription: appt.clothingDescription,
 						counselor: appt.counselor,
-						postalCode: adopter?.demographics.postalCode,
-						state: adopter?.demographics.state,
-						streetAddress: adopter?.demographics.streetAddress,
 					}}
 					modalState={modalState}
 				/>
@@ -238,13 +207,16 @@ function CheckOutButton({ appt }: AppointmentCardActionProps) {
 	return (
 		<>
 			<Modal modalState={modalState} modalTitle="Check Out">
-				<CheckOutForm apptID={apptID} defaults={{ outcome: appt.outcome }} modalState={modalState} />
+				<CheckOutForm
+					apptID={apptID}
+					defaults={{
+						dogID: appt.chosenDogID ? String(appt.chosenDogID) : undefined,
+						outcome: appt.outcome,
+					}}
+					modalState={modalState}
+				/>
 			</Modal>
-			<CardActionButton
-				primaryIcon={appt.checkOutTime ? faEdit : faSignOutAlt}
-				primaryTooltipContent="Check Out"
-				onClick={modalState.open}
-			/>
+			<CardActionButton primaryIcon={appt.checkOutTime ? faEdit : faSignOutAlt} primaryTooltipContent="Check Out" onClick={modalState.open} />
 		</>
 	)
 }
@@ -258,13 +230,7 @@ function PrintButton({ appt }: AppointmentCardActionProps) {
 
 	const link = `https://new.shelterluv.com/application-request/${booking.adopter.demographics.shelterluvAppID}/print`
 
-	return (
-		<CardActionButton
-			primaryIcon={faPrint}
-			primaryTooltipContent="Print Application"
-			onClick={() => window.open(link, "_blank")}
-		/>
-	)
+	return <CardActionButton primaryIcon={faPrint} primaryTooltipContent="Print Application" onClick={() => window.open(link, "_blank")} />
 }
 
 function LockButton({ appt, session }: AppointmentCardActionProps) {
@@ -281,11 +247,7 @@ function LockButton({ appt, session }: AppointmentCardActionProps) {
 	}
 
 	return (
-		<CardActionButton
-			primaryIcon={appt.locked ? faUnlock : faLock}
-			primaryTooltipContent={appt.locked ? "Unlock" : "Lock"}
-			onClick={handleClick}
-		/>
+		<CardActionButton primaryIcon={appt.locked ? faUnlock : faLock} primaryTooltipContent={appt.locked ? "Unlock" : "Lock"} onClick={handleClick} />
 	)
 }
 
@@ -321,10 +283,7 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 	if (appt.locked) {
 		return (
 			<>
-				<button
-					className="cursor-pointer rounded-md bg-pink-700 px-3 py-1 text-sm font-medium text-white hover:bg-pink-400"
-					onClick={modalState.open}
-				>
+				<button className="cursor-pointer rounded-md bg-pink-700 px-3 py-1 text-sm font-medium text-white hover:bg-pink-400" onClick={modalState.open}>
 					Message Us
 				</button>
 				<Modal modalState={modalState} modalTitle="Message Adoptions">

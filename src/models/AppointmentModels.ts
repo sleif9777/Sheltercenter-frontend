@@ -26,6 +26,7 @@ export interface IAppointment {
 	outcome?: Outcome
 	outcomeDisplay?: string
 	chosenDog?: string
+	chosenDogID?: number
 
 	checkInTime?: string
 	checkOutTime?: string
@@ -41,24 +42,16 @@ export interface AppointmentIDProps extends Pick<IAppointment, "ID"> {}
 export type AppointmentHash = ScheduleHash<HashAppointment>
 
 export interface HashAppointment
-	extends
-		AppointmentIDProps,
-		Pick<IAppointment, "hasCurrentBooking" | "isAdminAppt" | "checkInTime" | "checkOutTime" | "isInProgress"> {}
+	extends AppointmentIDProps, Pick<IAppointment, "hasCurrentBooking" | "isAdminAppt" | "checkInTime" | "checkOutTime" | "isInProgress"> {}
 
 export interface AppointmentMissingOutcome extends AppointmentIDProps, Pick<IAppointment, "description" | "isoDate"> {}
 
-export interface ReportingAppointment extends Pick<
-	IAppointment,
-	"ID" | "timeDisplay" | "description" | "type" | "typeDisplay"
-> {}
+export interface ReportingAppointment extends Pick<IAppointment, "ID" | "timeDisplay" | "description" | "type" | "typeDisplay"> {}
 
 export interface ReportingAdoptionAppointment
 	extends
 		ReportingAppointment,
-		Pick<
-			IAppointment,
-			"checkInTime" | "checkOutTime" | "counselor" | "clothingDescription" | "outcomeDisplay" | "chosenDog"
-		> {
+		Pick<IAppointment, "checkInTime" | "checkOutTime" | "counselor" | "clothingDescription" | "outcomeDisplay" | "chosenDog"> {
 	booking: IBooking
 }
 

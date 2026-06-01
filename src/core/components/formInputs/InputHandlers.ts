@@ -5,7 +5,7 @@ import ReactQuill from "react-quill"
 import { DatePickerProps } from "rsuite"
 import { TypeAttributes } from "rsuite/esm/internals/types"
 
-import { DateTime, MomentOrNull } from "../../../utils/DateTime"
+import { DateTime, MomentOrNull, TimeDict } from "../../../utils/DateTime"
 
 export type OptionalChangeHandler<T> = (value?: T) => void
 export type RequiredChangeHandler<T> = (value: T) => void
@@ -61,10 +61,8 @@ export interface DateInputProps extends OptionalValueInputProps<DateTime> {
 }
 
 // Time field values are tracked by hour and minute. The value is calculated within the component, not externally.
-export interface TimeInputProps extends Omit<RequiredValueInputProps<MomentOrNull>, "value"> {
+export interface TimeInputProps extends Omit<RequiredValueInputProps<MomentOrNull>, "value">, TimeDict {
 	addlProps?: ComponentProps<typeof TimePicker>
-	hour: number
-	minute: number
 }
 
 export interface RequiredEnumInputProps<T extends number> extends RequiredValueInputProps<T> {}
