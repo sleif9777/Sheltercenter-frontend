@@ -120,16 +120,16 @@ export function AdopterPreferenceFieldset({
 
 	return (
 		<div className="grid grid-cols-1 items-start gap-x-2 gap-y-1.5 lg:grid-cols-2">
+			<div className="flex flex-col gap-y-1.5">
+				<InputLabel fieldLabel="Let us know if you..." />
+				<BringingDogField {...bindField("bringingDog")} />
+				<MobilityField {...bindField("mobility")} />
+				<LowShedField {...bindField("lowShed")} />
+			</div>
 			<NotesField formData={formData} session={session} setField={setField} />
 			<GenderPreferenceField {...bindField("genderPreference")} />
 			<AgePreferenceField {...bindField("agePreference")} apptType={apptType} />
 			<WeightPreferencesField errors={weightErrors} formData={formData} setField={setField} />
-			<div className="flex flex-col gap-y-1.5">
-				<InputLabel fieldLabel="Let us know if you..." />
-				<MobilityField {...bindField("mobility")} />
-				<BringingDogField {...bindField("bringingDog")} />
-				<LowShedField {...bindField("lowShed")} />
-			</div>
 			<HousingTypeField {...bindField("housingType")} />
 			<HousingOwnershipField {...bindField("housingOwnership")} />
 			<ActivityLevelField {...bindField("activityLevel")} />

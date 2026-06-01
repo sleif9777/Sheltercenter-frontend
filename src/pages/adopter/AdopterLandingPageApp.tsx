@@ -71,6 +71,7 @@ export function AdopterLandingPageApp() {
 								<div className="m-auto text-lg">
 									<span>You do not have an appointment booked.</span>
 									<BookAppointmentButton />
+									<BringingDogHint />
 									<ManageWatchlistButton />
 									<UpdatePreferencesButton />
 									<MessageAdoptionsButton />
@@ -123,6 +124,18 @@ export function CancelAppointmentButton() {
 				onSubmit={handleSubmit}
 			/>
 		</>
+	)
+}
+
+function BringingDogHint() {
+	return (
+		<p className="text-sm text-gray-500">
+			Planning to bring your current dog?{" "}
+			<a className="font-medium text-pink-700 underline" href="/preferences/">
+				Let us know in your preferences
+			</a>{" "}
+			before you book.
+		</p>
 	)
 }
 
