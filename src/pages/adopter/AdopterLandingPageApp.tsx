@@ -1,10 +1,11 @@
-import { faShieldDog } from "@fortawesome/free-solid-svg-icons"
+import { faFilePdf, faShieldDog } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useCallback } from "react"
 import ReactQuill from "react-quill"
 
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import Logo from "../../assets/logo.png"
-import UserInstructions from "../../assets/UserInstructions.jpg"
+import ApprovalDiagram from "../../assets/Application-Approval-Diagram_v6.pdf"
 import { AppointmentCard } from "../../cards/appointments/AppointmentCard"
 import { AppointmentCardContext } from "../../cards/appointments/Types"
 import { LargeButton } from "../../core/components/buttons/LargeButton"
@@ -191,11 +192,15 @@ function AdoptionProcess() {
 	return (
 		<>
 			<Modal modalState={modalState} modalTitle="Adoption Process">
-				<img className="m-auto w-full" src={UserInstructions} />
+				<iframe className="h-[80vh] w-full" src={ApprovalDiagram} title="Adoption Process" />
 			</Modal>
 			<TooltipProvider tooltip="Click to expand">
-				<button className="cursor-nesw-resize hover:opacity-70" onClick={modalState.open}>
-					<img className="m-auto mt-3 w-[70%]" src={UserInstructions} />
+				<button
+					className="mt-3 flex cursor-nesw-resize flex-col items-center gap-2 hover:opacity-70"
+					onClick={modalState.open}
+				>
+					<FontAwesomeIcon className="text-5xl text-pink-700" icon={faFilePdf} />
+					<span className="text-sm font-medium text-pink-700">View Adoption Process</span>
 				</button>
 			</TooltipProvider>
 		</>
