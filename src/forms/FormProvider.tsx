@@ -1,5 +1,5 @@
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons"
-import { ReactNode, useCallback } from "react"
+import { ReactNode, useCallback, useState } from "react"
 
 import { CardColor } from "../core/components/card/CardEnums"
 import {
@@ -41,6 +41,7 @@ export function FormProvider<T extends object>({
 	onCancel?: () => void
 }) {
 	const { getPostRequest, reset, errors, isValid } = formState
+	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const { border } = {
 		[CardColor.RED]: { bg: "bg-red-200", border: "border-red-800", text: "text-red-800" },
@@ -53,19 +54,21 @@ export function FormProvider<T extends object>({
 	const handleSubmit: SubmitClickHandler = useCallback(
 		async (e) => {
 			e.preventDefault()
-			if (!isValid) {
+			if (!isValid || isSubmitting) {
 				return
 			}
-
-			await onSubmit(getPostRequest())
-
-			if (!avoidReset) {
-				reset()
+			setIsSubmitting(true)
+			try {
+				await onSubmit(getPostRequest())
+				if (!avoidReset) {
+					reset()
+				}
+				modalState?.close()
+			} finally {
+				setIsSubmitting(false)
 			}
-
-			modalState?.close()
 		},
-		[isValid, onSubmit, getPostRequest, avoidReset, modalState, reset]
+		[isValid, isSubmitting, onSubmit, getPostRequest, avoidReset, modalState, reset]
 	)
 
 	const handleCancel: CancelClickHandler = useCallback(() => {
@@ -118,9 +121,9 @@ export function FormProvider<T extends object>({
 							type: "submit",
 						}}
 						colorOverride={colorOverride}
-						disabled={!isValid}
+						disabled={!isValid || isSubmitting}
 						icon={submitButtonProps?.icon ?? faCheck}
-						label={submitButtonProps?.label ?? "Submit"}
+						label={isSubmitting ? "Sending..." : (submitButtonProps?.label ?? "Submit")}
 					/>
 				</TooltipProvider>
 			</div>

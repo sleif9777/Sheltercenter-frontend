@@ -338,6 +338,8 @@ function MessageButton({ adoption }: { adoption: IPendingAdoption }) {
 			<Modal modalState={modalState} modalTitle={"Message " + adoption.adopter.firstName}>
 				<MessageForm
 					adopterID={adoption.adopter.ID ?? 0}
+					adoptionID={adoption.ID}
+					adoptionSubject={`An update on ${adoption.dog}`}
 					hideSubject
 					modalState={modalState}
 					quickTextOptions={quickTexts}

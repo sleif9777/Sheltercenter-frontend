@@ -86,7 +86,13 @@ function Fieldset({
 
 	return (
 		<div>
-			<EmailInput {...bindField("primaryEmail")} className="m-auto" enterKeyHandler={handleEnter} showRequired />
+			<EmailInput
+				{...bindField("primaryEmail")}
+				addlProps={{ autoComplete: "email" }}
+				className="m-auto"
+				enterKeyHandler={handleEnter}
+				showRequired
+			/>
 		</div>
 	)
 }

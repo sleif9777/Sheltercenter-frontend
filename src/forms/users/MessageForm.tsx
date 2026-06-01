@@ -12,6 +12,7 @@ import ReactQuill from "react-quill"
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
 import { SendMessageRequest } from "../../api/adopters/Requests"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
+import { PendingAdoptionsAPI } from "../../api/pendingAdoptions/PendingAdoptionsAPI"
 import { StringInputProps } from "../../core/components/formInputs/InputHandlers"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import { RichTextInput } from "../../core/components/formInputs/RichTextInput"
@@ -35,6 +36,8 @@ export type WildcardDefaults = Partial<Record<BookingMessageTemplate, Record<str
 
 export function MessageForm({
 	adopterID,
+	adoptionID,
+	adoptionSubject,
 	apptID,
 	hideSubject,
 	initialValue,
@@ -45,6 +48,8 @@ export function MessageForm({
 	templateFlag,
 }: {
 	adopterID: number
+	adoptionID?: number
+	adoptionSubject?: string
 	apptID?: number
 	hideSubject?: boolean
 	initialValue?: ReactQuill.Value
@@ -84,10 +89,17 @@ export function MessageForm({
 	// --- prepare POST request ---
 	const handleSubmit: FormSubmitHandler<SendMessageRequest> = useCallback(
 		async (req: SendMessageRequest) => {
-			// Message is already replaced in real-time via useEffect above
-			const messageToSend = req.message
+			const updatedReq = { ...req, message: req.message }
 
-			const updatedReq = { ...req, message: messageToSend }
+			if (adoptionID) {
+				await new PendingAdoptionsAPI().AddUpdate(
+					adoptionID,
+					deltaToPlainText(updatedReq.message),
+					adoptionSubject ?? updatedReq.subject ?? ""
+				)
+				showToast({ level: MessageLevel.Success, message: "Message sent!" })
+				return
+			}
 
 			const resp = isMessageToAdoptions
 				? await new AdoptersAPI().MessageAdoptions(updatedReq)
@@ -103,7 +115,7 @@ export function MessageForm({
 				showToast({ level: MessageLevel.Error, message: "Failed to send!" })
 			}
 		},
-		[apptID, fields, isMessageToAdoptions, schedule]
+		[adoptionID, adoptionSubject, apptID, fields, isMessageToAdoptions, schedule]
 	)
 
 	const handleManualEdit = useCallback(() => {
