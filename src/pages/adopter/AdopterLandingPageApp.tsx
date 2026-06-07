@@ -150,7 +150,7 @@ function BringingDogHint({ bringingDog }: { bringingDog: boolean }) {
 
 	return (
 		<p className="text-sm text-gray-500">
-			Planning to bring your current pets?{" "}
+			Planning to bring your current dog?{" "}
 			<a className="font-medium text-pink-700 underline" href="/preferences/">
 				Let us know in your preferences
 			</a>{" "}
