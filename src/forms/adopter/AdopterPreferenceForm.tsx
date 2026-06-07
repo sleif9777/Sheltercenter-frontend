@@ -1,5 +1,5 @@
 import { faCat, faDog, faHorse, faPaw, IconDefinition } from "@fortawesome/free-solid-svg-icons"
-import { useCallback, useEffect, useState } from "react"
+import { ReactNode, useCallback, useEffect, useState } from "react"
 
 import { CheckboxInput, Toggleable } from "../../core/components/formInputs/CheckboxInput"
 import {
@@ -12,7 +12,7 @@ import { NumberInput } from "../../core/components/formInputs/NumberInput"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
 import { TextInput } from "../../core/components/formInputs/TextInput"
-import { Message, MessageLevel } from "../../core/components/messages/Message"
+import { MessageLevel } from "../../core/components/messages/Message"
 import { showToast } from "../../core/components/messages/ToastProvider"
 import { SessionState } from "../../core/session/SessionState"
 import { ActivityLevel, AgePreference, GenderPreference, HousingOwnership, HousingType } from "../../enums/AdopterEnums"
@@ -65,32 +65,26 @@ export function AdopterPreferencesForm({ adopterID, session }: { adopterID: numb
 }
 
 export function AllFieldsOptionalMessage({ session }: { session: SessionState }) {
-	const errors = [
-		{
-			error: session.adopterUser,
-			message: "All fields are optional.",
-		},
-		{
-			error: true,
-			message:
-				"All fields (except Adopter) are optional. Only adopters that have a valid application and no active booking are available.",
-		},
-	]
-	return <WarningMessage errors={errors} />
+	const message = session.adopterUser
+		? "All fields are optional."
+		: "All fields (except Adopter) are optional. Only adopters with a valid application and no active booking are available."
+
+	return <p className="mb-2 text-sm italic text-gray-500">{message}</p>
 }
 
-function WarningMessage({
-	errors,
-}: {
-	errors: { error: boolean; message: string; level?: MessageLevel }[] // TODO: Make this a type
-}) {
-	const error = errors.find((e) => e.error)
+// ----------------------
+// Section card
+// ----------------------
 
-	if (!error) {
-		return null
-	}
-
-	return <Message level={MessageLevel.Default} message={error.message} />
+function PreferenceSectionCard({ title, children }: { title: string; children: ReactNode }) {
+	return (
+		<div className="flex flex-col gap-3 rounded-xl border border-pink-200 bg-white p-4 shadow-sm">
+			<h2 className="border-b border-pink-200 pb-1 text-base font-semibold uppercase tracking-wide text-pink-800">
+				{title}
+			</h2>
+			{children}
+		</div>
+	)
 }
 
 // ----------------------
@@ -110,7 +104,6 @@ export function AdopterPreferenceFieldset({
 	session: SessionState
 	setField: AdopterPreferencesFormFieldUpdater
 }) {
-	// helper to bind formData fields to value + onChange
 	const bindField = <K extends keyof AdopterPreferencesRequest>(field: K) => ({
 		errors: errors[field],
 		onChange: (v: AdopterPreferencesRequest[K]) => setField(field, v),
@@ -120,22 +113,35 @@ export function AdopterPreferenceFieldset({
 	const weightErrors = (errors.maxWeightPreference ?? []).concat(errors.minWeightPreference ?? [])
 
 	return (
-		<div className="grid grid-cols-1 items-start gap-x-2 gap-y-1.5 lg:grid-cols-2">
-			<div className="flex flex-col gap-y-1.5">
-				<InputLabel fieldLabel="Let us know if you..." />
-				<BringingDogField {...bindField("bringingDog")} />
-				<MobilityField {...bindField("mobility")} />
-				<LowShedField {...bindField("lowShed")} />
-			</div>
-			<NotesField formData={formData} session={session} setField={setField} />
-			<GenderPreferenceField {...bindField("genderPreference")} />
-			<AgePreferenceField {...bindField("agePreference")} apptType={apptType} />
-			<WeightPreferencesField errors={weightErrors} formData={formData} setField={setField} />
-			<HousingTypeField {...bindField("housingType")} />
-			<HousingOwnershipField {...bindField("housingOwnership")} />
-			<ActivityLevelField {...bindField("activityLevel")} />
-			<HasFenceField {...bindField("hasFence")} />
-			<PetsAtHomeField formData={formData} setField={setField} />
+		<div className="flex flex-col gap-4">
+			<PreferenceSectionCard title="Your Visit">
+				<div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
+					<div className="flex flex-col gap-y-2">
+						<BringingDogField {...bindField("bringingDog")} />
+						<MobilityField {...bindField("mobility")} />
+					</div>
+					<NotesField formData={formData} session={session} setField={setField} />
+				</div>
+			</PreferenceSectionCard>
+
+			<PreferenceSectionCard title="Dog Preferences">
+				<div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
+					<GenderPreferenceField {...bindField("genderPreference")} />
+					<AgePreferenceField {...bindField("agePreference")} apptType={apptType} />
+					<WeightPreferencesField errors={weightErrors} formData={formData} setField={setField} />
+					<ActivityLevelField {...bindField("activityLevel")} />
+					<LowShedField {...bindField("lowShed")} />
+				</div>
+			</PreferenceSectionCard>
+
+			<PreferenceSectionCard title="Your Home">
+				<div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
+					<HousingTypeField {...bindField("housingType")} />
+					<HousingOwnershipField {...bindField("housingOwnership")} />
+					<HasFenceField {...bindField("hasFence")} />
+					<PetsAtHomeField formData={formData} setField={setField} />
+				</div>
+			</PreferenceSectionCard>
 		</div>
 	)
 }
