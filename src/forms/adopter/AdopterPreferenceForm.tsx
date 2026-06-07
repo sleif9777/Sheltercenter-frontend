@@ -42,6 +42,7 @@ export function AdopterPreferencesForm({ adopterID, session }: { adopterID: numb
 	const handleSubmit: FormSubmitHandler<AdopterPreferencesRequest> = useCallback(async (req) => {
 		await new AdoptersAPI().UpdateAdopterPreferences(req)
 		showToast({ level: MessageLevel.Success, message: "Preferences saved!" })
+		window.location.href = "/my_home/"
 	}, [])
 
 	useEffect(() => {

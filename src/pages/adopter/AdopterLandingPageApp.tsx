@@ -1,8 +1,8 @@
-import { faFilePdf, faShieldDog } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useCallback } from "react"
+import { faShieldDog } from "@fortawesome/free-solid-svg-icons"
+import { useCallback, useEffect, useState } from "react"
 import ReactQuill from "react-quill"
 
+import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import Logo from "../../assets/logo.png"
 import ApprovalDiagram from "../../assets/Application-Approval-Diagram_v6.pdf"
@@ -11,7 +11,6 @@ import { AppointmentCardContext } from "../../cards/appointments/Types"
 import { LargeButton } from "../../core/components/buttons/LargeButton"
 import { MessageLevel } from "../../core/components/messages/Message"
 import { showToast } from "../../core/components/messages/ToastProvider"
-import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { AreYouSure } from "../../core/components/modal/AreYouSure"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
@@ -22,6 +21,15 @@ import { useScheduleState } from "../schedule/ScheduleAppState"
 
 export function AdopterLandingPageApp() {
 	const session = useSessionState()
+	const [bringingDog, setBringingDog] = useState<boolean>(false)
+
+	useEffect(() => {
+		if (session.user?.adopterID) {
+			new AdoptersAPI()
+				.GetAdopterPreferences(session.user.adopterID)
+				.then((resp) => setBringingDog(resp.pref.bringingDog ?? false))
+		}
+	}, [session.user?.adopterID])
 
 	return (
 		<FullWidthPage title={<WelcomeTitle />}>
@@ -70,15 +78,19 @@ export function AdopterLandingPageApp() {
 							) : (
 								<div className="m-auto text-lg">
 									<span>You do not have an appointment booked.</span>
+									<BringingDogHint bringingDog={bringingDog} />
 									<BookAppointmentButton />
-									<BringingDogHint />
 									<ManageWatchlistButton />
 									<UpdatePreferencesButton />
 									<MessageAdoptionsButton />
+									<iframe
+										className="mt-3 h-150 w-full"
+										src={ApprovalDiagram}
+										title="Adoption Process"
+									/>
 								</div>
 							)}
 						</div>
-						<AdoptionProcess />
 					</>
 				)}
 			</div>
@@ -127,10 +139,18 @@ export function CancelAppointmentButton() {
 	)
 }
 
-function BringingDogHint() {
+function BringingDogHint({ bringingDog }: { bringingDog: boolean }) {
+	if (bringingDog) {
+		return (
+			<p className="text-sm text-gray-500">
+				{"You've let us know you'll be bringing your dog — we'll be ready for you both!"}
+			</p>
+		)
+	}
+
 	return (
 		<p className="text-sm text-gray-500">
-			Planning to bring your current dog?{" "}
+			Planning to bring your current pets?{" "}
 			<a className="font-medium text-pink-700 underline" href="/preferences/">
 				Let us know in your preferences
 			</a>{" "}
@@ -199,26 +219,6 @@ function MessageAdoptionsButton({ includeQTs }: { includeQTs?: boolean }) {
 	)
 }
 
-function AdoptionProcess() {
-	const modalState = useModalState()
-
-	return (
-		<>
-			<Modal modalState={modalState} modalTitle="Adoption Process">
-				<iframe className="h-[80vh] w-full" src={ApprovalDiagram} title="Adoption Process" />
-			</Modal>
-			<TooltipProvider tooltip="Click to expand">
-				<button
-					className="mt-3 flex cursor-nesw-resize flex-col items-center gap-2 hover:opacity-70"
-					onClick={modalState.open}
-				>
-					<FontAwesomeIcon className="text-5xl text-pink-700" icon={faFilePdf} />
-					<span className="text-sm font-medium text-pink-700">View Adoption Process</span>
-				</button>
-			</TooltipProvider>
-		</>
-	)
-}
 
 export enum AdopterInquiryTemplate {
 	VISIT_MY_DOG = 1,
