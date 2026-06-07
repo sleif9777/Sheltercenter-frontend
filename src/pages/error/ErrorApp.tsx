@@ -7,6 +7,7 @@ import { useSessionState } from "../../core/session/SessionState"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { DateTime } from "../../utils/DateTime"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export function ErrorDisplay({ error }: { error: AxiosError }) {
 	// Extract numeric code if possible
@@ -52,6 +53,7 @@ export function ErrorDisplay({ error }: { error: AxiosError }) {
 }
 
 export function ErrorApp({ errorObj, scheduleDate }: { errorObj?: AxiosError; scheduleDate?: DateTime }) {
+	usePageTitle("Error")
 	const session = useSessionState(),
 		downloadDate = (scheduleDate ?? new DateTime()).GetISODate()
 

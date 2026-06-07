@@ -26,6 +26,7 @@ interface CardComponentProps extends CardContentProps {
 
 interface PhotoCardProps extends CardComponentProps {
 	grayscale?: boolean
+	photoAlt?: string
 	photoPath: string
 }
 
@@ -92,6 +93,7 @@ export function PhotoCard({
 	hideTitleBorder,
 	maxWidth,
 	minWidth,
+	photoAlt = "",
 	photoPath,
 	twoColItems,
 	topIcon,
@@ -120,6 +122,7 @@ export function PhotoCard({
 				</table>
 				<div className="my-1 flex flex-row gap-x-1">
 					<img
+						alt={photoAlt}
 						className={`m-auto aspect-square w-[50%] max-w-40 rounded-full ` + (grayscale ? "grayscale" : "")}
 						src={photoPath}
 					/>

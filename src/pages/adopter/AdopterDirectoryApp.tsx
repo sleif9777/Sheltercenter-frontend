@@ -11,8 +11,10 @@ import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { DirectoryAdopter } from "../../models/AdopterModels"
 import { StringUtils } from "../../utils/StringUtils"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export default function AdopterDirectoryApp() {
+	usePageTitle("Adopter Directory")
 	const [adopters, setAdopters] = useState<DirectoryAdopter[]>([])
 	const [filterText, setFilterText] = useState<string>("")
 	const [includeArchived, setIncludeArchived] = useState<boolean>(false)

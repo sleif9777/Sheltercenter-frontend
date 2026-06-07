@@ -8,8 +8,10 @@ import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import { ApptInstantCell } from "../printView/PrintViewApp"
 import { ScheduleAppTitle } from "../schedule/ScheduleApp"
 import { useScheduleState } from "../schedule/ScheduleAppState"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export default function InProgressAppointmentsApp() {
+	usePageTitle("In Progress Appointments")
 	const { date } = useParams()
 	const schedule = useScheduleState()
 

@@ -13,7 +13,7 @@ import { ChosenBoardApp } from "./pages/chosenBoard/ChosenBoardApp.tsx"
 import DailyReportApp from "./pages/dailyReport/DailyReportApp.tsx"
 import DashboardsApp from "./pages/dashboards/DashboardsApp.tsx"
 import { ErrorApp } from "./pages/error/ErrorApp.tsx"
-import InProgressAppointmentsApp from "./pages/inProgressAppts/InProgressAppointmentsApp.tsx"
+import InProgressAppointmentsApp from "./pages/inProgressAppointments/InProgressAppointmentsApp.tsx"
 import { LoginApp } from "./pages/login/LoginApp.tsx"
 import PrintViewApp from "./pages/printView/PrintViewApp.tsx"
 import { PrivacyPolicyApp } from "./pages/privacy/PrivacyPolicyApp.tsx"
@@ -69,6 +69,12 @@ function App() {
 	return (
 		<BrowserRouter>
 			<div className="flex h-screen w-screen flex-col overflow-hidden md:flex-row print:h-auto print:overflow-visible">
+				<a
+					className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-100 focus:rounded focus:bg-pink-700 focus:px-4 focus:py-2 focus:text-white"
+					href="#main-content"
+				>
+					Skip to main content
+				</a>
 				{/* Mobile menu button */}
 				{session.isAuthenticated && (
 					<button
@@ -99,7 +105,7 @@ function App() {
 
 				{/* Main column */}
 				<div className="flex flex-1 flex-col not-print:min-h-screen lg:w-[85%] print:w-full">
-					<div className="flex-1 overflow-auto print:overflow-visible">
+					<div className="flex-1 overflow-auto print:overflow-visible" id="main-content">
 						{session.isAuthenticated ? (
 							<Routes>
 								<Route element={<AdopterLandingPageApp />} index={session.adopterUser} />

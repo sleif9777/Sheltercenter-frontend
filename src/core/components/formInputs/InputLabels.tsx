@@ -52,7 +52,11 @@ export function InputLabel({
 
 export function InputErrorLabel({ errors, isWarning }: { errors: string[]; isWarning?: boolean }) {
 	return (
-		<div className={`text-left text-xs font-semibold ${isWarning ? "text-yellow-600" : "text-pink-700"}`}>
+		<div
+			aria-live="polite"
+			className={`text-left text-xs font-semibold ${isWarning ? "text-yellow-600" : "text-pink-700"}`}
+			role="alert"
+		>
 			<ul>
 				{errors.map((e, i) => (
 					<li key={i}>{e}</li>

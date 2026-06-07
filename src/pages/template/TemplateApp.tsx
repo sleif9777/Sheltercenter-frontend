@@ -11,8 +11,10 @@ import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { TemplateHash } from "../../models/TemplateModels"
 import { useTemplateState } from "./TemplateAppState"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export default function TemplateApp() {
+	usePageTitle("Weekly Template")
 	const template = useTemplateState()
 
 	// Render the component

@@ -4,8 +4,10 @@ import { ImportSpreadsheetBatchForm } from "../../forms/users/ImportSpreadsheetB
 import { UserForm } from "../../forms/users/UserForm"
 import { UserFormContext } from "../../forms/users/UserFormState"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export function AdopterUploadApp() {
+	usePageTitle("Upload Adopters")
 	return (
 		<FullWidthPage title="Upload Adopters">
 			<div className="mx-5 mt-3 flex flex-row gap-x-4 border-t border-pink-800 py-2">

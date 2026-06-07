@@ -43,9 +43,11 @@ import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { IPendingAdoption } from "../../models/PendingAdoptionModels"
 import { DateTime } from "../../utils/DateTime"
+import { usePageTitle } from "../../utils/usePageTitle"
 import { useChosenBoardState } from "./ChosenBoardAppState"
 
 export function ChosenBoardApp() {
+	usePageTitle("Chosen Board")
 	const boardState = useChosenBoardState()
 	const groupedAdoptions = groupPendingAdoptionsByStatus(boardState.adoptions)
 

@@ -18,8 +18,10 @@ import { MessageForm, QuickText } from "../../forms/users/MessageForm"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { useScheduleState } from "../schedule/ScheduleAppState"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export function AdopterLandingPageApp() {
+	usePageTitle("My Home")
 	const session = useSessionState()
 	const [bringingDog, setBringingDog] = useState<boolean>(false)
 

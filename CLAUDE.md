@@ -99,6 +99,10 @@ src/
 └── assets/              # Static files (images, SVGs)
 ```
 
+### Page state convention
+
+A `*AppState.ts` file (Zustand store) is only created for a page when it needs shared state accessed by multiple child components. Pages that manage everything with local `useState` do not need one. When in doubt, start with `useState` and extract to a Zustand store only when two or more sibling components need to read or write the same value.
+
 ---
 
 ## Routing

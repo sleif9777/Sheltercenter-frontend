@@ -1,6 +1,8 @@
 import { LoginForm } from "../../forms/users/LoginForm"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export function LoginApp() {
+	usePageTitle("Log In")
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center px-4">
 			<div className="mb-4 block">

@@ -1,8 +1,10 @@
 import { useSessionState } from "../../core/session/SessionState"
 import { AdopterPreferencesForm } from "../../forms/adopter/AdopterPreferenceForm"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export function AdopterPreferencesApp() {
+	usePageTitle("My Preferences")
 	const session = useSessionState(),
 		adopterID = session.user?.adopterID
 	return (

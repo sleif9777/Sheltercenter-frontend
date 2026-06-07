@@ -12,8 +12,10 @@ import ReportTable, {
 import { RecentlyUploadedAdopter } from "../../models/AdopterModels"
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export default function RecentUploadsApp() {
+	usePageTitle("Recent Uploads")
 	const [emailedIDs, setEmailedIDs] = useState<Value[]>([])
 	const [rowContent, setRowContent] = useState<Row[]>([])
 

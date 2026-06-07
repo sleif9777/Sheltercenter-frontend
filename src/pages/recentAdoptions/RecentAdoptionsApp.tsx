@@ -7,8 +7,10 @@ import ReportTable, { ColumnDef, ColumnFormatCallback, Row, Value } from "../../
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import { RecentAdoption } from "../../models/AppointmentModels"
 import { DateTime } from "../../utils/DateTime"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export default function RecentAdoptionsApp() {
+	usePageTitle("Recent Adoptions")
 	const [rowContent, setRowContent] = useState<Row[]>([])
 
 	const getNameLink: ColumnFormatCallback = useCallback((v?: Value) => {

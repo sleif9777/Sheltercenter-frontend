@@ -22,6 +22,7 @@ export interface SessionState extends Omit<SessionContext, "securityLevel"> {
 	removeCurrentAppt: () => void
 	setCurrentAppt: (appt: IAppointment) => void
 	setUpSession: (resp: LogInResponse) => void
+	updateAccessToken: (token: string) => void
 	validateSession: () => boolean
 	adminUser: boolean
 	adopterUser: boolean
@@ -156,6 +157,10 @@ export const useSessionState = create<SessionState>()(
 					sessionExpires: getExpiration(),
 					user: resp.user,
 				}))
+			},
+
+			updateAccessToken: (token: string) => {
+				set((state) => ({ ...state, accessToken: token }))
 			},
 
 			validateSession: () => {

@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
+import { usePageTitle } from "../../utils/usePageTitle"
 import { DashboardMode, useDashboardsState } from "./DashboardsAppState"
 import { DashboardDog, DashboardDogHash } from "../../models/DogModels"
 import RadioInput from "../../core/components/formInputs/RadioInput"
@@ -65,6 +66,7 @@ function sortByUnavailableDateThenName(dogs: DashboardDog[]) {
 }
 
 export default function DashboardsApp() {
+	usePageTitle("Dashboards")
 	const { dogHash, isRefreshing, mode, refresh } = useDashboardsState()
 
 	useEffect(() => {

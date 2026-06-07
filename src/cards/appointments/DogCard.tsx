@@ -62,6 +62,7 @@ export function DogCard({ dogID, inWatchlist }: { dogID: number; inWatchlist: bo
 			<div className="my-2 flex flex-row gap-x-1">
 				<div>
 					<img
+						alt={dog.name}
 						className={`m-auto aspect-square max-w-30 rounded-full md:max-w-40 ` + (!dog.availableNow ? "grayscale" : "")}
 						src={dog.photoURL}
 					/>
@@ -119,6 +120,7 @@ function ReadBioButton({ dog }: { dog: IDog }) {
 			<Modal modalState={modalState} modalTitle={"About " + dog.name}>
 				<div className="flex flex-row gap-x-2">
 					<img
+						alt={`Photo of ${dog.name}`}
 						className="m-auto aspect-square max-h-50 w-[50%] max-w-50 rounded-3xl border-4 border-pink-700 shadow-2xl shadow-pink-200"
 						src={dog.photoURL}
 					/>

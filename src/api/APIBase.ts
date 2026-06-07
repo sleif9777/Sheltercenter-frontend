@@ -1,5 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse, HttpStatusCode } from "axios"
 
+import { useSessionState } from "../core/session/SessionState"
+
 export abstract class APIBase {
 	rootPath: string = import.meta.env.VITE_BACKEND_API_ROOT
 	subPath: string = ""
@@ -8,15 +10,49 @@ export abstract class APIBase {
 		this.subPath = subPath
 	}
 
+	private authHeaders(): Record<string, string> {
+		const token = useSessionState.getState().accessToken
+		return token ? { Authorization: `Bearer ${token}` } : {}
+	}
+
+	private async handleUnauthorized(retry: () => Promise<AxiosResponse>): Promise<AxiosResponse> {
+		const session = useSessionState.getState()
+		const refreshToken = session.refreshToken
+
+		if (refreshToken) {
+			try {
+				const refreshResp = await axios.post(`${this.rootPath}/auth/token/refresh/`, {
+					refresh: refreshToken,
+				})
+				const newToken: string = refreshResp.data.access
+				session.updateAccessToken(newToken)
+				return retry()
+			} catch {
+				// refresh also failed
+			}
+		}
+
+		session.endSession()
+		return Promise.reject(new Error("Session expired"))
+	}
+
 	async deleteRecord<T>(id: number) {
 		const path = [this.rootPath, this.subPath, id, ""].join("/")
 		return this.deleteResp<T>(path)
 	}
 
 	async deleteResp<T>(path: string): Promise<HttpStatusCode> {
-		const { status } = await axios.delete<T>(path, {
-			headers: { "Content-Type": "application/json" },
-		})
+		const { status, data } = await axios
+			.delete<T>(path, {
+				headers: { "Content-Type": "application/json", ...this.authHeaders() },
+			})
+			.catch(async (err) => {
+				if (err.response?.status === 401) {
+					return this.handleUnauthorized(() => this.deleteResp<T>(path) as unknown as Promise<AxiosResponse>)
+				}
+				return err.response
+			})
+		void data
 		return status
 	}
 
@@ -48,13 +84,20 @@ export abstract class APIBase {
 	}
 
 	async getResp<T>(path: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-		return axios
-			.get<T>(path, {
-				headers: { "Content-Type": "application/json" },
-				...config,
-			})
-			.then((res) => res)
-			.catch((err) => err.response)
+		const doRequest = () =>
+			axios
+				.get<T>(path, {
+					headers: { "Content-Type": "application/json", ...this.authHeaders() },
+					...config,
+				})
+				.then((res) => res)
+				.catch(async (err) => {
+					if (err.response?.status === 401) {
+						return this.handleUnauthorized(doRequest)
+					}
+					return err.response
+				})
+		return doRequest()
 	}
 
 	async buildAndPost<P extends object>(commandName: string, data: P): Promise<AxiosResponse> {
@@ -63,10 +106,19 @@ export abstract class APIBase {
 	}
 
 	async postResp<P extends object>(path: string, data: P): Promise<AxiosResponse> {
-		return axios
-			.post(path, data)
-			.then((res) => res)
-			.catch((err) => err)
+		const doRequest = () =>
+			axios
+				.post(path, data, {
+					headers: { ...this.authHeaders() },
+				})
+				.then((res) => res)
+				.catch(async (err) => {
+					if (err.response?.status === 401) {
+						return this.handleUnauthorized(doRequest)
+					}
+					return err
+				})
+		return doRequest()
 	}
 
 	async buildAndPostFormData<T>(commandName: string, data: FormData): Promise<T> {
@@ -75,14 +127,22 @@ export abstract class APIBase {
 	}
 
 	async postFormDataResp<T>(path: string, data: FormData): Promise<AxiosResponse<T>> {
-		return axios
-			.post(path, data, {
-				headers: {
-					"Content-Type": "multipart/form-data",
-				},
-			})
-			.then((res) => res)
-			.catch((err) => err)
+		const doRequest = () =>
+			axios
+				.post(path, data, {
+					headers: {
+						"Content-Type": "multipart/form-data",
+						...this.authHeaders(),
+					},
+				})
+				.then((res) => res)
+				.catch(async (err) => {
+					if (err.response?.status === 401) {
+						return this.handleUnauthorized(doRequest)
+					}
+					return err
+				})
+		return doRequest()
 	}
 
 	buildCommandPath<P extends { [key: string]: string | number | boolean }>(command: string, params?: P): string {
@@ -105,6 +165,7 @@ export abstract class APIBase {
 			.get(path, {
 				headers: {
 					"Content-Type": "application/json",
+					...this.authHeaders(),
 				},
 			})
 			.then((res) => res)
@@ -118,7 +179,9 @@ export abstract class APIBase {
 
 	post(path: string, data: {}) {
 		return axios
-			.post(path, data)
+			.post(path, data, {
+				headers: { ...this.authHeaders() },
+			})
 			.then((res) => res)
 			.catch((err) => err)
 	}

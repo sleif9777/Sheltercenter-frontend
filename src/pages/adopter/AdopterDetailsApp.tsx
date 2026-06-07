@@ -17,6 +17,7 @@ import { AdopterDemographics, BookingHistory } from "../../models/AdopterModels"
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
 import { DateTime } from "../../utils/DateTime"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
+import { usePageTitle } from "../../utils/usePageTitle"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { StringUtils } from "../../utils/StringUtils"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
@@ -24,6 +25,7 @@ import { UpdatePrimaryEmailForm } from "../../forms/users/UpdatePrimaryEmailForm
 import { useAdopterDetailsState } from "./AdopterDetailsAppState"
 
 export default function AdopterDetailsApp() {
+	usePageTitle("Adopter Profile")
 	const { id } = useParams(),
 		intID = parseInt(id ?? "0")
 	const context = UserFormContext.EDIT

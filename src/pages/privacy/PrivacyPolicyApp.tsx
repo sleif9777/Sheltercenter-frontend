@@ -1,6 +1,7 @@
 import { ReactNode } from "react"
 
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 interface PolicySectionProps {
 	title: string
@@ -40,6 +41,7 @@ function PolicyList({ items, bulletStyle = "circle", className }: PolicyListProp
 }
 
 export function PrivacyPolicyApp() {
+	usePageTitle("Privacy Policy")
 	return (
 		<FullWidthPage title="Privacy Policy">
 			<div className="prose prose-pink mx-5 mt-3 max-w-none border-t border-pink-700 py-2 text-left">
@@ -201,6 +203,37 @@ export function PrivacyPolicyApp() {
 						Updates will be posted on this page with the date of the most recent revision.
 					</p>
 					<p>Please review this policy periodically to stay informed about how we protect your data.</p>
+				</PolicySection>
+
+				<PolicySection title="11. Third-Party Software Credits">
+					<p>This application is built using open-source software. We gratefully acknowledge the following:</p>
+					<PolicyList
+						items={[
+							<>
+								<strong>Font Awesome Free</strong> — Icons used throughout this application are from Font Awesome Free,
+								licensed under{" "}
+								<a href="https://creativecommons.org/licenses/by/4.0/" rel="noreferrer" target="_blank">
+									CC BY 4.0
+								</a>
+								. See{" "}
+								<a href="https://fontawesome.com" rel="noreferrer" target="_blank">
+									fontawesome.com
+								</a>
+								.
+							</>,
+							<>
+								<strong>Inter, Lato, Roboto</strong> — Fonts used in this application are licensed under the{" "}
+								<a href="https://scripts.sil.org/OFL" rel="noreferrer" target="_blank">
+									SIL Open Font License 1.1
+								</a>
+								.
+							</>,
+							<>
+								<strong>React, MUI, rsuite, React Quill, Axios, Zustand, and others</strong> — Licensed under the MIT
+								License.
+							</>,
+						]}
+					/>
 				</PolicySection>
 			</div>
 		</FullWidthPage>

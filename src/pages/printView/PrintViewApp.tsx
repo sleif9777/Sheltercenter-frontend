@@ -20,8 +20,10 @@ import { ScheduleAppTitle } from "../schedule/ScheduleApp"
 import { useScheduleState } from "../schedule/ScheduleAppState"
 import { AdopterWatchlist } from "../../models/DogModels"
 import { getAvailableTypes, getNotYetAvailableDogsFromWatchlist } from "../../cards/appointments/AppointmentCard"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export default function PrintViewApp() {
+	usePageTitle("Print View")
 	const { date } = useParams()
 	const schedule = useScheduleState()
 

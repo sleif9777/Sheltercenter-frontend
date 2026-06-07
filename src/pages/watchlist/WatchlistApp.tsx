@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { DogCard } from "../../cards/appointments/DogCard"
+import { usePageTitle } from "../../utils/usePageTitle"
 import { StandardCard } from "../../core/components/card/Card"
 import { CardColor } from "../../core/components/card/CardEnums"
 import RadioInput from "../../core/components/formInputs/RadioInput"
@@ -14,6 +15,7 @@ import { HashDog } from "../../models/DogModels"
 import { useWatchlistState } from "./WatchlistAppState"
 
 export function WatchlistApp() {
+	usePageTitle("My Watchlist")
 	const watchlist = useWatchlistState(),
 		session = useSessionState()
 	const helpModalState = useModalState()

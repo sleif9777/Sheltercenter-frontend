@@ -7,8 +7,10 @@ import { ReportingAdoptionAppointment } from "../../models/AppointmentModels"
 import { ApptInstantCell } from "../printView/PrintViewApp"
 import { ScheduleAppTitle } from "../schedule/ScheduleApp"
 import { useScheduleState } from "../schedule/ScheduleAppState"
+import { usePageTitle } from "../../utils/usePageTitle"
 
 export default function DailyReportApp() {
+	usePageTitle("Daily Report")
 	const { date } = useParams()
 	const schedule = useScheduleState()
 

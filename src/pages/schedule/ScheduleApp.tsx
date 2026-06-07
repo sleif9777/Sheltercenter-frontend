@@ -36,11 +36,13 @@ import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { AppointmentsMissingOutcomesResponse, EmptyDatesResponse } from "../../api/appointments/Responses"
 import { ClosedDatesAPI } from "../../api/closedDates/ClosedDatesAPI"
 import { DateTime } from "../../utils/DateTime"
+import { usePageTitle } from "../../utils/usePageTitle"
 import { CancelAppointmentButton } from "../adopter/AdopterLandingPageApp"
 import { ErrorApp } from "../error/ErrorApp"
 import { useScheduleState } from "./ScheduleAppState"
 
 export function ScheduleApp() {
+	usePageTitle("Schedule")
 	const schedule = useScheduleState()
 	const session = useSessionState()
 
