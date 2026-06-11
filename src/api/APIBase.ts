@@ -32,7 +32,11 @@ export abstract class APIBase {
 			}
 		}
 
-		session.endSession()
+		// Only wipe the session if it hasn't been replaced by a new login while
+		// we were waiting for the async refresh request to complete.
+		if (useSessionState.getState().refreshToken === refreshToken) {
+			session.endSession()
+		}
 		return Promise.reject(new Error("Session expired"))
 	}
 
