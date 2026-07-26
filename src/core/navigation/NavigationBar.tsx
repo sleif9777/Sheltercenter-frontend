@@ -13,7 +13,7 @@ import {
 	faDashboard,
 	faDog,
 	faEye,
-	faFileUpload,
+	// faFileUpload,
 	faHammer,
 	faHome,
 	faLock,
@@ -97,7 +97,7 @@ export function NavigationBar({ debug, onNavigate, collapsed = false, onToggleCo
 							<NavigationSection caption="Adopters" collapsed={collapsed}>
 								<AdopterDirectoryButton collapsed={collapsed} onNavigate={onNavigate} />
 								<UploadAdoptersButton collapsed={collapsed} onNavigate={onNavigate} />
-								<RecentUploadsButton collapsed={collapsed} onNavigate={onNavigate} />
+								{/* <RecentUploadsButton collapsed={collapsed} onNavigate={onNavigate} /> */}
 							</NavigationSection>
 							<NavigationSection caption="Dogs" collapsed={collapsed}>
 								<WatchlistButton collapsed={collapsed} onNavigate={onNavigate} />
@@ -403,20 +403,20 @@ function PrivacyPolicyButton({ collapsed, onNavigate }: NavigationButtonProps) {
 	)
 }
 
-function RecentUploadsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
-	return (
-		<NavigationButton
-			caption="Recent Uploads"
-			collapsed={collapsed}
-			icon={faFileUpload}
-			noBorder={noBorder}
-			overlayClassName="bg-white text-pink-700"
-			overlayIcon={faClockRotateLeft}
-			route="/recent_uploads/"
-			onNavigate={onNavigate}
-		/>
-	)
-}
+// function RecentUploadsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
+// 	return (
+// 		<NavigationButton
+// 			caption="Recent Uploads"
+// 			collapsed={collapsed}
+// 			icon={faFileUpload}
+// 			noBorder={noBorder}
+// 			overlayClassName="bg-white text-pink-700"
+// 			overlayIcon={faClockRotateLeft}
+// 			route="/recent_uploads/"
+// 			onNavigate={onNavigate}
+// 		/>
+// 	)
+// }
 
 function RecentAdoptionsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
 	return (
