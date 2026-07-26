@@ -33,6 +33,7 @@ import { Modal, useModalState } from "../../core/components/modal/Modal"
 import { CircumstanceOptions, CircumstanceOptionsLabel, PendingAdoptionStatus, PendingAdoptionStatusLabel } from "../../enums/PendingAdoptionEnums"
 import { ChangeDogForm } from "../../forms/pendingAdoptions/ChangeDogForm"
 import { PendingAdoptionForm } from "../../forms/pendingAdoptions/PendingAdoptionForm"
+import { ReadyToRollForm } from "../../forms/pendingAdoptions/ReadyToRollForm"
 import { MessageForm, QuickText } from "../../forms/users/MessageForm"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
@@ -268,7 +269,7 @@ export function AdoptionCardActions({ adoption }: { adoption: IPendingAdoption }
 			<ChangeDogFormModal adoptionID={adoption.ID} />
 			<StatusButton {...actionProps} icon={faUserDoctor} status={PendingAdoptionStatus.NEEDS_VETTING} titleAndTooltip="Needs Vetting" />
 			<StatusButton {...actionProps} icon={faThermometer} status={PendingAdoptionStatus.NEEDS_WELL_CHECK} titleAndTooltip="Needs Well Check" />
-			<StatusButton {...actionProps} icon={faCarSide} status={PendingAdoptionStatus.READY_TO_ROLL} titleAndTooltip="Ready to Roll" />
+			<ReadyToRollButton adoption={adoption} />
 			<StatusButton {...actionProps} icon={faCheckCircle} status={PendingAdoptionStatus.COMPLETED} titleAndTooltip="Complete Adoption" />
 			<StatusAreYouSureButton
 				{...actionProps}
@@ -348,6 +349,20 @@ function getQuickTextContent(adoption: IPendingAdoption, condition: string) {
 			{ attributes: { bold: true, color: "#1e6c80" }, insert: "Saving Grace Animals for Adoption" },
 		],
 	} as ReactQuill.Value
+}
+
+function ReadyToRollButton({ adoption }: { adoption: IPendingAdoption }) {
+	const modalState = useModalState()
+	const boardState = useChosenBoardState()
+
+	return (
+		<>
+			<CardActionButton primaryIcon={faCarSide} primaryTooltipContent="Ready to Roll" onClick={modalState.open} />
+			<Modal modalState={modalState} modalTitle={`${adoption.dog} is Ready to Roll!`}>
+				<ReadyToRollForm adoption={adoption} modalState={modalState} onSuccess={() => boardState.refresh()} />
+			</Modal>
+		</>
+	)
 }
 
 function HeartwormButton({ adoption }: AdoptionHeartwormActionProps) {

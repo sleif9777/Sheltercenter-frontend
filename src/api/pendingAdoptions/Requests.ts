@@ -26,4 +26,5 @@ export type MarkHeartwormRequest = {
 export type MarkStatusRequest = {
 	status: PendingAdoptionStatus
 	message?: string
+	sendEmail?: boolean
 } & AdoptionIDRequest

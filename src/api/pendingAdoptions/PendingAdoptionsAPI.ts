@@ -32,7 +32,7 @@ export class PendingAdoptionsAPI extends APIBase {
 		return this.buildAndPost<MarkHeartwormRequest>("MarkHeartworm", { adoptionID, heartworm })
 	}
 
-	async MarkStatus(adoptionID: number, status: PendingAdoptionStatus, message?: string) {
-		return this.buildAndPost<MarkStatusRequest>("MarkStatus", { adoptionID, message, status })
+	async MarkStatus(adoptionID: number, status: PendingAdoptionStatus, message?: string, sendEmail: boolean = true) {
+		return this.buildAndPost<MarkStatusRequest>("MarkStatus", { adoptionID, message, sendEmail, status })
 	}
 }
