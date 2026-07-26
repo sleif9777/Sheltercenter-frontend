@@ -1,6 +1,7 @@
 import { faFileArrowUp } from "@fortawesome/free-solid-svg-icons"
 import { useCallback, useState } from "react"
 
+import { CardTableSection } from "../../core/components/card/CardTableSection"
 import { CardColor } from "../../core/components/card/CardEnums"
 import { FileInput } from "../../core/components/formInputs/FileInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
@@ -52,7 +53,7 @@ export function ImportSpreadsheetBatchForm() {
 }
 
 function ResponseStatusMessage({ resp }: { resp: ImportSpreadsheetBatchResponse }) {
-	const { successes, updates, failures, aversions } = resp
+	const { successes, updates, failures, aversions, rejected } = resp
 
 	const successStr = successes > 0 ? `${resp.successes} succeeded` : ""
 	const updatesStr = updates > 0 ? `${resp.updates} updated` : ""
@@ -71,15 +72,20 @@ function ResponseStatusMessage({ resp }: { resp: ImportSpreadsheetBatchResponse 
 				<>
 					<div className="m-auto w-full text-center">{statusStr}</div>
 					{aversions.length > 0 && (
-						<div>
+						<div className="mt-2 text-left">
 							<span>The following adopters were previously denied. You must manually set them to Approved:</span>
-							<ul>
-								{aversions.map((a, i) => (
-									<li key={i}>
-										<a href={`/adopters/detail/${a.ID}`}>{a.name}</a>
-									</li>
-								))}
-							</ul>
+							<CardTableSection
+								items={aversions.map((a) => ({
+									label: a.name,
+									value: <a href={`/adopters/detail/${a.ID}`}>View Profile</a>,
+								}))}
+							/>
+						</div>
+					)}
+					{rejected.length > 0 && (
+						<div className="mt-2 text-left">
+							<span>The following rows could not be imported:</span>
+							<CardTableSection items={rejected.map((r) => ({ label: r.name, value: r.email }))} />
 						</div>
 					)}
 				</>

@@ -15,4 +15,8 @@ export type ImportSpreadsheetBatchResponse = {
 		ID: number
 		name: string
 	}[]
+	rejected: {
+		name: string
+		email: string
+	}[]
 }
