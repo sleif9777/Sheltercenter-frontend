@@ -91,7 +91,7 @@ function App() {
 				)}
 
 				{/* Sidebar */}
-				{session.isAuthenticated && (
+				{session.isAuthenticated && !(session.dashboardUser && session.dashboardPreferences.hideNav) && (
 					<div
 						className={`fixed top-0 right-0 z-40 h-full w-64 bg-white transition-all duration-300 md:static md:h-screen md:shrink-0 md:translate-x-0 print:hidden ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"} ${desktopCollapsed ? "md:w-14" : "md:w-[15%] md:min-w-32"} `}
 					>
@@ -108,7 +108,8 @@ function App() {
 					<div className="flex-1 overflow-auto print:overflow-visible" id="main-content">
 						{session.isAuthenticated ? (
 							<Routes>
-								<Route element={<AdopterLandingPageApp />} index={session.adopterUser} />
+								<Route element={<DashboardsApp />} index={session.dashboardUser} />
+									<Route element={<AdopterLandingPageApp />} index={session.adopterUser} />
 								<Route element={<AdopterLandingPageApp />} path="/my_home/" />
 								<Route element={<AdopterPreferencesApp />} path="/preferences/" />
 								<Route element={<WatchlistApp />} path="/watchlist/" />

@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import { usePageTitle } from "../../utils/usePageTitle"
@@ -7,6 +7,7 @@ import { DashboardDog, DashboardDogHash } from "../../models/DogModels"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import { SelectInputOption } from "../../core/components/formInputs/SelectInput"
 import { DateTime } from "../../utils/DateTime"
+import { useSessionState } from "../../core/session/SessionState"
 
 type DashboardDogHashKey = Omit<keyof DashboardDogHash, "chosen"> | keyof DashboardDogHash["chosen"]
 
@@ -15,6 +16,8 @@ const DASHBOARD_MODE_OPTIONS: SelectInputOption<DashboardMode>[] = [
 	{ label: "Chosen", value: DashboardMode.CHOSEN },
 	{ label: "FTA", value: DashboardMode.FTA },
 ]
+
+const DASHBOARD_MODE_ORDER: DashboardMode[] = [DashboardMode.WHO_WENT_HOME, DashboardMode.CHOSEN, DashboardMode.FTA]
 
 const DASHBOARD_MODE_TITLES: Record<DashboardMode, string> = {
 	[DashboardMode.WHO_WENT_HOME]: "Who Went Home This Week",
@@ -68,6 +71,10 @@ function sortByUnavailableDateThenName(dogs: DashboardDog[]) {
 export default function DashboardsApp() {
 	usePageTitle("Dashboards")
 	const { dogHash, isRefreshing, mode, refresh } = useDashboardsState()
+	const session = useSessionState()
+	const { cycleEnabled, hideNav } = session.dashboardPreferences
+	const modeRef = useRef(mode)
+	modeRef.current = mode
 
 	useEffect(() => {
 		refresh()
@@ -83,6 +90,18 @@ export default function DashboardsApp() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
+	useEffect(() => {
+		if (!cycleEnabled) return
+
+		const interval = setInterval(() => {
+			const currentIndex = DASHBOARD_MODE_ORDER.indexOf(modeRef.current)
+			const nextIndex = (currentIndex + 1) % DASHBOARD_MODE_ORDER.length
+			useDashboardsState.setState({ mode: DASHBOARD_MODE_ORDER[nextIndex] })
+		}, 10_000)
+
+		return () => clearInterval(interval)
+	}, [cycleEnabled])
+
 	return (
 		<FullWidthPage title={DASHBOARD_MODE_TITLES[mode]}>
 			<div className="flex flex-col gap-4">
@@ -92,49 +111,73 @@ export default function DashboardsApp() {
 						columnOverride="columns-3"
 						options={DASHBOARD_MODE_OPTIONS}
 						value={mode}
-						onChange={(v: DashboardMode) => useDashboardsState.setState({ mode: v })}
+						onChange={(v: DashboardMode) => {
+							useDashboardsState.setState({ mode: v })
+							if (cycleEnabled) {
+								session.setDashboardPreferences({ cycleEnabled: false })
+							}
+						}}
 					/>
 					{isRefreshing && <span className="text-sm text-gray-500">Refreshing...</span>}
 				</div>
 
-				{mode === DashboardMode.WHO_WENT_HOME && (
-					<DashboardSection
-						className="columns-5"
-						dogs={sortByUnavailableDateThenName(dogHash.newlyInHome)}
-						hashKey="newlyInHome"
-						mode={mode}
-					/>
-				)}
-
-				{mode === DashboardMode.CHOSEN && (
-					<div className="m-auto flex flex-row gap-4">
-						<DashboardSection
-							className="columns-2"
-							dogs={sortByName(dogHash.chosen.needsSN)}
-							hashKey="needsSN"
-							mode={mode}
-							title="Needs Spay/Neuter"
-						/>
-						<DashboardSection
-							className="columns-2"
-							dogs={sortByName(dogHash.chosen.readyToRoll)}
-							hashKey="readyToRoll"
-							mode={mode}
-							title="Ready to Roll"
-						/>
-						<DashboardSection
-							className="columns-2"
-							dogs={sortByName(dogHash.chosen.needsWC)}
-							hashKey="needsWC"
-							mode={mode}
-							title="Needs Well Check"
-						/>
+				{session.dashboardUser && (
+					<div className="m-auto flex gap-3">
+						<button
+							className="large-button"
+							onClick={() => session.setDashboardPreferences({ hideNav: !hideNav })}
+						>
+							{hideNav ? "Show Navigation" : "Hide Navigation"}
+						</button>
+						<button
+							className="large-button"
+							onClick={() => session.setDashboardPreferences({ cycleEnabled: !cycleEnabled })}
+						>
+							{cycleEnabled ? "Stop Cycling" : "Start Cycling"}
+						</button>
 					</div>
 				)}
 
-				{mode === DashboardMode.FTA && (
-					<DashboardSection className="columns-5" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />
-				)}
+				<div key={mode} className="dashboard-fade-in">
+					{mode === DashboardMode.WHO_WENT_HOME && (
+						<DashboardSection
+							className="columns-5"
+							dogs={sortByUnavailableDateThenName(dogHash.newlyInHome)}
+							hashKey="newlyInHome"
+							mode={mode}
+						/>
+					)}
+
+					{mode === DashboardMode.CHOSEN && (
+						<div className="m-auto flex flex-row gap-4">
+							<DashboardSection
+								className="columns-2"
+								dogs={sortByName(dogHash.chosen.needsSN)}
+								hashKey="needsSN"
+								mode={mode}
+								title="Needs Spay/Neuter"
+							/>
+							<DashboardSection
+								className="columns-2"
+								dogs={sortByName(dogHash.chosen.readyToRoll)}
+								hashKey="readyToRoll"
+								mode={mode}
+								title="Ready to Roll"
+							/>
+							<DashboardSection
+								className="columns-2"
+								dogs={sortByName(dogHash.chosen.needsWC)}
+								hashKey="needsWC"
+								mode={mode}
+								title="Needs Well Check"
+							/>
+						</div>
+					)}
+
+					{mode === DashboardMode.FTA && (
+						<DashboardSection className="columns-5" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />
+					)}
+				</div>
 			</div>
 		</FullWidthPage>
 	)

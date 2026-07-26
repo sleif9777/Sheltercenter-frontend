@@ -33,6 +33,15 @@
 	}
 }
 
+@keyframes dashboardFadeIn {
+	from { opacity: 0; }
+	to   { opacity: 1; }
+}
+
+.dashboard-fade-in {
+	animation: dashboardFadeIn 0.5s ease-in-out;
+}
+
 .mobile-only {
 	display: none;
 }

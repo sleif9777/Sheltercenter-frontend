@@ -3,4 +3,5 @@ export enum SecurityLevel {
 	GREETER = 1,
 	ADMIN = 2,
 	SUPERUSER = 3,
+	DASHBOARD = 4,
 }
