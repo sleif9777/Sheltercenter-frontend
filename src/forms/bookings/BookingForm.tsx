@@ -56,7 +56,7 @@ export function BookingForm({
 	const handleSubmit: FormSubmitHandler<ScheduleAppointmentWithPreferencesRequest> = useCallback(
 		async (req) => {
 			await new AppointmentsAPI().ScheduleAppointment(req)
-			schedule.refresh()
+			await schedule.refresh()
 		},
 		[schedule]
 	)

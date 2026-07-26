@@ -30,12 +30,7 @@ import { CardTableSection } from "../../core/components/card/CardTableSection"
 import { ValueLabelPair } from "../../core/components/formInputs/SelectInput"
 import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
-import {
-	CircumstanceOptions,
-	CircumstanceOptionsLabel,
-	PendingAdoptionStatus,
-	PendingAdoptionStatusLabel,
-} from "../../enums/PendingAdoptionEnums"
+import { CircumstanceOptions, CircumstanceOptionsLabel, PendingAdoptionStatus, PendingAdoptionStatusLabel } from "../../enums/PendingAdoptionEnums"
 import { ChangeDogForm } from "../../forms/pendingAdoptions/ChangeDogForm"
 import { PendingAdoptionForm } from "../../forms/pendingAdoptions/PendingAdoptionForm"
 import { MessageForm, QuickText } from "../../forms/users/MessageForm"
@@ -100,9 +95,7 @@ function PendingAdoptionFormModal() {
 	)
 }
 
-export function groupPendingAdoptionsByStatus(
-	items: IPendingAdoption[]
-): Record<PendingAdoptionStatus, IPendingAdoption[]> {
+export function groupPendingAdoptionsByStatus(items: IPendingAdoption[]): Record<PendingAdoptionStatus, IPendingAdoption[]> {
 	return items.reduce(
 		(acc, item) => {
 			const status = item.status as PendingAdoptionStatus
@@ -154,26 +147,22 @@ function AdoptionCard({ adoption, cardColor }: { adoption: IPendingAdoption; car
 	const details: ValueLabelPair<ReactNode>[] = [
 		{
 			label: "Status",
-			value:
-				PendingAdoptionStatusLabel[adoption.status as PendingAdoptionStatus] +
-				" (HW " +
-				(adoption.heartwormPositive ? "Pos)" : "Neg)"),
+			value: PendingAdoptionStatusLabel[adoption.status as PendingAdoptionStatus] + " (HW " + (adoption.heartwormPositive ? "Pos)" : "Neg)"),
 		},
-		{
-			label: "Paperwork",
-			value:
-				adoption.status == PendingAdoptionStatus.READY_TO_ROLL ? (
-					adoption.paperworkAppointmentInst ? (
+		...(adoption.status === PendingAdoptionStatus.READY_TO_ROLL
+			? [
+				{
+					label: "Paperwork",
+					value: adoption.paperworkAppointmentInst ? (
 						new DateTime(adoption.paperworkAppointmentInst).GetShortDate(false, true)
 					) : (
 						<b>
 							<FontAwesomeIcon icon={faExclamationTriangle} /> Unscheduled
 						</b>
-					)
-				) : (
-					""
-				),
-		},
+					),
+				},
+			]
+			: []),
 		{ label: "Circumstance", value: CircumstanceOptionsLabel[adoption.circumstance as CircumstanceOptions] },
 		{ label: "Created", value: new DateTime(adoption.created).GetFullDateTime() },
 		{
@@ -246,9 +235,7 @@ function ChangeDogFormModal({ adoptionID }: { adoptionID: number }) {
 
 function getOverdueForUpdate(adoption: IPendingAdoption) {
 	const compareInst = new DateTime(
-		adoption.updates && adoption.updates?.length > 0
-			? adoption.updates[adoption.updates.length - 1].instant
-			: adoption.created
+		adoption.updates && adoption.updates?.length > 0 ? adoption.updates[adoption.updates.length - 1].instant : adoption.created
 	)
 
 	return new DateTime().DiffWithDate(compareInst) >= 7
@@ -279,30 +266,10 @@ export function AdoptionCardActions({ adoption }: { adoption: IPendingAdoption }
 		<CardActionSection color={CardColor.PINK}>
 			<MessageButton adoption={adoption} />
 			<ChangeDogFormModal adoptionID={adoption.ID} />
-			<StatusButton
-				{...actionProps}
-				icon={faUserDoctor}
-				status={PendingAdoptionStatus.NEEDS_VETTING}
-				titleAndTooltip="Needs Vetting"
-			/>
-			<StatusButton
-				{...actionProps}
-				icon={faThermometer}
-				status={PendingAdoptionStatus.NEEDS_WELL_CHECK}
-				titleAndTooltip="Needs Well Check"
-			/>
-			<StatusButton
-				{...actionProps}
-				icon={faCarSide}
-				status={PendingAdoptionStatus.READY_TO_ROLL}
-				titleAndTooltip="Ready to Roll"
-			/>
-			<StatusButton
-				{...actionProps}
-				icon={faCheckCircle}
-				status={PendingAdoptionStatus.COMPLETED}
-				titleAndTooltip="Complete Adoption"
-			/>
+			<StatusButton {...actionProps} icon={faUserDoctor} status={PendingAdoptionStatus.NEEDS_VETTING} titleAndTooltip="Needs Vetting" />
+			<StatusButton {...actionProps} icon={faThermometer} status={PendingAdoptionStatus.NEEDS_WELL_CHECK} titleAndTooltip="Needs Well Check" />
+			<StatusButton {...actionProps} icon={faCarSide} status={PendingAdoptionStatus.READY_TO_ROLL} titleAndTooltip="Ready to Roll" />
+			<StatusButton {...actionProps} icon={faCheckCircle} status={PendingAdoptionStatus.COMPLETED} titleAndTooltip="Complete Adoption" />
 			<StatusAreYouSureButton
 				{...actionProps}
 				icon={faCircleXmark}
@@ -332,11 +299,7 @@ function MessageButton({ adoption }: { adoption: IPendingAdoption }) {
 
 	return (
 		<>
-			<CardActionButton
-				primaryIcon={faEnvelope}
-				primaryTooltipContent={"Message " + adoption.adopter.firstName}
-				onClick={modalState.open}
-			/>
+			<CardActionButton primaryIcon={faEnvelope} primaryTooltipContent={"Message " + adoption.adopter.firstName} onClick={modalState.open} />
 			<Modal modalState={modalState} modalTitle={"Message " + adoption.adopter.firstName}>
 				<MessageForm
 					adopterID={adoption.adopter.ID ?? 0}
@@ -431,13 +394,7 @@ function StatusButton({ adoption, icon, status, titleAndTooltip }: AdoptionCardA
 	return <CardActionButton primaryIcon={icon} primaryTooltipContent={titleAndTooltip} onClick={handleClick} />
 }
 
-function StatusAreYouSureButton({
-	adoption,
-	icon,
-	titleAndTooltip: modalTitle,
-	status,
-	youWantTo,
-}: AdoptionCardAreYouSureActionProps) {
+function StatusAreYouSureButton({ adoption, icon, titleAndTooltip: modalTitle, status, youWantTo }: AdoptionCardAreYouSureActionProps) {
 	const adoptionID = adoption.ID
 	const boardState = useChosenBoardState()
 

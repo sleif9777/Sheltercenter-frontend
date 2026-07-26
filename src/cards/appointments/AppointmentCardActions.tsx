@@ -261,19 +261,23 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 		schedule.setNowBookingAppt(apptID)
 
 		if (!session.user?.adopterID) {
+			schedule.setNowBookingAppt(0)
 			return
 		}
 
-		await new AppointmentsAPI().ScheduleAppointment({
-			adopterID: session.user.adopterID ?? 0,
-			apptID: apptID,
-		})
-
-		showToast({ level: MessageLevel.Success, message: "Appointment confirmed!" })
-
-		session.setCurrentAppt(appt)
-		schedule.refresh()
-		schedule.setNowBookingAppt(0)
+		try {
+			await new AppointmentsAPI().ScheduleAppointment({
+				adopterID: session.user.adopterID ?? 0,
+				apptID: apptID,
+			})
+			showToast({ level: MessageLevel.Success, message: "Appointment confirmed!" })
+			session.setCurrentAppt(appt)
+			await schedule.refresh()
+		} catch {
+			showToast({ level: MessageLevel.Error, message: "Booking failed. Please try again." })
+		} finally {
+			schedule.setNowBookingAppt(0)
+		}
 	}, [appt, apptID, schedule, session])
 
 	if (!session.user?.adopterID || session.user.currentAppt) {
