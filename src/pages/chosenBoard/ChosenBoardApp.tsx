@@ -283,6 +283,7 @@ export function AdoptionCardActions({ adoption }: { adoption: IPendingAdoption }
 
 function MessageButton({ adoption }: { adoption: IPendingAdoption }) {
 	const modalState = useModalState()
+	const boardState = useChosenBoardState()
 
 	const quickTexts: QuickText[] = [
 		{
@@ -308,6 +309,7 @@ function MessageButton({ adoption }: { adoption: IPendingAdoption }) {
 					hideSubject
 					modalState={modalState}
 					quickTextOptions={quickTexts}
+					onSuccess={() => boardState.refresh()}
 				/>
 			</Modal>
 		</>

@@ -44,6 +44,7 @@ export function MessageForm({
 	initialWildcardValues,
 	isMessageToAdoptions,
 	modalState,
+	onSuccess,
 	quickTextOptions,
 	templateFlag,
 }: {
@@ -56,6 +57,7 @@ export function MessageForm({
 	initialWildcardValues?: Record<string, string>
 	isMessageToAdoptions?: boolean
 	modalState: ModalState
+	onSuccess?: () => void
 	quickTextOptions?: QuickText[]
 	templateFlag?: BookingMessageTemplate
 }) {
@@ -98,6 +100,7 @@ export function MessageForm({
 					adoptionSubject ?? updatedReq.subject ?? ""
 				)
 				showToast({ level: MessageLevel.Success, message: "Message sent!" })
+				onSuccess?.()
 				return
 			}
 
@@ -115,7 +118,7 @@ export function MessageForm({
 				showToast({ level: MessageLevel.Error, message: "Failed to send!" })
 			}
 		},
-		[adoptionID, adoptionSubject, apptID, fields, isMessageToAdoptions, schedule]
+		[adoptionID, adoptionSubject, apptID, fields, isMessageToAdoptions, onSuccess, schedule]
 	)
 
 	const handleManualEdit = useCallback(() => {
