@@ -137,6 +137,7 @@ export const useSessionState = create<SessionState>()(
 								ID: appt.ID,
 								instantDisplay: appt.instantDisplay,
 								isoDate: appt.isoDate,
+								isoInstant: appt.isoInstant,
 							},
 						},
 					}

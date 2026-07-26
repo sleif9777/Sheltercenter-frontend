@@ -118,16 +118,20 @@ export function WatchlistApp() {
 									</li>
 								))}
 						</ul>
-						<h3 className="mb-2 text-left text-lg font-semibold uppercase underline">No Longer Available</h3>
-						<ul>
-							{watchlist.dogHash?.watching.notAvailable
-								.sort((a, b) => a.name.localeCompare(b.name))
-								.map((dog, i) => (
-									<li key={i}>
-										<DogCard dogID={dog.ID} inWatchlist />
-									</li>
-								))}
-						</ul>
+						{(watchlist.dogHash?.watching.notAvailable.length ?? 0) > 0 && (
+							<>
+								<h3 className="mb-2 text-left text-lg font-semibold uppercase underline">No Longer Available</h3>
+								<ul>
+									{watchlist.dogHash?.watching.notAvailable
+										.sort((a, b) => a.name.localeCompare(b.name))
+										.map((dog, i) => (
+											<li key={i}>
+												<DogCard dogID={dog.ID} inWatchlist />
+											</li>
+										))}
+								</ul>
+							</>
+						)}
 					</StandardCard>
 				)}
 			</div>

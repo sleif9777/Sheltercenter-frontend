@@ -1,4 +1,5 @@
 import { faShieldDog } from "@fortawesome/free-solid-svg-icons"
+import moment from "moment-timezone"
 import { useCallback, useEffect, useState } from "react"
 import ReactQuill from "react-quill"
 
@@ -27,11 +28,12 @@ export function AdopterLandingPageApp() {
 
 	useEffect(() => {
 		if (session.user?.adopterID) {
-			new AdoptersAPI()
-				.GetAdopterPreferences(session.user.adopterID)
-				.then((resp) => setBringingDog(resp.pref.bringingDog ?? false))
+			new AdoptersAPI().GetAdopterPreferences(session.user.adopterID).then((resp) => setBringingDog(resp.pref.bringingDog ?? false))
 		}
 	}, [session.user?.adopterID])
+
+	const currentAppt = session.user?.currentAppt
+	const apptIsInPast = currentAppt?.isoInstant != null && moment(currentAppt.isoInstant).isBefore(moment())
 
 	return (
 		<FullWidthPage title={<WelcomeTitle />}>
@@ -42,8 +44,7 @@ export function AdopterLandingPageApp() {
 						<div className="text-lg">
 							<div>Calendar access is restricted after choosing a dog or completing adoption.</div>
 							<div>
-								Use the <span className="font-bold text-pink-700">Message Adoptions</span> button for futher assistance,
-								including any of the following:
+								Use the <span className="font-bold text-pink-700">Message Adoptions</span> button for futher assistance, including any of the following:
 							</div>
 						</div>
 						<div className="m-auto rounded border-2 border-pink-700 bg-pink-200 p-2">
@@ -56,25 +57,32 @@ export function AdopterLandingPageApp() {
 						</div>
 						<MessageAdoptionsButton includeQTs />
 					</div>
+				) : apptIsInPast ? (
+					<div className="flex flex-col gap-y-1">
+						<PlaceholderText iconDef={faShieldDog} text={"We're finishing up your appointment on our end!"} />
+						<div className="text-lg">
+							<div>
+								Your appointment on <span className="font-semibold">{currentAppt!.instantDisplay}</span> is complete, but we still need to record the outcome.
+								Your calendar access will be restored once that's done.
+							</div>
+							<div className="mt-1">Please check back later to reschedule.</div>
+						</div>
+						<MessageAdoptionsButton />
+					</div>
 				) : (
 					<>
 						<div className="flex flex-row flex-wrap gap-x-4">
-							{session.user?.currentAppt ? (
+							{currentAppt ? (
 								<>
 									<div className="text-lg">
-										Your current appointment is <span className="font-semibold">{session.user.currentAppt.instantDisplay}.</span>
+										Your current appointment is <span className="font-semibold">{currentAppt.instantDisplay}.</span>
 										<CancelAppointmentButton />
 										<BookAppointmentButton />
 										<MessageAdoptionsButton />
 										<UpdatePreferencesButton />
 									</div>
 									<div className="m-auto flex w-sm flex-col gap-y-1">
-										{session.user?.currentAppt?.ID && (
-											<AppointmentCard
-												apptID={session.user?.currentAppt?.ID}
-												context={AppointmentCardContext.CURRENT_APPOINTMENT}
-											/>
-										)}
+										{currentAppt.ID && <AppointmentCard apptID={currentAppt.ID} context={AppointmentCardContext.CURRENT_APPOINTMENT} />}
 									</div>
 								</>
 							) : (
@@ -85,11 +93,7 @@ export function AdopterLandingPageApp() {
 									<ManageWatchlistButton />
 									<UpdatePreferencesButton />
 									<MessageAdoptionsButton />
-									<iframe
-										className="mt-3 h-150 w-full"
-										src={ApprovalDiagram}
-										title="Adoption Process"
-									/>
+									<iframe className="mt-3 h-150 w-full" src={ApprovalDiagram} title="Adoption Process" />
 								</div>
 							)}
 						</div>
@@ -131,23 +135,14 @@ export function CancelAppointmentButton() {
 	return (
 		<>
 			<LargeButton label={`Cancel My Appointment (${currentAppt.instantDisplay})`} onClick={modalState.open} />
-			<AreYouSure
-				modalState={modalState}
-				modalTitle={"Cancel Appointment"}
-				youWantTo={"cancel your appointment"}
-				onSubmit={handleSubmit}
-			/>
+			<AreYouSure modalState={modalState} modalTitle={"Cancel Appointment"} youWantTo={"cancel your appointment"} onSubmit={handleSubmit} />
 		</>
 	)
 }
 
 function BringingDogHint({ bringingDog }: { bringingDog: boolean }) {
 	if (bringingDog) {
-		return (
-			<p className="text-sm text-gray-500">
-				{"You've let us know you'll be bringing your dog — we'll be ready for you both!"}
-			</p>
-		)
+		return <p className="text-sm text-gray-500">{"You've let us know you'll be bringing your dog — we'll be ready for you both!"}</p>
 	}
 
 	return (
@@ -156,7 +151,7 @@ function BringingDogHint({ bringingDog }: { bringingDog: boolean }) {
 			<a className="font-medium text-pink-700 underline" href="/preferences/">
 				Let us know in your preferences
 			</a>{" "}
-			before you book.
+			before you book. You do not need to also message us about it, but we will be ready for you and your dog when you arrive!
 		</p>
 	)
 }
@@ -220,7 +215,6 @@ function MessageAdoptionsButton({ includeQTs }: { includeQTs?: boolean }) {
 		</>
 	)
 }
-
 
 export enum AdopterInquiryTemplate {
 	VISIT_MY_DOG = 1,

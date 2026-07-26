@@ -9,6 +9,7 @@ export interface IUser {
 	currentAppt?: {
 		ID: number
 		isoDate: string
+		isoInstant: string
 		instantDisplay: string
 	}
 	restrictCalendar: boolean
