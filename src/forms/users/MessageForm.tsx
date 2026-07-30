@@ -499,6 +499,8 @@ export function replaceWildcardsInDelta(
 export function deltaToPlainText(content: ReactQuill.Value | undefined): string {
 	if (!content) return ""
 
+	if (typeof content === "string") return content
+
 	const ops = (content as any)?.ops
 	if (!ops || !Array.isArray(ops)) return ""
 
