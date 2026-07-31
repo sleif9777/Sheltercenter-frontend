@@ -68,7 +68,7 @@ function App() {
 
 	return (
 		<BrowserRouter>
-			<div className="flex h-screen w-screen flex-col overflow-hidden md:flex-row print:h-auto print:overflow-visible">
+			<div className="flex flex-col md:h-screen md:overflow-hidden md:flex-row print:h-auto print:overflow-visible">
 				<a
 					className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-100 focus:rounded focus:bg-pink-700 focus:px-4 focus:py-2 focus:text-white"
 					href="#main-content"
@@ -105,7 +105,7 @@ function App() {
 
 				{/* Main column */}
 				<div className="flex flex-1 flex-col not-print:min-h-screen lg:w-[85%] print:w-full">
-					<div className="flex-1 overflow-auto print:overflow-visible" id="main-content">
+					<div className="md:flex-1 md:overflow-auto print:overflow-visible" id="main-content">
 						{session.isAuthenticated ? (
 							<Routes>
 								<Route element={<DashboardsApp />} index={session.dashboardUser} />
