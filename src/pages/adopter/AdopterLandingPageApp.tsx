@@ -148,7 +148,6 @@ function BringingDogFAQ({ prefs, onPrefsChange }: { prefs: AdopterPreferences | 
 	const session = useSessionState()
 	const [open, setOpen] = useState(false)
 	const [saving, setSaving] = useState(false)
-	const [saved, setSaved] = useState(false)
 
 	const referenceDate = moment()
 	const month = referenceDate.month() + 1
