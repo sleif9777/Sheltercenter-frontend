@@ -34,13 +34,10 @@ export function WatchlistHelpForm({ modalState }: { modalState: ModalState }) {
 				<ul className="list-outside list-disc space-y-2 pl-5">
 					<li>This page updates every 10 minutes.</li>
 					<li>
-						Click the <b>Add to List</b> button to add a dog to your watchlist. Click the <b>Remove from List</b> button to
-						remove a dog from your watchlist.
+						Click the <b>Add to List</b> button to add a dog to your watchlist. Click the <b>Remove from List</b> button to remove a dog from your
+						watchlist.
 					</li>
-					<li>
-						When you check in for your appointment, this information will be given to your counselor to help find potential
-						matches.
-					</li>
+					<li>When you check in for your appointment, this information will be given to your counselor to help find potential matches.</li>
 					<li>We will auto-email you if a dog you added to your watchlist is no longer available.</li>
 				</ul>
 			</div>
@@ -59,8 +56,9 @@ function NoHoldsAcknowledgementField() {
 				message={
 					<div>
 						<div className="text-lg underline">IMPORTANT!</div>
-						Adding dogs to your watchlist does NOT place them on any sort of hold. To give all dogs the most opportunities to
-						find a forever home, Saving Grace is a first-come, first-serve facility.
+						Adding dogs to your watchlist does NOT place them on any sort of hold. To give all dogs the most opportunities to find a forever home, Saving
+						Grace is a first-come, first-serve facility. If multiple adopters share the same appointment time, the adopter who booked earliest gets
+						priority.
 					</div>
 				}
 			/>
@@ -77,8 +75,8 @@ function SoleResponsibilityAcknowledgementField() {
 				message={
 					<div>
 						<div className="text-lg underline">IMPORTANT!</div>
-						Our volunteers can see your watchlist, but do NOT have the ability (or time) to manage it for you. You are solely
-						responsible for updating your watchlist.
+						Our volunteers can see your watchlist, but do NOT have the ability (or time) to manage it for you. You are solely responsible for updating your
+						watchlist.
 					</div>
 				}
 			/>

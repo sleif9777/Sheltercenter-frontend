@@ -15,7 +15,15 @@ import { Message, MessageLevel } from "../../core/components/messages/Message"
 import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
-import { ActivityLevelLabel, AgePreference, AgePreferenceLabel, GenderPreference, GenderPreferenceLabel, HousingOwnershipLabel, HousingTypeLabel } from "../../enums/AdopterEnums"
+import {
+	ActivityLevelLabel,
+	AgePreference,
+	AgePreferenceLabel,
+	GenderPreference,
+	GenderPreferenceLabel,
+	HousingOwnershipLabel,
+	HousingTypeLabel,
+} from "../../enums/AdopterEnums"
 import { AppointmentType, Outcome } from "../../enums/AppointmentEnums"
 import { BookingMessageTemplate } from "../../enums/BookingEnums"
 import { EnumLabel } from "../../enums/EnumLabel"
@@ -204,6 +212,11 @@ export function AbleToMeet({ apptData }: { apptData: IAppointment }) {
 
 	const unavailableDogs = getNotYetAvailableDogsFromWatchlist(watchlist ?? [], schedule.dateUtil, funSize, puppies, adults)
 
+	const availableWatchlistDogs = (watchlist ?? []).filter((d) => d.availableNow)
+	const allCanMeet = availableWatchlistDogs.length > 0 && unavailableDogs.length === 0
+	const isSaturday = schedule.dateUtil.GetWeekday() === Weekday.SATURDAY
+	const hasAdults = availableWatchlistDogs.some((d) => d.ageMonths > 6 && !d.funSize)
+
 	return (
 		<>
 			<CardListSection
@@ -216,6 +229,15 @@ export function AbleToMeet({ apptData }: { apptData: IAppointment }) {
 			/>
 			{unavailableDogs.length > 0 && (
 				<Message level={MessageLevel.Warning} message={"These dogs will not be available to meet: " + unavailableDogs.join(", ")} />
+			)}
+			{allCanMeet && (
+				<Message
+					level={MessageLevel.Success}
+					message={
+						"All your watchlisted dogs should be available to meet." +
+						(isSaturday && hasAdults ? " Note: larger adults may be out for host weekend on Saturdays." : "")
+					}
+				/>
 			)}
 		</>
 	)

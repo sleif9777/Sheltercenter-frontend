@@ -1,10 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-	faDollarSign,
-	faEnvelopeCircleCheck,
-	faExclamationCircle,
-	IconDefinition,
-} from "@fortawesome/free-solid-svg-icons"
+import { faDollarSign, faEnvelopeCircleCheck, faExclamationCircle, IconDefinition } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { SetStateAction, useCallback, useEffect, useMemo, useState } from "react"
 import ReactQuill from "react-quill"
@@ -19,7 +14,7 @@ import { RichTextInput } from "../../core/components/formInputs/RichTextInput"
 import { ValueLabelPair } from "../../core/components/formInputs/SelectInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
 import { TextInput } from "../../core/components/formInputs/TextInput"
-import { MessageLevel } from "../../core/components/messages/Message"
+import { Message, MessageLevel } from "../../core/components/messages/Message"
 import { showToast } from "../../core/components/messages/ToastProvider"
 import { ModalState } from "../../core/components/modal/Modal"
 import { BookingMessageTemplate } from "../../enums/BookingEnums"
@@ -65,6 +60,7 @@ export function MessageForm({
 	const formState = useMessageFormState(),
 		schedule = useScheduleState()
 	const { reset, setField, errors, ...fields } = formState
+	const [sent, setSent] = useState(false)
 
 	// --- wildcard state ---
 	const [wildcardValues, setWildcardValues] = useState<Record<string, string>>({})
@@ -94,22 +90,17 @@ export function MessageForm({
 			const updatedReq = { ...req, message: req.message }
 
 			if (adoptionID) {
-				await new PendingAdoptionsAPI().AddUpdate(
-					adoptionID,
-					deltaToPlainText(updatedReq.message),
-					adoptionSubject ?? updatedReq.subject ?? ""
-				)
+				await new PendingAdoptionsAPI().AddUpdate(adoptionID, deltaToPlainText(updatedReq.message), adoptionSubject ?? updatedReq.subject ?? "")
 				showToast({ level: MessageLevel.Success, message: "Message sent!" })
 				onSuccess?.()
 				return
 			}
 
-			const resp = isMessageToAdoptions
-				? await new AdoptersAPI().MessageAdoptions(updatedReq)
-				: await new AdoptersAPI().MessageAdopter(updatedReq)
+			const resp = isMessageToAdoptions ? await new AdoptersAPI().MessageAdoptions(updatedReq) : await new AdoptersAPI().MessageAdopter(updatedReq)
 
 			if (resp.status == 204) {
-				showToast({ level: MessageLevel.Success, message: "Message sent!" })
+				setSent(true)
+				await new Promise<void>((resolve) => setTimeout(resolve, 4000))
 				if (apptID && fields["templateFlag"] != undefined) {
 					await new AppointmentsAPI().MarkTemplateSent(apptID, fields["templateFlag"])
 					schedule.refresh()
@@ -155,20 +146,24 @@ export function MessageForm({
 			}}
 			onSubmit={handleSubmit}
 		>
-			<Fieldset
-				errors={errors}
-				formData={fields}
-				hideSubject={hideSubject}
-				initialWildcardValues={initialWildcardValues}
-				isManuallyEdited={isManuallyEdited}
-				isMessageToAdoptions={isMessageToAdoptions ?? false}
-				quickTextOptions={quickTextOptions}
-				selectedTemplate={selectedTemplate}
-				setField={setField}
-				onManualEdit={handleManualEdit}
-				onTemplateChange={handleTemplateChange}
-				onWildcardsChange={setWildcardValues}
-			/>
+			{sent ? (
+				<Message level={MessageLevel.Success} message="Your message was sent! This window will close shortly." />
+			) : (
+				<Fieldset
+					errors={errors}
+					formData={fields}
+					hideSubject={hideSubject}
+					initialWildcardValues={initialWildcardValues}
+					isManuallyEdited={isManuallyEdited}
+					isMessageToAdoptions={isMessageToAdoptions ?? false}
+					quickTextOptions={quickTextOptions}
+					selectedTemplate={selectedTemplate}
+					setField={setField}
+					onManualEdit={handleManualEdit}
+					onTemplateChange={handleTemplateChange}
+					onWildcardsChange={setWildcardValues}
+				/>
+			)}
 		</FormProvider>
 	)
 }
@@ -212,12 +207,7 @@ function Fieldset({
 	return (
 		<div className="flex flex-col gap-y-3">
 			{quickTextOptions && (
-				<QuickTextField
-					options={quickTextOptions}
-					setField={setField}
-					value={formData["templateFlag"]}
-					onTemplateChange={onTemplateChange}
-				/>
+				<QuickTextField options={quickTextOptions} setField={setField} value={formData["templateFlag"]} onTemplateChange={onTemplateChange} />
 			)}
 
 			<div className="flex flex-col gap-3 md:flex-row">
@@ -271,12 +261,10 @@ function Fieldset({
 			{isMessageToAdoptions && (
 				<>
 					<div className="rounded border-2 border-orange-800 bg-orange-200 text-[12px] font-semibold text-orange-800 italic">
-						Friendly reminder! Our operating hours are 12pm-6pm (M/Tu/W/F), 1pm-6pm (Th), and 12pm-3pm (Sa). Please allow up
-						to 24 hours for a response.
+						Friendly reminder! Our operating hours are 12pm-6pm (M/Tu/W/F), 1pm-6pm (Th), and 12pm-3pm (Sa). Please allow up to 24 hours for a response.
 					</div>
 					<div className="rounded border-2 border-orange-800 bg-orange-200 text-[12px] font-semibold text-orange-800 italic">
-						We allow visits with your chosen dog by appointment, Monday through Thursday during business hours. Please limit
-						yourself to one visit per week.
+						We allow visits with your chosen dog by appointment, Monday through Thursday during business hours. Please limit yourself to one visit per week.
 					</div>
 				</>
 			)}
@@ -352,17 +340,7 @@ function extractWildcardsFromDelta(content: ReactQuill.Value | undefined): strin
 	return Array.from(found)
 }
 
-function EditModeHelp({
-	icon,
-	header,
-	helpText,
-	color,
-}: {
-	icon: IconDefinition
-	header: string
-	helpText: string
-	color: "green" | "orange"
-}) {
+function EditModeHelp({ icon, header, helpText, color }: { icon: IconDefinition; header: string; helpText: string; color: "green" | "orange" }) {
 	const { bgColor, borderColor, headerTextColor, textColor } = {
 		["green"]: {
 			bgColor: "bg-green-50",
@@ -396,12 +374,7 @@ function EditModeHelp({
 /**
  * Component that detects wildcards in message templates and renders input fields for them
  */
-function WildcardFields({
-	templateContent,
-	onWildcardsChange,
-	disabled = false,
-	initialValues = {},
-}: WildcardFieldsProps) {
+function WildcardFields({ templateContent, onWildcardsChange, disabled = false, initialValues = {} }: WildcardFieldsProps) {
 	const [wildcardValues, setWildcardValues] = useState<Record<string, string>>(initialValues)
 
 	// Extract wildcards from the template
@@ -431,9 +404,7 @@ function WildcardFields({
 	}
 
 	return (
-		<div
-			className={"rounded-sm border-2 p-4 " + (disabled ? "rounded-sm border-gray-500 bg-gray-200" : "border-pink-600")}
-		>
+		<div className={"rounded-sm border-2 p-4 " + (disabled ? "rounded-sm border-gray-500 bg-gray-200" : "border-pink-600")}>
 			<div className="mb-3 text-lg uppercase underline">Fill in the Blanks</div>
 			<div className="space-y-3">
 				{wildcards.map((wildcard) => {
@@ -457,10 +428,7 @@ function WildcardFields({
 /**
  * Replaces wildcards in a Quill delta with provided values
  */
-export function replaceWildcardsInDelta(
-	content: ReactQuill.Value | undefined,
-	wildcardValues: Record<string, string>
-): ReactQuill.Value {
+export function replaceWildcardsInDelta(content: ReactQuill.Value | undefined, wildcardValues: Record<string, string>): ReactQuill.Value {
 	if (!content) {
 		return ""
 	}

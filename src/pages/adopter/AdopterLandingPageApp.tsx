@@ -1,15 +1,18 @@
-import { faShieldDog } from "@fortawesome/free-solid-svg-icons"
+import { faChevronDown, faChevronUp, faShieldDog } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import moment from "moment-timezone"
 import { useCallback, useEffect, useState } from "react"
 import ReactQuill from "react-quill"
 
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
+import { AdopterPreferencesRequest } from "../../api/adopters/Requests"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import Logo from "../../assets/logo.png"
 import ApprovalDiagram from "../../assets/Application-Approval-Diagram_v6.pdf"
 import { AppointmentCard } from "../../cards/appointments/AppointmentCard"
 import { AppointmentCardContext } from "../../cards/appointments/Types"
 import { LargeButton } from "../../core/components/buttons/LargeButton"
+import { Toggleable } from "../../core/components/formInputs/CheckboxInput"
 import { MessageLevel } from "../../core/components/messages/Message"
 import { showToast } from "../../core/components/messages/ToastProvider"
 import { AreYouSure } from "../../core/components/modal/AreYouSure"
@@ -18,17 +21,18 @@ import { useSessionState } from "../../core/session/SessionState"
 import { MessageForm, QuickText } from "../../forms/users/MessageForm"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
+import { AdopterPreferences } from "../../models/AdopterModels"
 import { useScheduleState } from "../schedule/ScheduleAppState"
 import { usePageTitle } from "../../utils/usePageTitle"
 
 export function AdopterLandingPageApp() {
 	usePageTitle("My Home")
 	const session = useSessionState()
-	const [bringingDog, setBringingDog] = useState<boolean>(false)
+	const [prefs, setPrefs] = useState<AdopterPreferences>()
 
 	useEffect(() => {
 		if (session.user?.adopterID) {
-			new AdoptersAPI().GetAdopterPreferences(session.user.adopterID).then((resp) => setBringingDog(resp.pref.bringingDog ?? false))
+			new AdoptersAPI().GetAdopterPreferences(session.user.adopterID).then((resp) => setPrefs(resp.pref))
 		}
 	}, [session.user?.adopterID])
 
@@ -88,9 +92,9 @@ export function AdopterLandingPageApp() {
 							) : (
 								<div className="m-auto text-lg">
 									<span>You do not have an appointment booked.</span>
-									<BringingDogHint bringingDog={bringingDog} />
-									<BookAppointmentButton />
+									<BringingDogFAQ prefs={prefs} onPrefsChange={setPrefs} />
 									<ManageWatchlistButton />
+									<BookAppointmentButton />
 									<UpdatePreferencesButton />
 									<MessageAdoptionsButton />
 									<iframe className="mt-3 h-150 w-full" src={ApprovalDiagram} title="Adoption Process" />
@@ -140,19 +144,67 @@ export function CancelAppointmentButton() {
 	)
 }
 
-function BringingDogHint({ bringingDog }: { bringingDog: boolean }) {
-	if (bringingDog) {
-		return <p className="text-sm text-gray-500">{"You've let us know you'll be bringing your dog — we'll be ready for you both!"}</p>
-	}
+function BringingDogFAQ({ prefs, onPrefsChange }: { prefs: AdopterPreferences | undefined; onPrefsChange: (updated: AdopterPreferences) => void }) {
+	const session = useSessionState()
+	const [open, setOpen] = useState(false)
+	const [saving, setSaving] = useState(false)
+	const [saved, setSaved] = useState(false)
+
+	const referenceDate = moment()
+	const month = referenceDate.month() + 1
+	const isCoolWeather = month >= 11 || month <= 3
+
+	const handleToggle = useCallback(
+		async (newValue: boolean) => {
+			if (!prefs || !session.user?.adopterID) return
+			const { applicationComments: _, ...rest } = prefs
+			const req: AdopterPreferencesRequest = { ...rest, adopterID: session.user.adopterID, bringingDog: newValue }
+			setSaving(true)
+			await new AdoptersAPI().UpdateAdopterPreferences(req)
+			onPrefsChange({ ...prefs, bringingDog: newValue })
+			setSaving(false)
+			showToast({ level: MessageLevel.Success, message: "Saved!" })
+		},
+		[prefs, session.user?.adopterID, onPrefsChange]
+	)
 
 	return (
-		<p className="text-sm text-gray-500">
-			Planning to bring your current dog?{" "}
-			<a className="font-medium text-pink-700 underline" href="/preferences/">
-				Let us know in your preferences
-			</a>{" "}
-			before you book. You do not need to also message us about it, but we will be ready for you and your dog when you arrive!
-		</p>
+		<div className="my-1 text-base w-2xl m-auto">
+			<button
+				className="flex w-full items-center justify-between rounded border border-pink-300 bg-pink-50 px-3 py-2 text-left font-semibold text-pink-800 hover:bg-pink-100"
+				onClick={() => setOpen((o) => !o)}
+			>
+				<span className="m-auto">
+					Bringing your current dog?
+					{!open && prefs?.bringingDog && <span className="ml-2 text-sm font-normal text-green-700">{"✓ You've let us know — we'll be ready!"}</span>}
+				</span>
+				<FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} />
+			</button>
+			{open && (
+				<div className="flex flex-col gap-y-2 rounded-b border border-t-0 border-pink-300 bg-white px-3 py-3 text-sm text-gray-700">
+					<div className="text-left">
+						<ul className="list-inside">
+							<li className="list-disc!">
+								<span className="font-semibold">Meet-and-greets happen on-leash in the parking lot.</span> Your dog does not go inside the gates.
+							</li>
+							<li className="list-disc!">
+								{isCoolWeather
+									? "Your dog can wait in the car while you visit."
+									: "Your dog must wait in the parking lot with a family member while you visit."}
+							</li>
+						</ul>
+					</div>
+					<div className="m-auto">
+						<Toggleable
+							addlProps={{ disabled: saving }}
+							fieldLabel="I'm planning to bring my current dog"
+							value={prefs?.bringingDog ?? false}
+							onChange={handleToggle}
+						/>
+					</div>
+				</div>
+			)}
+		</div>
 	)
 }
 
@@ -161,7 +213,14 @@ function UpdatePreferencesButton() {
 		window.location.href = "/preferences/"
 	}, [])
 
-	return <LargeButton label="Update My Preferences" onClick={handleClick} />
+	return (
+		<>
+			<LargeButton label="Update My Preferences" onClick={handleClick} />
+			<p className="text-sm text-gray-500">
+				Let us know your housing situation, dog size preferences, and other details that help us prepare for your visit.
+			</p>
+		</>
+	)
 }
 
 function ManageWatchlistButton() {
@@ -169,7 +228,15 @@ function ManageWatchlistButton() {
 		window.location.href = "/watchlist/"
 	}, [])
 
-	return <LargeButton label="Manage My Dog Watchlist" onClick={handleClick} />
+	return (
+		<>
+			<LargeButton label="Manage My Dog Watchlist" onClick={handleClick} />
+			<p className="text-sm text-gray-500">
+				Wondering if a specific dog will be at your appointment? Add them to your watchlist — your appointment view will show which of your watchlisted
+				dogs are expected to be available.
+			</p>
+		</>
+	)
 }
 
 function BookAppointmentButton() {
@@ -184,7 +251,12 @@ function BookAppointmentButton() {
 		return
 	}
 
-	return <LargeButton label="Book New Appointment" onClick={handleClick} />
+	return (
+		<>
+			<LargeButton label="Book New Appointment" onClick={handleClick} />
+			<p className="text-sm text-gray-500">Ready to pick a date and time? Browse available slots here.</p>
+		</>
+	)
 }
 
 function MessageAdoptionsButton({ includeQTs }: { includeQTs?: boolean }) {
@@ -203,6 +275,7 @@ function MessageAdoptionsButton({ includeQTs }: { includeQTs?: boolean }) {
 	return (
 		<>
 			<LargeButton label="Message Adoptions" onClick={modalState.open} />
+			<p className="text-sm text-gray-500">Have a question for us? Our team typically responds within 24 hours during operating hours.</p>
 			<Modal modalState={modalState} modalTitle={"Message Adoptions"}>
 				<MessageForm
 					adopterID={session.user?.adopterID}
