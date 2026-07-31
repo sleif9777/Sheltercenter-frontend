@@ -254,7 +254,7 @@ function AbleToMeetItem({ label, canMeet }: { label: string; canMeet: boolean })
 }
 
 export function SingleBookingDisclaimer() {
-	return <Disclaimer text="You may only have one appointment booked at a time." />
+	return <Disclaimer text="You may only have one appointment booked at a time. To book this appointment, cancel your current appointment first." />
 }
 
 export function LockedAppointmentDisclaimer({ apptData }: { apptData: IAppointment }) {
