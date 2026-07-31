@@ -90,14 +90,22 @@ export function AdopterLandingPageApp() {
 									</div>
 								</>
 							) : (
-								<div className="m-auto text-lg">
+								<div className="m-auto w-full text-lg">
 									<span>You do not have an appointment booked.</span>
 									<BringingDogFAQ prefs={prefs} onPrefsChange={setPrefs} />
 									<ManageWatchlistButton />
 									<BookAppointmentButton />
 									<UpdatePreferencesButton />
 									<MessageAdoptionsButton />
-									<iframe className="mt-3 h-150 w-full" src={ApprovalDiagram} title="Adoption Process" />
+									<a
+										className="m-auto mt-3 block w-fit rounded-lg border-2 border-gray-700 bg-gray-100 px-2 py-1 text-center uppercase transition-colors hover:cursor-pointer hover:border-pink-700 hover:bg-pink-200 hover:text-pink-700 focus:ring-2 focus:ring-pink-700 focus:outline-none md:hidden"
+										href={ApprovalDiagram}
+										rel="noopener noreferrer"
+										target="_blank"
+									>
+										View Adoption Process (PDF)
+									</a>
+									<iframe className="mt-3 hidden h-150 w-full md:block" src={ApprovalDiagram} title="Adoption Process" />
 								</div>
 							)}
 						</div>
@@ -168,7 +176,7 @@ function BringingDogFAQ({ prefs, onPrefsChange }: { prefs: AdopterPreferences | 
 	)
 
 	return (
-		<div className="my-1 text-base w-2xl m-auto">
+		<div className="m-auto my-1 w-full max-w-2xl text-base">
 			<button
 				className="flex w-full items-center justify-between rounded border border-pink-300 bg-pink-50 px-3 py-2 text-left font-semibold text-pink-800 hover:bg-pink-100"
 				onClick={() => setOpen((o) => !o)}
