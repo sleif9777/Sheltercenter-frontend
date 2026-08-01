@@ -10,8 +10,10 @@ import {
 	faTrash,
 	faUnlock,
 	faWandMagicSparkles,
+	faXmark,
 } from "@fortawesome/free-solid-svg-icons"
-import { useCallback } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useCallback, useEffect, useState } from "react"
 
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { CardActionAreYouSure } from "../../core/components/card/CardActionAreYouSure"
@@ -20,7 +22,7 @@ import { CardActionSection } from "../../core/components/card/CardActionSection"
 import { CardColor } from "../../core/components/card/CardEnums"
 import { MessageLevel } from "../../core/components/messages/Message"
 import { showToast } from "../../core/components/messages/ToastProvider"
-import { Modal, useModalState } from "../../core/components/modal/Modal"
+import { Modal, ModalState, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
 import { Outcome } from "../../enums/AppointmentEnums"
 import { isAdoptionAppointment } from "../../forms/appointments/AppointmentForm"
@@ -29,6 +31,7 @@ import { CheckOutForm } from "../../forms/appointments/CheckOutForm"
 import { BookingForm } from "../../forms/bookings/BookingForm"
 import { MessageForm } from "../../forms/users/MessageForm"
 import { IAppointment } from "../../models/AppointmentModels"
+import { DateTime } from "../../utils/DateTime"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
 import { AppointmentCardActionProps, AppointmentCardContext } from "./Types"
 import { getCanViewBookingForm } from "./Utils"
@@ -253,9 +256,11 @@ function LockButton({ appt, session }: AppointmentCardActionProps) {
 
 export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 	const session = useSessionState()
-	const modalState = useModalState()
+	const lockedModalState = useModalState()
+	const confirmModal = useModalState()
 	const schedule = useScheduleState()
 	const apptID = appt.ID
+	const [confirmedAppt, setConfirmedAppt] = useState<IAppointment | null>(null)
 
 	const handleBookClick = useCallback(async () => {
 		schedule.setNowBookingAppt(apptID)
@@ -270,7 +275,8 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 				adopterID: session.user.adopterID ?? 0,
 				apptID: apptID,
 			})
-			showToast({ level: MessageLevel.Success, message: "Appointment confirmed!" })
+			setConfirmedAppt(appt)
+			confirmModal.open()
 			session.setCurrentAppt(appt)
 			await schedule.refresh()
 		} catch {
@@ -278,25 +284,29 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 		} finally {
 			schedule.setNowBookingAppt(0)
 		}
-	}, [appt, apptID, schedule, session])
+	}, [appt, apptID, confirmModal, schedule, session])
+
+	const confirmationModal = confirmedAppt ? (
+		<BookingConfirmationModal appt={confirmedAppt} modalState={confirmModal} />
+	) : null
 
 	if (!session.user?.adopterID || session.user.currentAppt) {
-		return
+		return confirmationModal
 	}
 
 	if (appt.locked) {
 		return (
 			<>
-				<button className="cursor-pointer rounded-md bg-pink-700 px-3 py-1 text-sm font-medium text-white hover:bg-pink-400" onClick={modalState.open}>
+				<button className="cursor-pointer rounded-md bg-pink-700 px-3 py-1 text-sm font-medium text-white hover:bg-pink-400" onClick={lockedModalState.open}>
 					Message Us
 				</button>
-				<Modal modalState={modalState} modalTitle="Message Adoptions">
+				<Modal modalState={lockedModalState} modalTitle="Message Adoptions">
 					<MessageForm
 						adopterID={session.user?.adopterID}
 						hideSubject
 						initialValue={"I would like to book the locked appointment on " + appt.instantDisplay + "."}
 						isMessageToAdoptions
-						modalState={modalState}
+						modalState={lockedModalState}
 					/>
 				</Modal>
 			</>
@@ -304,15 +314,45 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 	}
 
 	return (
-		<button
-			className={`cursor-pointer rounded-md px-3 py-1 text-sm font-medium text-white transition-colors ${
-				schedule.nowBookingAppt == apptID ? "cursor-not-allowed bg-pink-300" : "bg-pink-700 hover:bg-pink-400"
-			}`}
-			disabled={schedule.nowBookingAppt > 0}
-			onClick={handleBookClick}
-		>
-			{schedule.nowBookingAppt == apptID ? "Booking..." : schedule.nowBookingAppt > 0 ? "Please Wait..." : "Click to Book"}
-		</button>
+		<>
+			{confirmationModal}
+			<button
+				className={`cursor-pointer rounded-md px-3 py-1 text-sm font-medium text-white transition-colors ${
+					schedule.nowBookingAppt == apptID ? "cursor-not-allowed bg-pink-300" : "bg-pink-700 hover:bg-pink-400"
+				}`}
+				disabled={schedule.nowBookingAppt > 0}
+				onClick={handleBookClick}
+			>
+				{schedule.nowBookingAppt == apptID ? "Booking..." : schedule.nowBookingAppt > 0 ? "Please Wait..." : "Click to Book"}
+			</button>
+		</>
+	)
+}
+
+function BookingConfirmationModal({ appt, modalState }: { appt: IAppointment; modalState: ModalState }) {
+	useEffect(() => {
+		const timer = setTimeout(() => modalState.close(), 4000)
+		return () => clearTimeout(timer)
+	}, [modalState])
+
+	const date = new DateTime(appt.isoDate).GetShortDate(true)
+
+	return (
+		<Modal modalState={modalState} modalTitle="Appointment Confirmed">
+			<div className="flex w-full flex-col gap-4">
+				<p>
+					Your appointment on {date} at {appt.timeDisplay} has been confirmed.
+				</p>
+				<div className="flex justify-end">
+					<button
+						className="flex cursor-pointer items-center gap-1 rounded-md bg-pink-700 px-3 py-1 text-sm font-medium text-white hover:bg-pink-400"
+						onClick={modalState.close}
+					>
+						<FontAwesomeIcon icon={faXmark} /> OK
+					</button>
+				</div>
+			</div>
+		</Modal>
 	)
 }
 
