@@ -239,8 +239,8 @@ function ManageWatchlistButton() {
 		<>
 			<LargeButton label="Manage My Dog Watchlist" onClick={handleClick} />
 			<p className="text-sm text-gray-500">
-				Wondering if a specific dog will be at your appointment? Add them to your watchlist — your appointment view will show which of your watchlisted
-				dogs are expected to be available.
+				Wondering if a specific dog will be at your appointment? Add them to your watchlist before booking — your appointment view will show which of your watchlisted
+				dogs are expected to be available. You'll also be notified if a dog on your watchlist is adopted prior to your appointment.
 			</p>
 		</>
 	)
