@@ -204,6 +204,11 @@ function Fieldset({
 
 	const hasWildcards = extractWildcardsFromDelta(selectedTemplate).length > 0
 
+	const showWatchlistHint = useMemo(() => {
+		if (!isMessageToAdoptions || formData.templateFlag != null) return false
+		return looksLikeDogAvailabilityQuestion(deltaToPlainText(formData.message))
+	}, [isMessageToAdoptions, formData.message, formData.templateFlag])
+
 	return (
 		<div className="flex flex-col gap-y-3">
 			{quickTextOptions && (
@@ -257,6 +262,8 @@ function Fieldset({
 					/>
 				</div>
 			</div>
+
+			{showWatchlistHint && <WatchlistHint />}
 
 			{isMessageToAdoptions && (
 				<>
@@ -489,4 +496,24 @@ export function plainTextToDelta(text: string): ReactQuill.Value {
 	return {
 		ops: [{ insert: text }],
 	} as ReactQuill.Value
+}
+
+function looksLikeDogAvailabilityQuestion(text: string): boolean {
+	const lower = text.toLowerCase()
+	const hasAppointmentContext = /\b(appointment|when i (come|visit|arrive)|my visit)\b/.test(lower)
+	const hasDogReference = /\b(dog|pup|puppy|he|she|the dog)\b/.test(lower)
+	const hasAvailabilityQuestion = /\b(will|is|are|can|going to be|be there|available)\b/.test(lower) || lower.includes("?")
+	return hasAppointmentContext && hasDogReference && hasAvailabilityQuestion
+}
+
+function WatchlistHint() {
+	return (
+		<div className="rounded border-2 border-blue-700 bg-blue-100 p-2 text-[12px] font-semibold text-blue-800">
+			Wondering if a specific dog will be at your visit?{" "}
+			<a className="underline" href="/watchlist/" rel="noreferrer" target="_blank">
+				Set up your watchlist
+			</a>{" "}
+			to track dogs you&apos;re interested in — you&apos;ll get notified when their availability changes.
+		</div>
+	)
 }
