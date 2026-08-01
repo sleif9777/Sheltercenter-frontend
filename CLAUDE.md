@@ -155,6 +155,18 @@ Zustand store persisted to `localStorage`. Contains:
 
 ---
 
+## DateTime Utility
+
+Use `new DateTime(isoString)` from `src/utils/DateTime.ts` for all date/time formatting — never raw `new Date()` or manual string parsing. Augment the `DateTime` class when a new format is needed rather than adding one-off inline formatting logic. Key methods: `GetShortDate(includeWeekday?)`, `GetTimeOnly()`, `GetFullDateTime()`, `GetISODate()`, `GetWeekday()`.
+
+---
+
+## Domain Policy
+
+**No holds, no guarantees, first-come-first-served.** Saving Grace does not hold dogs for specific adopters. Application comments (e.g. "interested in German Shepherds") reflect preferences, not reservations. Do not design features that imply a dog is reserved or held for a specific person.
+
+---
+
 ## Code Style
 
 - **Prettier** — import sorting (`@trivago/prettier-plugin-sort-imports`), Tailwind class sorting (`prettier-plugin-tailwindcss`)
