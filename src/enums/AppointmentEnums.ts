@@ -35,3 +35,9 @@ export const OutcomeLabel: Record<Outcome, string> = {
 	[Outcome.NO_DECISION]: "No Decision",
 	[Outcome.NO_SHOW]: "No Show",
 }
+
+export enum NoDecisionEmailOption {
+	NO_EMAIL = 0,
+	STANDARD = 1,
+	WITH_SLEEPOVER = 2,
+}

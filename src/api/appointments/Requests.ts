@@ -1,4 +1,4 @@
-import { Outcome } from "../../enums/AppointmentEnums"
+import { NoDecisionEmailOption, Outcome } from "../../enums/AppointmentEnums"
 import { AdopterDemographics } from "../../models/AdopterModels"
 import { IAppointment } from "../../models/AppointmentModels"
 import { ISODateDict, TimeRequest } from "../../utils/DateTime"
@@ -49,6 +49,6 @@ export type CheckInAppointmentRequest = Pick<IAppointment, "clothingDescription"
 
 export type CheckOutAppointmentRequest = {
 	outcome: Outcome
-	sendSleepoverInfo: boolean
+	noDecisionEmailOption: NoDecisionEmailOption
 	dogID?: string
 } & AppointmentIDRequest

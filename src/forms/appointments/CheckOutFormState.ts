@@ -1,4 +1,4 @@
-import { Outcome } from "../../enums/AppointmentEnums"
+import { NoDecisionEmailOption, Outcome } from "../../enums/AppointmentEnums"
 import { CheckOutAppointmentRequest } from "../../api/appointments/Requests"
 import { createFormState, FormFieldUpdateCallback } from "../FormState"
 
@@ -7,7 +7,7 @@ export type CheckOutFormFieldUpdater = FormFieldUpdateCallback<CheckOutAppointme
 const initialState: CheckOutAppointmentRequest = {
 	apptID: 0,
 	outcome: Outcome.ADOPTION,
-	sendSleepoverInfo: false,
+	noDecisionEmailOption: NoDecisionEmailOption.WITH_SLEEPOVER,
 }
 
 export const useCheckOutFormState = createFormState<CheckOutAppointmentRequest>(initialState, {

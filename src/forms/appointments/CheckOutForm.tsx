@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from "react"
 
-import { Toggleable } from "../../core/components/formInputs/CheckboxInput"
-import { BooleanInputProps, RequiredEnumInputProps } from "../../core/components/formInputs/InputHandlers"
+import { RequiredEnumInputProps } from "../../core/components/formInputs/InputHandlers"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
 import { ModalState } from "../../core/components/modal/Modal"
-import { Outcome } from "../../enums/AppointmentEnums"
+import { NoDecisionEmailOption, Outcome } from "../../enums/AppointmentEnums"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { CheckOutAppointmentRequest } from "../../api/appointments/Requests"
@@ -63,13 +62,6 @@ function Fieldset({
 	formData: CheckOutAppointmentRequest
 	setField: CheckOutFormFieldUpdater
 }) {
-	// helper to bind formData fields to value + onChange
-	const bindField = <K extends keyof CheckOutAppointmentRequest>(field: K) => ({
-		errors: errors[field],
-		onChange: (v: CheckOutAppointmentRequest[K]) => setField(field, v),
-		value: formData[field],
-	})
-
 	const handleOutcomeChange = useCallback(
 		(v: Outcome) => {
 			setField("outcome", v)
@@ -95,7 +87,18 @@ function Fieldset({
 			{isDogChoiceOutcome(formData["outcome"]) && (
 				<DogSelectField errors={errors["dogID"]} value={formData["dogID"]} onChange={handleDogChange} />
 			)}
-			{formData["outcome"] == Outcome.NO_DECISION && <SendSleepoverInfoField {...bindField("sendSleepoverInfo")} />}
+			{formData["outcome"] == Outcome.NO_DECISION && (
+				<RadioInput
+					fieldLabel="Send email?"
+					options={[
+						{ label: "Yes, with sleepover info", value: NoDecisionEmailOption.WITH_SLEEPOVER },
+						{ label: "Yes", value: NoDecisionEmailOption.STANDARD },
+						{ label: "No", value: NoDecisionEmailOption.NO_EMAIL },
+					]}
+					value={formData["noDecisionEmailOption"]}
+					onChange={(v: NoDecisionEmailOption) => setField("noDecisionEmailOption", v)}
+				/>
+			)}
 		</div>
 	)
 }
@@ -152,10 +155,6 @@ export function DogSelectField({
 			onChange={onChange}
 		/>
 	)
-}
-
-function SendSleepoverInfoField({ value, onChange }: BooleanInputProps) {
-	return <Toggleable fieldLabel="Send Sleepover information?" value={value} onChange={onChange} />
 }
 
 function isDogChoiceOutcome(outcome: Outcome) {
