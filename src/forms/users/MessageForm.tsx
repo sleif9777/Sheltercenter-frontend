@@ -514,9 +514,8 @@ function looksLikeCancelOrReschedule(text: string): boolean {
 function looksLikeDogAvailabilityQuestion(text: string): boolean {
 	const lower = text.toLowerCase()
 	const hasAppointmentContext = /\b(appointment|when i (come|visit|arrive)|my visit)\b/.test(lower)
-	const hasDogReference = /\b(dog|pup|puppy|he|she|the dog)\b/.test(lower)
 	const hasAvailabilityQuestion = /\b(will|is|are|can|going to be|be there|available)\b/.test(lower) || lower.includes("?")
-	return hasAppointmentContext && hasDogReference && hasAvailabilityQuestion
+	return hasAppointmentContext && hasAvailabilityQuestion
 }
 
 function WatchlistHint() {
