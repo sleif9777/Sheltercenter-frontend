@@ -77,10 +77,14 @@ interface AppointmentDescriptionProps {
 
 export function AppointmentDescription({ context, apptData }: AppointmentDescriptionProps) {
 	const { adopter } = unpackApptData(apptData)
+	const session = useSessionState()
+
+	const isOwnAppt = session.adopterUser && session.user?.currentAppt?.ID === apptData.ID
+	const slotText = isOwnAppt ? "YOUR APPOINTMENT" : apptData.description
 
 	return (
 		<>
-			<span className="whitespace-normal">{context == AppointmentCardContext.TIMESLOT ? apptData.description : apptData.instantDisplay}</span>
+			<span className="whitespace-normal">{context == AppointmentCardContext.TIMESLOT ? slotText : apptData.instantDisplay}</span>
 			<span className="ml-1.5 space-x-0.5 whitespace-nowrap">
 				{apptData.locked && <Icon def={faLock} />}
 				{adopter?.preferences.mobility && <TooltippedIcon icon={faWheelchair} tooltip="Mobility assistance requested" />}
