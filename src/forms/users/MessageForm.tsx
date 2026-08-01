@@ -204,10 +204,13 @@ function Fieldset({
 
 	const hasWildcards = extractWildcardsFromDelta(selectedTemplate).length > 0
 
-	const showWatchlistHint = useMemo(() => {
-		if (!isMessageToAdoptions || formData.templateFlag != null) return false
-		return looksLikeDogAvailabilityQuestion(deltaToPlainText(formData.message))
-	}, [isMessageToAdoptions, formData.message, formData.templateFlag])
+	const hintText = useMemo(
+		() => (isMessageToAdoptions && formData.templateFlag == null ? deltaToPlainText(formData.message) : ""),
+		[isMessageToAdoptions, formData.message, formData.templateFlag]
+	)
+	const showWatchlistHint = hintText ? looksLikeDogAvailabilityQuestion(hintText) : false
+	const showHoldHint = hintText ? looksLikeHoldInquiry(hintText) : false
+	const showCancelHint = hintText ? looksLikeCancelOrReschedule(hintText) : false
 
 	return (
 		<div className="flex flex-col gap-y-3">
@@ -264,6 +267,8 @@ function Fieldset({
 			</div>
 
 			{showWatchlistHint && <WatchlistHint />}
+			{showHoldHint && <HoldHint />}
+			{showCancelHint && <CancelHint />}
 
 			{isMessageToAdoptions && (
 				<>
@@ -498,6 +503,14 @@ export function plainTextToDelta(text: string): ReactQuill.Value {
 	} as ReactQuill.Value
 }
 
+function looksLikeHoldInquiry(text: string): boolean {
+	return /\b(hold|reserve|reserved|deposit|guarantee|set aside|save.{0,10}for me|saving)\b/.test(text.toLowerCase())
+}
+
+function looksLikeCancelOrReschedule(text: string): boolean {
+	return /\b(cancel|reschedule|rescheduling|change my appointment|move my appointment|switch my appointment)\b/.test(text.toLowerCase())
+}
+
 function looksLikeDogAvailabilityQuestion(text: string): boolean {
 	const lower = text.toLowerCase()
 	const hasAppointmentContext = /\b(appointment|when i (come|visit|arrive)|my visit)\b/.test(lower)
@@ -514,6 +527,27 @@ function WatchlistHint() {
 				Set up your watchlist
 			</a>{" "}
 			to track dogs you&apos;re interested in — you&apos;ll get notified when their availability changes.
+		</div>
+	)
+}
+
+function HoldHint() {
+	return (
+		<div className="rounded border-2 border-blue-700 bg-blue-100 p-2 text-[12px] font-semibold text-blue-800">
+			Heads up — we don&apos;t hold or reserve dogs for specific adopters. Adoptions are first-come, first-served.{" "}
+			<a className="underline" href="/watchlist/" rel="noreferrer" target="_blank">
+				Your watchlist
+			</a>{" "}
+			is the best way to track dogs you&apos;re interested in and get notified when their availability changes.
+		</div>
+	)
+}
+
+function CancelHint() {
+	return (
+		<div className="rounded border-2 border-blue-700 bg-blue-100 p-2 text-[12px] font-semibold text-blue-800">
+			Need to cancel or reschedule? Close this form and use the <span className="font-bold">Cancel My Appointment</span> button on your home page. To
+			reschedule, cancel first and then pick a new slot on the calendar.
 		</div>
 	)
 }
