@@ -19,7 +19,7 @@ import { DateTime } from "../../utils/DateTime"
 import { ScheduleAppTitle } from "../schedule/ScheduleApp"
 import { useScheduleState } from "../schedule/ScheduleAppState"
 import { AdopterWatchlist } from "../../models/DogModels"
-import { getAvailableTypes, getNotYetAvailableDogsFromWatchlist } from "../../cards/appointments/AppointmentCard"
+import { getAvailableTypes, getNotYetAvailableDogsFromWatchlist } from "../../cards/appointments/AppointmentCardAvailability"
 import { usePageTitle } from "../../utils/usePageTitle"
 
 export default function PrintViewApp() {
