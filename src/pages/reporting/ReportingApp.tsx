@@ -56,7 +56,7 @@ export default function ReportingApp() {
 	}, [])
 
 	if (!stats) {
-		return <FullWidthPage title="Reporting" />
+		return <FullWidthPage title="Reporting">{null}</FullWidthPage>
 	}
 
 	const outcomeRows = buildOutcomeRows(stats.periods)
