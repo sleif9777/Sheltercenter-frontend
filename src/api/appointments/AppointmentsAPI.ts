@@ -20,6 +20,7 @@ import {
 	EmptyDatesResponse,
 	RecentAdoptionsResponse,
 	ReportingAppointmentResponse,
+	ReportingStatsResponse,
 	ScheduleContextResponse,
 } from "./Responses"
 
@@ -69,6 +70,10 @@ export class AppointmentsAPI extends APIBase {
 
 	async GetRecentAdoptions() {
 		return this.buildAndGetData<RecentAdoptionsResponse>("GetRecentAdoptions")
+	}
+
+	async GetReportingStats() {
+		return this.buildAndGetData<ReportingStatsResponse>("GetReportingStats")
 	}
 
 	async GetReportingAppointment<T extends ReportingAppointment>(apptID: number) {

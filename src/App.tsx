@@ -18,6 +18,7 @@ import { LoginApp } from "./pages/login/LoginApp.tsx"
 import PrintViewApp from "./pages/printView/PrintViewApp.tsx"
 import { PrivacyPolicyApp } from "./pages/privacy/PrivacyPolicyApp.tsx"
 import RecentAdoptionsApp from "./pages/recentAdoptions/RecentAdoptionsApp.tsx"
+import ReportingApp from "./pages/reporting/ReportingApp.tsx"
 import RecentUploadsApp from "./pages/recentUploads/RecentUploadsApp.tsx"
 import { ScheduleApp } from "./pages/schedule/ScheduleApp.tsx"
 import TemplateApp from "./pages/template/TemplateApp.tsx"
@@ -125,6 +126,7 @@ function App() {
 								<Route element={<AdopterDetailsApp />} path="/adopters/detail/:id" />
 								<Route element={<InProgressAppointmentsApp />} path="/in_progress/" />
 								<Route element={<RecentAdoptionsApp />} path="/recent_adoptions/" />
+								<Route element={<ReportingApp />} path="/reporting/" />
 								<Route element={<RecentUploadsApp />} path="/recent_uploads/" />
 								<Route element={<PrivacyPolicyApp />} path="/privacy/" />
 								<Route element={<ErrorApp />} path="/*/" />

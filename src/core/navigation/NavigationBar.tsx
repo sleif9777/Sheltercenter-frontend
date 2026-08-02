@@ -3,6 +3,7 @@ import {
 	faCalendar,
 	faCalendarWeek,
 	faCarSide,
+	faChartBar,
 	faChevronDown,
 	faChevronLeft,
 	faChevronRight,
@@ -103,6 +104,11 @@ export function NavigationBar({ debug, onNavigate, collapsed = false, onToggleCo
 								<WatchlistButton collapsed={collapsed} onNavigate={onNavigate} />
 								<DashboardsButton collapsed={collapsed} onNavigate={onNavigate} />
 							</NavigationSection>
+							{session.user?.userID === 1816 && (
+								<NavigationSection caption="Reporting" collapsed={collapsed}>
+									<ReportingButton collapsed={collapsed} onNavigate={onNavigate} />
+								</NavigationSection>
+							)}
 						</>
 					)}
 					<PrivacyPolicyButton collapsed={collapsed} onNavigate={onNavigate} />
@@ -119,15 +125,7 @@ export function NavigationBar({ debug, onNavigate, collapsed = false, onToggleCo
 	)
 }
 
-function NavigationSection({
-	caption,
-	children,
-	collapsed,
-}: {
-	caption: string
-	children: ReactNode
-	collapsed?: boolean
-}) {
+function NavigationSection({ caption, children, collapsed }: { caption: string; children: ReactNode; collapsed?: boolean }) {
 	const [open, setOpen] = useState(false)
 
 	// When collapsed on desktop, render children as flat icon buttons (no section header)
@@ -135,9 +133,7 @@ function NavigationSection({
 		return (
 			<div className="hidden w-full flex-col md:flex">
 				{React.Children.map(children, (child) =>
-					React.isValidElement(child)
-						? React.cloneElement(child as React.ReactElement, { collapsed: true, noBorder: true })
-						: child
+					React.isValidElement(child) ? React.cloneElement(child as React.ReactElement, { collapsed: true, noBorder: true }) : child
 				)}
 			</div>
 		)
@@ -209,9 +205,7 @@ function NavigationButton({
 					<Link
 						aria-label={caption}
 						className={`flex items-center justify-center py-3 transition-colors ${
-							disabled
-								? "pointer-events-none cursor-not-allowed text-gray-400"
-								: "cursor-pointer text-pink-700 hover:bg-pink-200"
+							disabled ? "pointer-events-none cursor-not-allowed text-gray-400" : "cursor-pointer text-pink-700 hover:bg-pink-200"
 						}`}
 						to={route ?? "#"}
 						onClick={handleClick}
@@ -238,9 +232,7 @@ function NavigationButton({
 			<div className={`w-full ${!isLast && !noBorder ? "border-b border-pink-700" : ""}`}>
 				<Link
 					className={`block px-4 py-3 text-center text-2xl font-medium uppercase transition-colors md:text-sm lg:text-lg xl:text-xl ${
-						disabled
-							? "pointer-events-none cursor-not-allowed text-gray-400"
-							: "cursor-pointer text-pink-700 hover:bg-pink-200"
+						disabled ? "pointer-events-none cursor-not-allowed text-gray-400" : "cursor-pointer text-pink-700 hover:bg-pink-200"
 					}`}
 					to={route ?? "#"}
 					onClick={handleClick}
@@ -259,9 +251,7 @@ interface NavigationButtonProps {
 }
 
 function AdopterLandingPageButton({ collapsed, onNavigate }: NavigationButtonProps) {
-	return (
-		<NavigationButton caption="Home" collapsed={collapsed} icon={faHome} route="/my_home/" onNavigate={onNavigate} />
-	)
+	return <NavigationButton caption="Home" collapsed={collapsed} icon={faHome} route="/my_home/" onNavigate={onNavigate} />
 }
 
 function ScheduleButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
@@ -297,27 +287,12 @@ function WatchlistButton({ noBorder, collapsed, onNavigate }: NavigationButtonPr
 
 function DashboardsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
 	return (
-		<NavigationButton
-			caption="Dashboards"
-			collapsed={collapsed}
-			icon={faDashboard}
-			noBorder={noBorder}
-			route="/dashboards/"
-			onNavigate={onNavigate}
-		/>
+		<NavigationButton caption="Dashboards" collapsed={collapsed} icon={faDashboard} noBorder={noBorder} route="/dashboards/" onNavigate={onNavigate} />
 	)
 }
 
 function AdopterPreferencesButton({ collapsed, onNavigate }: NavigationButtonProps) {
-	return (
-		<NavigationButton
-			caption="My Preferences"
-			collapsed={collapsed}
-			icon={faStar}
-			route="/preferences/"
-			onNavigate={onNavigate}
-		/>
-	)
+	return <NavigationButton caption="My Preferences" collapsed={collapsed} icon={faStar} route="/preferences/" onNavigate={onNavigate} />
 }
 
 function WeeklyTemplateButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
@@ -392,14 +367,12 @@ function InProgressAppointmentsButton({ noBorder, collapsed, onNavigate }: Navig
 }
 
 function PrivacyPolicyButton({ collapsed, onNavigate }: NavigationButtonProps) {
+	return <NavigationButton caption="Privacy Policy" collapsed={collapsed} icon={faLock} route="/privacy/" onNavigate={onNavigate} />
+}
+
+function ReportingButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
 	return (
-		<NavigationButton
-			caption="Privacy Policy"
-			collapsed={collapsed}
-			icon={faLock}
-			route="/privacy/"
-			onNavigate={onNavigate}
-		/>
+		<NavigationButton caption="Reporting" collapsed={collapsed} icon={faChartBar} noBorder={noBorder} route="/reporting/" onNavigate={onNavigate} />
 	)
 }
 
@@ -442,14 +415,5 @@ function SignOutButton({ collapsed, onNavigate }: { collapsed?: boolean; onNavig
 		navigate("/")
 	}, [session, navigate])
 
-	return (
-		<NavigationButton
-			caption="Sign Out"
-			collapsed={collapsed}
-			icon={faSignOutAlt}
-			isLast
-			onClick={handleClick}
-			onNavigate={onNavigate}
-		/>
-	)
+	return <NavigationButton caption="Sign Out" collapsed={collapsed} icon={faSignOutAlt} isLast onClick={handleClick} onNavigate={onNavigate} />
 }
