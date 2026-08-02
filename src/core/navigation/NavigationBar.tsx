@@ -104,11 +104,9 @@ export function NavigationBar({ debug, onNavigate, collapsed = false, onToggleCo
 								<WatchlistButton collapsed={collapsed} onNavigate={onNavigate} />
 								<DashboardsButton collapsed={collapsed} onNavigate={onNavigate} />
 							</NavigationSection>
-							{session.user?.userID === 1816 && (
-								<NavigationSection caption="Reporting" collapsed={collapsed}>
-									<ReportingButton collapsed={collapsed} onNavigate={onNavigate} />
-								</NavigationSection>
-							)}
+							<NavigationSection caption="Reporting" collapsed={collapsed}>
+								<ReportingButton collapsed={collapsed} onNavigate={onNavigate} />
+							</NavigationSection>
 						</>
 					)}
 					<PrivacyPolicyButton collapsed={collapsed} onNavigate={onNavigate} />
