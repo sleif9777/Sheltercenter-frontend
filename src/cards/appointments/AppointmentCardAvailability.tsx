@@ -130,6 +130,7 @@ export function getAvailableTypes(apptType: AppointmentType, weekday: Weekday) {
 			break
 		case AppointmentType.FUN_SIZE:
 			funSize = true
+			adults = true
 	}
 
 	return { adults, funSize, puppies }
