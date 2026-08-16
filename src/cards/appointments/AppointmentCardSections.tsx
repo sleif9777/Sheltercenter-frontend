@@ -115,7 +115,7 @@ function NotesSection({ apptData }: { apptData: IAppointment }) {
 		},
 	]
 
-	if (adopter.demographics.bookingHistory.completed < 2) {
+	if (adopter.demographics.bookingHistory.completed < 2 && !session.adopterUser) {
 		allNotes.push({
 			label: "From Shelterluv",
 			value: adopter.preferences.applicationComments,

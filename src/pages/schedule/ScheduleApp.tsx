@@ -456,7 +456,7 @@ function RestrictCalendarPlaceholder() {
 		<>
 			<PlaceholderText iconDef={faShieldDog} text={"Congrats on your adoption!"} />
 			<p>
-				Calendar access is restricted after choosing a dog. Email adoptions@savinggracenc.org for futher assistance,
+				Calendar access is restricted after choosing a dog. Email adoptions@savinggracenc.org for further assistance,
 				including any of the following:
 			</p>
 			<ul>
