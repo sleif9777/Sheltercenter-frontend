@@ -27,3 +27,7 @@ export type AdopterSelectFieldOptionsRequest = {
 }
 
 export type AdopterPreferencesRequest = Omit<AdopterPreferences, "applicationComments"> & AdopterIDRequest
+
+export type ReportBugRequest = AdopterIDRequest & {
+	bugDescription: string
+}

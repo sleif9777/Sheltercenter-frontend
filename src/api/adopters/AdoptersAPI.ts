@@ -8,6 +8,7 @@ import {
 	AdopterSelectFieldOptionsRequest,
 	GetAdopterDirectoryListingRequest,
 	GetRecentlyUploadedAdoptersRequest,
+	ReportBugRequest,
 	SendMessageRequest,
 } from "./Requests"
 import {
@@ -79,5 +80,9 @@ export class AdoptersAPI extends APIBase {
 
 	async UpdateAdopterPreferences(req: AdopterPreferencesRequest) {
 		return this.buildAndPost<AdopterPreferencesRequest>("UpdateAdopterPreferences", req)
+	}
+
+	async ReportBug(req: ReportBugRequest) {
+		return this.buildAndPost<ReportBugRequest>("ReportBug", req)
 	}
 }

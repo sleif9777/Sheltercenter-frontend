@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react"
 import ReactQuill from "react-quill"
 
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
-import { AdopterPreferencesRequest } from "../../api/adopters/Requests"
+import { AdopterPreferencesRequest, ReportBugRequest } from "../../api/adopters/Requests"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import Logo from "../../assets/logo.png"
 import ApprovalDiagram from "../../assets/Application-Approval-Diagram_v6.pdf"
@@ -48,7 +48,7 @@ export function AdopterLandingPageApp() {
 						<div className="text-lg">
 							<div>Calendar access is restricted after choosing a dog or completing adoption.</div>
 							<div>
-								Use the <span className="font-bold text-pink-700">Message Adoptions</span> button for futher assistance, including any of the following:
+								Use the <span className="font-bold text-pink-700">Message Adoptions</span> button for further assistance, including any of the following:
 							</div>
 						</div>
 						<div className="m-auto rounded border-2 border-pink-700 bg-pink-200 p-2">
@@ -84,10 +84,12 @@ export function AdopterLandingPageApp() {
 										<BookAppointmentButton />
 										<MessageAdoptionsButton />
 										<UpdatePreferencesButton />
+										<ReportBugButton />
 									</div>
 									<div className="m-auto flex w-sm flex-col gap-y-1">
 										{currentAppt.ID && <AppointmentCard apptID={currentAppt.ID} context={AppointmentCardContext.CURRENT_APPOINTMENT} />}
 									</div>
+									<BringingDogFAQ prefs={prefs} onPrefsChange={setPrefs} />
 								</>
 							) : (
 								<div className="m-auto w-full text-lg">
@@ -97,6 +99,7 @@ export function AdopterLandingPageApp() {
 									<BookAppointmentButton />
 									<UpdatePreferencesButton />
 									<MessageAdoptionsButton />
+									<ReportBugButton />
 									<a
 										className="m-auto mt-3 block w-fit rounded-lg border-2 border-gray-700 bg-gray-100 px-2 py-1 text-center uppercase transition-colors hover:cursor-pointer hover:border-pink-700 hover:bg-pink-200 hover:text-pink-700 focus:ring-2 focus:ring-pink-700 focus:outline-none md:hidden"
 										href={ApprovalDiagram}
@@ -291,6 +294,54 @@ function MessageAdoptionsButton({ includeQTs }: { includeQTs?: boolean }) {
 					modalState={modalState}
 					quickTextOptions={includeQTs ? quickTexts : undefined}
 				/>
+			</Modal>
+		</>
+	)
+}
+
+function ReportBugButton() {
+	const session = useSessionState()
+	const modalState = useModalState()
+	const [description, setDescription] = useState("")
+	const [submitting, setSubmitting] = useState(false)
+
+	if (!session.user?.adopterID) {
+		return null
+	}
+
+	const handleSubmit = async () => {
+		if (!description.trim()) return
+		const req: ReportBugRequest = { adopterID: session.user!.adopterID!, bugDescription: description }
+		setSubmitting(true)
+		await new AdoptersAPI().ReportBug(req)
+		setSubmitting(false)
+		setDescription("")
+		modalState.close()
+		showToast({ level: MessageLevel.Success, message: "Issue report sent — thank you!" })
+	}
+
+	return (
+		<>
+			<LargeButton label="Report an Issue" onClick={modalState.open} />
+			<p className="text-sm text-gray-500">Found something wrong in the scheduler? Let us know and we'll look into it.</p>
+			<Modal modalState={modalState} modalTitle="Report an Issue">
+				<div className="flex flex-col gap-y-3 p-2">
+					<textarea
+						className="w-full rounded border border-gray-300 p-2 text-sm focus:border-pink-700 focus:outline-none"
+						disabled={submitting}
+						onChange={(e) => setDescription(e.target.value)}
+						placeholder="Describe what happened and what you expected to happen..."
+						rows={5}
+						value={description}
+					/>
+					<button
+						className="w-full rounded-lg border-2 border-pink-700 bg-pink-100 px-2 py-1 uppercase text-pink-700 transition-colors hover:bg-pink-200 disabled:cursor-not-allowed disabled:opacity-50"
+						disabled={submitting || !description.trim()}
+						onClick={handleSubmit}
+					>
+						{submitting ? "Sending…" : "Submit"}
+					</button>
+				</div>
 			</Modal>
 		</>
 	)
