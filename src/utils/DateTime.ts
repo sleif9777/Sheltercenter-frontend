@@ -24,6 +24,7 @@ enum DateTimeFormat {
 	ShortDateWithWeekday = "ddd M/D/YYYY", // Wed 1/1/2026
 	TimeOnly = "h:mm A", // 3:15 AM
 	Weekday = "dddd", // Saturday
+	SlotLabel = "ddd (M/D) h:mma", // Mon (8/17) 1:00pm
 }
 
 const TZ_EST = "America/New_York"
@@ -45,6 +46,19 @@ export class DateTime {
 		// d.set("minute", 59)
 
 		return d
+	}
+
+	GetOpenTime(): moment.Moment {
+		const d = this.instant.clone()
+		d.set("hour", this.GetWeekday() == Weekday.THURSDAY ? 13 : 12)
+		d.set("minute", 0)
+		d.set("second", 0)
+		d.set("millisecond", 0)
+		return d
+	}
+
+	GetSlotLabel(): string {
+		return this.Format(DateTimeFormat.SlotLabel)
 	}
 
 	DiffWithDate(d2?: DateTime) {
@@ -121,4 +135,51 @@ export class DateTime {
 
 		return new DateTime().instant.isAfter(cutoffTime)
 	}
+}
+
+const VISIT_DAYS = new Set([Weekday.MONDAY, Weekday.TUESDAY, Weekday.WEDNESDAY, Weekday.THURSDAY])
+const PICKUP_DAYS = new Set([Weekday.MONDAY, Weekday.TUESDAY, Weekday.WEDNESDAY, Weekday.THURSDAY, Weekday.FRIDAY, Weekday.SATURDAY])
+
+function slotsForDay(dateUtil: DateTime, eligibleDays: Set<Weekday>, now: moment.Moment): string[] {
+	const weekday = dateUtil.GetWeekday()
+	if (!eligibleDays.has(weekday)) return []
+
+	const open = dateUtil.GetOpenTime()
+	const close = dateUtil.CloseTime()
+	const slots: string[] = []
+
+	const cursor = open.clone()
+	while (cursor.isBefore(close)) {
+		if (cursor.isAfter(now)) {
+			const slotDt = new DateTime(cursor.toISOString())
+			slots.push(slotDt.GetSlotLabel())
+		}
+		cursor.add(30, "minutes")
+	}
+	return slots
+}
+
+export function generateVisitTimeSlots(): string[] {
+	const now = moment().tz(TZ_EST)
+	const slots: string[] = []
+	for (let i = 0; i < 7; i++) {
+		const dateUtil = new DateTime(new DateTime().GetDiffedDate(i))
+		slots.push(...slotsForDay(dateUtil, VISIT_DAYS, now))
+	}
+	return slots
+}
+
+export function generatePickupTimeSlots(readyToRollInstant: string): string[] {
+	const rtr = moment(readyToRollInstant).tz(TZ_EST)
+	const now = moment().tz(TZ_EST)
+	const cutoff = now.isAfter(rtr) ? now : rtr
+	const rtrDateUtil = new DateTime(rtr.toISOString())
+	const slots: string[] = []
+
+	for (let i = 0; i < 3; i++) {
+		const isoDate = rtrDateUtil.GetDiffedDate(i)
+		const dateUtil = new DateTime(isoDate)
+		slots.push(...slotsForDay(dateUtil, PICKUP_DAYS, cutoff))
+	}
+	return slots
 }

@@ -6,6 +6,7 @@ import ReactQuill from "react-quill"
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
 import { AdopterPreferencesRequest } from "../../api/adopters/Requests"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
+import { PendingAdoptionsAPI } from "../../api/pendingAdoptions/PendingAdoptionsAPI"
 import Logo from "../../assets/logo.png"
 import ApprovalDiagram from "../../assets/Application-Approval-Diagram_v6.pdf"
 import { AppointmentCard } from "../../cards/appointments/AppointmentCard"
@@ -17,6 +18,7 @@ import { showToast } from "../../core/components/messages/ToastProvider"
 import { AreYouSure } from "../../core/components/modal/AreYouSure"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
+import { PendingAdoptionStatus } from "../../enums/PendingAdoptionEnums"
 import { MessageForm, QuickText } from "../../forms/users/MessageForm"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
@@ -28,10 +30,16 @@ export function AdopterLandingPageApp() {
 	usePageTitle("My Home")
 	const session = useSessionState()
 	const [prefs, setPrefs] = useState<AdopterPreferences>()
+	const [pendingAdoptionStatus, setPendingAdoptionStatus] = useState<PendingAdoptionStatus | null>(null)
+	const [readyToRollInstant, setReadyToRollInstant] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (session.user?.adopterID) {
 			new AdoptersAPI().GetAdopterPreferences(session.user.adopterID).then((resp) => setPrefs(resp.pref))
+			new PendingAdoptionsAPI().GetAdopterCurrentPendingAdoptionStatus(session.user.adopterID).then((resp) => {
+				setPendingAdoptionStatus(resp.status)
+				setReadyToRollInstant(resp.readyToRollInstant)
+			})
 		}
 	}, [session.user?.adopterID])
 
@@ -58,7 +66,7 @@ export function AdopterLandingPageApp() {
 								<li>- I want to schedule a new adoption appointment.</li>
 							</ul>
 						</div>
-						<MessageAdoptionsButton includeQTs />
+						<MessageAdoptionsButton includeQTs pendingAdoptionStatus={pendingAdoptionStatus} readyToRollInstant={readyToRollInstant} />
 					</div>
 				) : apptIsInPast ? (
 					<div className="flex flex-col gap-y-1">
@@ -258,14 +266,29 @@ function BookAppointmentButton() {
 	)
 }
 
-function MessageAdoptionsButton({ includeQTs }: { includeQTs?: boolean }) {
+function MessageAdoptionsButton({
+	includeQTs,
+	pendingAdoptionStatus,
+	readyToRollInstant,
+}: {
+	includeQTs?: boolean
+	pendingAdoptionStatus?: PendingAdoptionStatus | null
+	readyToRollInstant?: string | null
+}) {
 	const session = useSessionState(),
 		modalState = useModalState()
-	let quickTexts: QuickText[] = []
 
-	if (includeQTs) {
-		quickTexts = createQuickTexts()
-	}
+	const quickTexts: QuickText[] = includeQTs
+		? createQuickTexts().filter((qt) => {
+				if (qt.value === AdopterInquiryTemplate.VISIT_MY_DOG) {
+					return pendingAdoptionStatus != null && pendingAdoptionStatus !== PendingAdoptionStatus.READY_TO_ROLL
+				}
+				if (qt.value === AdopterInquiryTemplate.PICK_UP_MY_DOG) {
+					return pendingAdoptionStatus === PendingAdoptionStatus.READY_TO_ROLL
+				}
+				return true
+			})
+		: []
 
 	if (!session.user?.adopterID) {
 		return
@@ -282,6 +305,7 @@ function MessageAdoptionsButton({ includeQTs }: { includeQTs?: boolean }) {
 					isMessageToAdoptions
 					modalState={modalState}
 					quickTextOptions={includeQTs ? quickTexts : undefined}
+					readyToRollInstant={readyToRollInstant ?? undefined}
 				/>
 			</Modal>
 		</>

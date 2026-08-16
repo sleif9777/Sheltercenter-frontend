@@ -11,13 +11,15 @@ import { PendingAdoptionsAPI } from "../../api/pendingAdoptions/PendingAdoptions
 import { StringInputProps } from "../../core/components/formInputs/InputHandlers"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import { RichTextInput } from "../../core/components/formInputs/RichTextInput"
-import { ValueLabelPair } from "../../core/components/formInputs/SelectInput"
+import SelectInput, { SelectInputOption, ValueLabelPair } from "../../core/components/formInputs/SelectInput"
+import { generatePickupTimeSlots, generateVisitTimeSlots } from "../../utils/DateTime"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
 import { TextInput } from "../../core/components/formInputs/TextInput"
 import { Message, MessageLevel } from "../../core/components/messages/Message"
 import { showToast } from "../../core/components/messages/ToastProvider"
 import { ModalState } from "../../core/components/modal/Modal"
 import { BookingMessageTemplate } from "../../enums/BookingEnums"
+import { useSessionState } from "../../core/session/SessionState"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
 import { FormProvider } from "../FormProvider"
 import { ErrorMap } from "../FormState"
@@ -42,6 +44,7 @@ export function MessageForm({
 	modalState,
 	onSuccess,
 	quickTextOptions,
+	readyToRollInstant,
 	templateFlag,
 }: {
 	adopterID: number
@@ -56,6 +59,7 @@ export function MessageForm({
 	modalState: ModalState
 	onSuccess?: () => void
 	quickTextOptions?: QuickText[]
+	readyToRollInstant?: string
 	templateFlag?: BookingMessageTemplate
 }) {
 	// --- form state ---
@@ -172,6 +176,7 @@ export function MessageForm({
 					isManuallyEdited={isManuallyEdited}
 					isMessageToAdoptions={isMessageToAdoptions ?? false}
 					quickTextOptions={quickTextOptions}
+					readyToRollInstant={readyToRollInstant}
 					selectedTemplate={selectedTemplate}
 					setField={setField}
 					onManualEdit={handleManualEdit}
@@ -189,6 +194,7 @@ function Fieldset({
 	isMessageToAdoptions,
 	hideSubject,
 	quickTextOptions,
+	readyToRollInstant,
 	setField,
 	errors,
 	selectedTemplate,
@@ -203,6 +209,7 @@ function Fieldset({
 	isIssueReport: boolean
 	isMessageToAdoptions: boolean
 	quickTextOptions?: QuickText[]
+	readyToRollInstant?: string
 	setField: MessageAdopterFormFieldUpdater
 	errors: ErrorMap<SendMessageRequest>
 	selectedTemplate: ReactQuill.Value | undefined
@@ -212,6 +219,8 @@ function Fieldset({
 	onWildcardsChange: (wildcards: Record<string, string>) => void
 	onManualEdit: () => void
 }) {
+	const session = useSessionState()
+
 	// helper to bind formData fields to value + onChange
 	const bindField = <K extends keyof SendMessageRequest>(field: K) => ({
 		errors: errors[field],
@@ -220,6 +229,7 @@ function Fieldset({
 	})
 
 	const hasWildcards = extractWildcardsFromDelta(selectedTemplate).length > 0
+	const showVisitHelpText = isMessageToAdoptions && !isIssueReport && !!session.user?.restrictCalendar
 
 	const hintText = useMemo(
 		() => (isMessageToAdoptions && formData.templateFlag == null ? deltaToPlainText(formData.message) : ""),
@@ -256,6 +266,7 @@ function Fieldset({
 						<WildcardFields
 							disabled={isManuallyEdited}
 							initialValues={initialWildcardValues ?? {}}
+							readyToRollInstant={readyToRollInstant}
 							templateContent={selectedTemplate}
 							onWildcardsChange={onWildcardsChange}
 						/>
@@ -287,7 +298,7 @@ function Fieldset({
 			{showHoldHint && <HoldHint />}
 			{showCancelHint && <CancelHint />}
 
-			{isMessageToAdoptions && !isIssueReport && (
+			{showVisitHelpText && (
 				<>
 					<div className="rounded border-2 border-orange-800 bg-orange-200 text-[12px] font-semibold text-orange-800 italic">
 						Friendly reminder! Our operating hours are 12pm-6pm (M/Tu/W/F), 1pm-6pm (Th), and 12pm-3pm (Sa). Please allow up to 24 hours for a response.
@@ -340,6 +351,7 @@ interface WildcardFieldsProps {
 	/** Whether fields should be disabled (when manually edited) */
 	disabled?: boolean
 	initialValues?: Record<string, string>
+	readyToRollInstant?: string
 }
 
 /**
@@ -403,8 +415,11 @@ function EditModeHelp({ icon, header, helpText, color }: { icon: IconDefinition;
 /**
  * Component that detects wildcards in message templates and renders input fields for them
  */
-function WildcardFields({ templateContent, onWildcardsChange, disabled = false, initialValues = {} }: WildcardFieldsProps) {
+const PICKUP_OTHER = "__OTHER__"
+
+function WildcardFields({ templateContent, onWildcardsChange, disabled = false, initialValues = {}, readyToRollInstant }: WildcardFieldsProps) {
 	const [wildcardValues, setWildcardValues] = useState<Record<string, string>>(initialValues)
+	const [pickupOtherText, setPickupOtherText] = useState<Record<string, string>>({})
 
 	// Extract wildcards from the template
 	const wildcards = useMemo(() => extractWildcardsFromDelta(templateContent), [templateContent])
@@ -412,6 +427,7 @@ function WildcardFields({ templateContent, onWildcardsChange, disabled = false, 
 	// Reset wildcard values when template changes
 	useEffect(() => {
 		setWildcardValues(initialValues)
+		setPickupOtherText({})
 		onWildcardsChange(initialValues)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [templateContent])
@@ -422,11 +438,17 @@ function WildcardFields({ templateContent, onWildcardsChange, disabled = false, 
 	}, [wildcardValues, onWildcardsChange])
 
 	const handleWildcardChange = (wildcard: string, value: string) => {
-		setWildcardValues((prev) => ({
-			...prev,
-			[wildcard]: value,
-		}))
+		setWildcardValues((prev) => ({ ...prev, [wildcard]: value }))
 	}
+
+	const visitSlots = useMemo((): SelectInputOption<string>[] => {
+		return generateVisitTimeSlots().map((s) => ({ value: s, label: s }))
+	}, [])
+
+	const pickupSlots = useMemo((): SelectInputOption<string>[] => {
+		const base = readyToRollInstant ? generatePickupTimeSlots(readyToRollInstant) : []
+		return [...base.map((s) => ({ value: s, label: s })), { value: PICKUP_OTHER, label: "Other" }]
+	}, [readyToRollInstant])
 
 	if (wildcards.length === 0) {
 		return null
@@ -438,6 +460,56 @@ function WildcardFields({ templateContent, onWildcardsChange, disabled = false, 
 			<div className="space-y-3">
 				{wildcards.map((wildcard) => {
 					const label = wildcard.replace(/\$\$\$/g, "")
+					const isVisitSlot = /^PREFERRED DATE\/TIME \d+$/.test(label)
+					const isPickupSlot = label === "PREFERRED DATES/TIMES"
+
+					if (isVisitSlot) {
+						return (
+							<SelectInput
+								disabled={disabled}
+								errors={[]}
+								fieldLabel={label}
+								key={wildcard}
+								options={visitSlots}
+								value={wildcardValues[wildcard] ?? null}
+								onChange={async (v) => handleWildcardChange(wildcard, v ?? "")}
+							/>
+						)
+					}
+
+					if (isPickupSlot) {
+						const isOther = wildcardValues[wildcard] === PICKUP_OTHER
+						return (
+							<div className="flex flex-col gap-y-2" key={wildcard}>
+								<SelectInput
+									disabled={disabled}
+									errors={[]}
+									fieldLabel={label}
+									options={pickupSlots}
+									value={wildcardValues[wildcard] ?? null}
+									onChange={async (v) => {
+										handleWildcardChange(wildcard, v ?? "")
+										if (v !== PICKUP_OTHER) {
+											setPickupOtherText((prev) => ({ ...prev, [wildcard]: "" }))
+										}
+									}}
+								/>
+								{isOther && (
+									<TextInput
+										errors={[]}
+										fieldLabel="Please specify"
+										showRequired
+										value={pickupOtherText[wildcard] ?? ""}
+										onChange={(v) => {
+											setPickupOtherText((prev) => ({ ...prev, [wildcard]: v }))
+											handleWildcardChange(wildcard, v)
+										}}
+									/>
+								)}
+							</div>
+						)
+					}
+
 					return (
 						<TextInput
 							addlProps={{ disabled: disabled }}
