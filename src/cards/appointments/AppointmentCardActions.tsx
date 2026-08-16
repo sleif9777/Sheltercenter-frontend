@@ -290,7 +290,7 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 		<BookingConfirmationModal appt={confirmedAppt} modalState={confirmModal} />
 	) : null
 
-	if (!session.user?.adopterID || session.user.currentAppt) {
+	if (!session.user?.adopterID || session.user.currentAppt || session.user.restrictCalendar) {
 		return confirmationModal
 	}
 
