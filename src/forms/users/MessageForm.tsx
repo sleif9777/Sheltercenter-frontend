@@ -5,7 +5,7 @@ import { SetStateAction, useCallback, useEffect, useMemo, useState } from "react
 import ReactQuill from "react-quill"
 
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
-import { SendMessageRequest } from "../../api/adopters/Requests"
+import { ReportBugRequest, SendMessageRequest } from "../../api/adopters/Requests"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { PendingAdoptionsAPI } from "../../api/pendingAdoptions/PendingAdoptionsAPI"
 import { StringInputProps } from "../../core/components/formInputs/InputHandlers"
@@ -37,6 +37,7 @@ export function MessageForm({
 	hideSubject,
 	initialValue,
 	initialWildcardValues,
+	isIssueReport,
 	isMessageToAdoptions,
 	modalState,
 	onSuccess,
@@ -50,6 +51,7 @@ export function MessageForm({
 	hideSubject?: boolean
 	initialValue?: ReactQuill.Value
 	initialWildcardValues?: Record<string, string>
+	isIssueReport?: boolean
 	isMessageToAdoptions?: boolean
 	modalState: ModalState
 	onSuccess?: () => void
@@ -96,6 +98,18 @@ export function MessageForm({
 				return
 			}
 
+			if (isIssueReport) {
+				const issueReq: ReportBugRequest = { adopterID, bugDescription: deltaToPlainText(updatedReq.message) }
+				const resp = await new AdoptersAPI().ReportBug(issueReq)
+				if (resp.status == 204) {
+					setSent(true)
+					await new Promise<void>((resolve) => setTimeout(resolve, 4000))
+				} else {
+					showToast({ level: MessageLevel.Error, message: "Failed to send!" })
+				}
+				return
+			}
+
 			const resp = isMessageToAdoptions ? await new AdoptersAPI().MessageAdoptions(updatedReq) : await new AdoptersAPI().MessageAdopter(updatedReq)
 
 			if (resp.status == 204) {
@@ -109,7 +123,7 @@ export function MessageForm({
 				showToast({ level: MessageLevel.Error, message: "Failed to send!" })
 			}
 		},
-		[adoptionID, adoptionSubject, apptID, fields, isMessageToAdoptions, onSuccess, schedule]
+		[adopterID, adoptionID, adoptionSubject, apptID, fields, isIssueReport, isMessageToAdoptions, onSuccess, schedule]
 	)
 
 	const handleManualEdit = useCallback(() => {
@@ -154,6 +168,7 @@ export function MessageForm({
 					formData={fields}
 					hideSubject={hideSubject}
 					initialWildcardValues={initialWildcardValues}
+					isIssueReport={isIssueReport ?? false}
 					isManuallyEdited={isManuallyEdited}
 					isMessageToAdoptions={isMessageToAdoptions ?? false}
 					quickTextOptions={quickTextOptions}
@@ -170,6 +185,7 @@ export function MessageForm({
 
 function Fieldset({
 	formData,
+	isIssueReport,
 	isMessageToAdoptions,
 	hideSubject,
 	quickTextOptions,
@@ -184,6 +200,7 @@ function Fieldset({
 }: {
 	formData: SendMessageRequest
 	hideSubject?: boolean
+	isIssueReport: boolean
 	isMessageToAdoptions: boolean
 	quickTextOptions?: QuickText[]
 	setField: MessageAdopterFormFieldUpdater
@@ -270,7 +287,7 @@ function Fieldset({
 			{showHoldHint && <HoldHint />}
 			{showCancelHint && <CancelHint />}
 
-			{isMessageToAdoptions && (
+			{isMessageToAdoptions && !isIssueReport && (
 				<>
 					<div className="rounded border-2 border-orange-800 bg-orange-200 text-[12px] font-semibold text-orange-800 italic">
 						Friendly reminder! Our operating hours are 12pm-6pm (M/Tu/W/F), 1pm-6pm (Th), and 12pm-3pm (Sa). Please allow up to 24 hours for a response.

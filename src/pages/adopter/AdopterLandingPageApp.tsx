@@ -1,11 +1,10 @@
-import { faChevronDown, faChevronUp, faShieldDog } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faShieldDog } from "@fortawesome/free-solid-svg-icons"
 import moment from "moment-timezone"
 import { useCallback, useEffect, useState } from "react"
 import ReactQuill from "react-quill"
 
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
-import { AdopterPreferencesRequest, ReportBugRequest } from "../../api/adopters/Requests"
+import { AdopterPreferencesRequest } from "../../api/adopters/Requests"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import Logo from "../../assets/logo.png"
 import ApprovalDiagram from "../../assets/Application-Approval-Diagram_v6.pdf"
@@ -78,6 +77,7 @@ export function AdopterLandingPageApp() {
 						<div className="flex flex-row flex-wrap gap-x-4">
 							{currentAppt ? (
 								<>
+									<BringingDogFAQ prefs={prefs} onPrefsChange={setPrefs} />
 									<div className="text-lg">
 										Your current appointment is <span className="font-semibold">{currentAppt.instantDisplay}.</span>
 										<CancelAppointmentButton />
@@ -89,12 +89,11 @@ export function AdopterLandingPageApp() {
 									<div className="m-auto flex w-sm flex-col gap-y-1">
 										{currentAppt.ID && <AppointmentCard apptID={currentAppt.ID} context={AppointmentCardContext.CURRENT_APPOINTMENT} />}
 									</div>
-									<BringingDogFAQ prefs={prefs} onPrefsChange={setPrefs} />
 								</>
 							) : (
 								<div className="m-auto w-full text-lg">
-									<span>You do not have an appointment booked.</span>
 									<BringingDogFAQ prefs={prefs} onPrefsChange={setPrefs} />
+									<span>You do not have an appointment booked.</span>
 									<ManageWatchlistButton />
 									<BookAppointmentButton />
 									<UpdatePreferencesButton />
@@ -157,7 +156,6 @@ export function CancelAppointmentButton() {
 
 function BringingDogFAQ({ prefs, onPrefsChange }: { prefs: AdopterPreferences | undefined; onPrefsChange: (updated: AdopterPreferences) => void }) {
 	const session = useSessionState()
-	const [open, setOpen] = useState(false)
 	const [saving, setSaving] = useState(false)
 
 	const referenceDate = moment()
@@ -180,40 +178,31 @@ function BringingDogFAQ({ prefs, onPrefsChange }: { prefs: AdopterPreferences | 
 
 	return (
 		<div className="m-auto my-1 w-full max-w-2xl text-base">
-			<button
-				className="flex w-full items-center justify-between rounded border border-pink-300 bg-pink-50 px-3 py-2 text-left font-semibold text-pink-800 hover:bg-pink-100"
-				onClick={() => setOpen((o) => !o)}
-			>
-				<span className="m-auto">
-					Bringing your current dog?
-					{!open && prefs?.bringingDog && <span className="ml-2 text-sm font-normal text-green-700">{"✓ You've let us know — we'll be ready!"}</span>}
-				</span>
-				<FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} />
-			</button>
-			{open && (
-				<div className="flex flex-col gap-y-2 rounded-b border border-t-0 border-pink-300 bg-white px-3 py-3 text-sm text-gray-700">
-					<div className="text-left">
-						<ul className="list-inside">
-							<li className="list-disc!">
-								<span className="font-semibold">Meet-and-greets happen on-leash in the parking lot.</span> Your dog does not go inside the gates.
-							</li>
-							<li className="list-disc!">
-								{isCoolWeather
-									? "Your dog can wait in the car while you visit."
-									: "Your dog must wait in the parking lot with a family member while you visit."}
-							</li>
-						</ul>
-					</div>
-					<div className="m-auto">
-						<Toggleable
-							addlProps={{ disabled: saving }}
-							fieldLabel="I'm planning to bring my current dog"
-							value={prefs?.bringingDog ?? false}
-							onChange={handleToggle}
-						/>
-					</div>
+			<div className="flex w-full items-center justify-center rounded-t border border-pink-300 bg-pink-50 px-3 py-2 font-semibold text-pink-800">
+				Bringing your current dog?
+			</div>
+			<div className="flex flex-col gap-y-2 rounded-b border border-t-0 border-pink-300 bg-white px-3 py-3 text-sm text-gray-700">
+				<div className="text-left">
+					<ul className="list-inside">
+						<li className="list-disc!">
+							<span className="font-semibold">Meet-and-greets happen on-leash in the parking lot.</span> Your dog does not go inside the gates.
+						</li>
+						<li className="list-disc!">
+							{isCoolWeather
+								? "Your dog can wait in the car while you visit."
+								: "Your dog must wait in the parking lot with a family member while you visit."}
+						</li>
+					</ul>
 				</div>
-			)}
+				<div className="m-auto">
+					<Toggleable
+						addlProps={{ disabled: saving }}
+						fieldLabel="I'm planning to bring my current dog"
+						value={prefs?.bringingDog ?? false}
+						onChange={handleToggle}
+					/>
+				</div>
+			</div>
 		</div>
 	)
 }
@@ -302,22 +291,9 @@ function MessageAdoptionsButton({ includeQTs }: { includeQTs?: boolean }) {
 function ReportBugButton() {
 	const session = useSessionState()
 	const modalState = useModalState()
-	const [description, setDescription] = useState("")
-	const [submitting, setSubmitting] = useState(false)
 
 	if (!session.user?.adopterID) {
 		return null
-	}
-
-	const handleSubmit = async () => {
-		if (!description.trim()) return
-		const req: ReportBugRequest = { adopterID: session.user!.adopterID!, bugDescription: description }
-		setSubmitting(true)
-		await new AdoptersAPI().ReportBug(req)
-		setSubmitting(false)
-		setDescription("")
-		modalState.close()
-		showToast({ level: MessageLevel.Success, message: "Issue report sent — thank you!" })
 	}
 
 	return (
@@ -325,23 +301,7 @@ function ReportBugButton() {
 			<LargeButton label="Report an Issue" onClick={modalState.open} />
 			<p className="text-sm text-gray-500">Found something wrong in the scheduler? Let us know and we'll look into it.</p>
 			<Modal modalState={modalState} modalTitle="Report an Issue">
-				<div className="flex flex-col gap-y-3 p-2">
-					<textarea
-						className="w-full rounded border border-gray-300 p-2 text-sm focus:border-pink-700 focus:outline-none"
-						disabled={submitting}
-						onChange={(e) => setDescription(e.target.value)}
-						placeholder="Describe what happened and what you expected to happen..."
-						rows={5}
-						value={description}
-					/>
-					<button
-						className="w-full rounded-lg border-2 border-pink-700 bg-pink-100 px-2 py-1 uppercase text-pink-700 transition-colors hover:bg-pink-200 disabled:cursor-not-allowed disabled:opacity-50"
-						disabled={submitting || !description.trim()}
-						onClick={handleSubmit}
-					>
-						{submitting ? "Sending…" : "Submit"}
-					</button>
-				</div>
+				<MessageForm adopterID={session.user.adopterID} hideSubject isIssueReport modalState={modalState} />
 			</Modal>
 		</>
 	)
