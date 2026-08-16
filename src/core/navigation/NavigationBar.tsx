@@ -2,7 +2,6 @@ import { IconDefinition, IconProp } from "@fortawesome/fontawesome-svg-core"
 import {
 	faCalendar,
 	faCalendarWeek,
-	faCarSide,
 	faChartBar,
 	faChevronDown,
 	faChevronLeft,
@@ -93,12 +92,12 @@ export function NavigationBar({ debug, onNavigate, collapsed = false, onToggleCo
 							</NavigationSection>
 							<NavigationSection caption="Adoptions" collapsed={collapsed}>
 								<ChosenBoardButton collapsed={collapsed} onNavigate={onNavigate} />
-								<RecentAdoptionsButton collapsed={collapsed} onNavigate={onNavigate} />
+								{/* <RecentAdoptionsButton collapsed={collapsed} onNavigate={onNavigate} /> */}
 							</NavigationSection>
 							<NavigationSection caption="Adopters" collapsed={collapsed}>
 								<AdopterDirectoryButton collapsed={collapsed} onNavigate={onNavigate} />
 								<UploadAdoptersButton collapsed={collapsed} onNavigate={onNavigate} />
-								{/* <RecentUploadsButton collapsed={collapsed} onNavigate={onNavigate} /> */}
+								<RecentUploadsButton collapsed={collapsed} onNavigate={onNavigate} />
 							</NavigationSection>
 							<NavigationSection caption="Dogs" collapsed={collapsed}>
 								<WatchlistButton collapsed={collapsed} onNavigate={onNavigate} />
@@ -202,9 +201,8 @@ function NavigationButton({
 				<div className="hidden w-full md:block">
 					<Link
 						aria-label={caption}
-						className={`flex items-center justify-center py-3 transition-colors ${
-							disabled ? "pointer-events-none cursor-not-allowed text-gray-400" : "cursor-pointer text-pink-700 hover:bg-pink-200"
-						}`}
+						className={`flex items-center justify-center py-3 transition-colors ${disabled ? "pointer-events-none cursor-not-allowed text-gray-400" : "cursor-pointer text-pink-700 hover:bg-pink-200"
+							}`}
 						to={route ?? "#"}
 						onClick={handleClick}
 					>
@@ -229,9 +227,8 @@ function NavigationButton({
 		<TooltipProvider tooltip={disabledTooltip}>
 			<div className={`w-full ${!isLast && !noBorder ? "border-b border-pink-700" : ""}`}>
 				<Link
-					className={`block px-4 py-3 text-center text-2xl font-medium uppercase transition-colors md:text-sm lg:text-lg xl:text-xl ${
-						disabled ? "pointer-events-none cursor-not-allowed text-gray-400" : "cursor-pointer text-pink-700 hover:bg-pink-200"
-					}`}
+					className={`block px-4 py-3 text-center text-2xl font-medium uppercase transition-colors md:text-sm lg:text-lg xl:text-xl ${disabled ? "pointer-events-none cursor-not-allowed text-gray-400" : "cursor-pointer text-pink-700 hover:bg-pink-200"
+						}`}
 					to={route ?? "#"}
 					onClick={handleClick}
 				>
@@ -374,35 +371,35 @@ function ReportingButton({ noBorder, collapsed, onNavigate }: NavigationButtonPr
 	)
 }
 
-// function RecentUploadsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
-// 	return (
-// 		<NavigationButton
-// 			caption="Recent Uploads"
-// 			collapsed={collapsed}
-// 			icon={faFileUpload}
-// 			noBorder={noBorder}
-// 			overlayClassName="bg-white text-pink-700"
-// 			overlayIcon={faClockRotateLeft}
-// 			route="/recent_uploads/"
-// 			onNavigate={onNavigate}
-// 		/>
-// 	)
-// }
-
-function RecentAdoptionsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
+function RecentUploadsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
 	return (
 		<NavigationButton
-			caption="Recent Adoptions"
+			caption="Recent Uploads"
 			collapsed={collapsed}
-			icon={faCarSide}
+			icon={faUpload}
 			noBorder={noBorder}
 			overlayClassName="bg-white text-pink-700"
 			overlayIcon={faClockRotateLeft}
-			route="/recent_adoptions/"
+			route="/recent_uploads/"
 			onNavigate={onNavigate}
 		/>
 	)
 }
+
+// function RecentAdoptionsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {
+// 	return (
+// 		<NavigationButton
+// 			caption="Recent Adoptions"
+// 			collapsed={collapsed}
+// 			icon={faCarSide}
+// 			noBorder={noBorder}
+// 			overlayClassName="bg-white text-pink-700"
+// 			overlayIcon={faClockRotateLeft}
+// 			route="/recent_adoptions/"
+// 			onNavigate={onNavigate}
+// 		/>
+// 	)
+// }
 
 function SignOutButton({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: () => void }) {
 	const session = useSessionState()
