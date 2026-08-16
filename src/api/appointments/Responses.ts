@@ -55,3 +55,16 @@ export type ReportingAppointmentResponse<T extends ReportingAppointment> = {
 export type RecentAdoptionsResponse = {
 	adoptions: RecentAdoption[]
 }
+
+export type DayOfWeekDayStats = {
+	total: number
+	adoptions: number
+	chosen: number
+	fta: number
+	no_decision: number
+	no_show: number
+}
+
+export type DayOfWeekStatsResponse = {
+	days: Record<string, DayOfWeekDayStats>
+}

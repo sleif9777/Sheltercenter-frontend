@@ -17,6 +17,7 @@ import {
 import {
 	AppointmentCardDataResponse,
 	AppointmentsMissingOutcomesResponse,
+	DayOfWeekStatsResponse,
 	EmptyDatesResponse,
 	RecentAdoptionsResponse,
 	ReportingAppointmentResponse,
@@ -72,8 +73,24 @@ export class AppointmentsAPI extends APIBase {
 		return this.buildAndGetData<RecentAdoptionsResponse>("GetRecentAdoptions")
 	}
 
+	async GetDayOfWeekStats() {
+		return this.buildAndGetData<DayOfWeekStatsResponse>("GetDayOfWeekStats")
+	}
+
 	async GetReportingStats() {
 		return this.buildAndGetData<ReportingStatsResponse>("GetReportingStats")
+	}
+
+	async GetReportingStatsExport() {
+		const blob = await this.buildAndGetBlob<{}>("GetReportingStatsExport")
+		const url = window.URL.createObjectURL(blob)
+		const link = document.createElement("a")
+		link.href = url
+		link.setAttribute("download", `reporting_stats_${new DateTime().GetISODate()}.xlsx`)
+		document.body.appendChild(link)
+		link.click()
+		link.remove()
+		window.URL.revokeObjectURL(url)
 	}
 
 	async GetReportingAppointment<T extends ReportingAppointment>(apptID: number) {
