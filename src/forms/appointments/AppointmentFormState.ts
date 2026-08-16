@@ -21,11 +21,9 @@ export const useAppointmentFormState = createFormState<CreateAppointmentRequest>
 	],
 	minute: [(s) => s.minute % 15 === 0 || "Must be scheduled in 15-minute intervals"],
 	notes: [
-		(s) =>
-			!(s.type == AppointmentType.SURRENDER || s.type == AppointmentType.VISIT) ||
-			(s.notes ?? "").length >= 1 ||
-			"Dog cannot be blank",
+		(s) => s.type != AppointmentType.VISIT || (s.notes ?? "").length >= 1 || "Dog cannot be blank",
 	],
+	surrenderDogID: [(s) => s.type != AppointmentType.SURRENDER || (s.surrenderDogID ?? 0) > 0 || "Must select a dog"],
 	pendingAdoptionID: [
 		(s) => s.type != AppointmentType.PAPERWORK || (s.pendingAdoptionID ?? 0) > 0 || "Must select a pending adoption",
 	],

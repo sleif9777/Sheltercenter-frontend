@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useState } from "react"
+import { Autocomplete, TextField } from "@mui/material"
+import { useCallback, useEffect, useId, useState } from "react"
 
+import { DogsAPI } from "../../api/dogs/DogsAPI"
 import { CheckboxInput } from "../../core/components/formInputs/CheckboxInput"
 import {
 	BooleanInputProps,
 	OptionalValueInputProps,
 	RequiredEnumInputProps,
 } from "../../core/components/formInputs/InputHandlers"
+import { InputErrorLabel, InputLabel } from "../../core/components/formInputs/InputLabels"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import SelectInput, { SelectInputOption } from "../../core/components/formInputs/SelectInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
@@ -13,7 +16,9 @@ import { TextInput } from "../../core/components/formInputs/TextInput"
 import { TimeChangeHandler, TimeInput } from "../../core/components/formInputs/TimeInput"
 import { ModalState } from "../../core/components/modal/Modal"
 import { AppointmentType } from "../../enums/AppointmentEnums"
+import { SurrenderDogOption } from "../../models/DogModels"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
+import { DateTime } from "../../utils/DateTime"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { CreateAppointmentRequest } from "../../api/appointments/Requests"
 import { PendingAdoptionsAPI } from "../../api/pendingAdoptions/PendingAdoptionsAPI"
@@ -83,11 +88,19 @@ function Fieldset({
 					value={formState["pendingAdoptionID"]}
 				/>
 			)}
-			{isAdminAppointment(formState["type"]) && (
-				<div className="grid grid-cols-2 grid-rows-1 gap-x-5">
+			{isAdminAppointment(formState["type"]) && !isSurrenderAppointment(formState["type"]) && (
+				<NotesField type={formState["type"]} {...bindField("notes")} />
+			)}
+			{isSurrenderAppointment(formState["type"]) && (
+				<>
+					<SurrenderDogSelectField
+						errors={errors["surrenderDogID"]}
+						setField={setField}
+						value={formState["surrenderDogID"]}
+					/>
 					<NotesField type={formState["type"]} {...bindField("notes")} />
-					{isSurrenderAppointment(formState["type"]) && <FKAField {...bindField("fka")} />}
-				</div>
+					<FKAField {...bindField("fka")} />
+				</>
 			)}
 		</div>
 	)
@@ -202,6 +215,84 @@ function PendingAdoptionSelectField({
 	)
 }
 
+function SurrenderDogSelectField({
+	errors,
+	value,
+	setField,
+}: {
+	errors?: string[]
+	value?: number
+	setField: AppointmentFormFieldUpdater
+}) {
+	const [options, setOptions] = useState<SurrenderDogOption[]>([])
+	const [dirty, setDirty] = useState(false)
+	const elemID = useId()
+
+	const loadOptions = useCallback(async () => {
+		const resp = await new DogsAPI().GetSurrenderDogOptions()
+		setOptions(resp.options)
+	}, [])
+
+	useEffect(() => {
+		loadOptions()
+	}, [loadOptions])
+
+	const selectedOption = options.find((o) => o.ID === value) ?? null
+
+	return (
+		<div className="flex flex-col gap-1">
+			<InputLabel
+				elemID={elemID}
+				fieldLabel="Dog"
+				showError={dirty && (errors ?? []).length > 0}
+				showRequired={(value ?? 0) > 0 && !dirty}
+			/>
+			<Autocomplete<SurrenderDogOption, false, false, false>
+				fullWidth
+				getOptionLabel={(o) => o.name}
+				id={elemID}
+				isOptionEqualToValue={(o, v) => o.ID === v.ID}
+				options={options}
+				renderInput={(params) => (
+					<TextField
+						{...params}
+						sx={{
+							"& .MuiOutlinedInput-root": {
+								"& fieldset": { borderColor: "#d1d5db" },
+								"&.Mui-focused": { boxShadow: "0 0 0 2px rgba(236,72,153,0.3)" },
+								"&.Mui-focused fieldset": { borderColor: "#ec4899" },
+								"&:hover fieldset": { borderColor: "#9ca3af" },
+							},
+						}}
+					/>
+				)}
+				renderOption={(props, option) => (
+					<li {...props} key={option.ID}>
+						<div className="flex items-center gap-3 py-1">
+							{option.photoURL && (
+								<img alt={option.name} className="h-10 w-10 shrink-0 rounded object-cover" src={option.photoURL} />
+							)}
+							<div>
+								<div className="font-medium">{option.name}</div>
+								<div className="text-xs text-gray-500">
+									SL-{option.shelterluvID} · Last updated:{" "}
+									{option.lastUpdated ? new DateTime(option.lastUpdated).GetShortDate() : "unknown"}
+								</div>
+							</div>
+						</div>
+					</li>
+				)}
+				value={selectedOption}
+				onBlur={() => setDirty(true)}
+				onChange={(_, newValue) => {
+					setField("surrenderDogID", newValue?.ID ?? 0)
+				}}
+			/>
+			{errors && dirty && <InputErrorLabel errors={errors} />}
+		</div>
+	)
+}
+
 function LockedField({ value, onChange }: BooleanInputProps) {
 	return <CheckboxInput fieldLabel="Lock Appointment?" value={value} onChange={onChange} />
 }
@@ -220,7 +311,7 @@ function NotesField({
 		<TextInput
 			errors={errors}
 			fieldLabel={label}
-			showRequired={!isDonationAppointment(type)}
+			showRequired={!isDonationAppointment(type) && !isSurrenderAppointment(type)}
 			value={value ?? ""}
 			onChange={(v) => onChange(v)}
 		/>
@@ -262,5 +353,5 @@ function isDonationAppointment(type: AppointmentType) {
 }
 
 function typeRequiresDogName(type: AppointmentType) {
-	return isPaperworkAppointment(type) || isSurrenderAppointment(type) || isVisitAppointment(type)
+	return isPaperworkAppointment(type) || isVisitAppointment(type)
 }

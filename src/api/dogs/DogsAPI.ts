@@ -5,6 +5,7 @@ import {
 	DashboardsContextResponse,
 	DogDemographicsResponse,
 	DogSelectFieldOptionsResponse,
+	SurrenderDogOptionsResponse,
 	WatchlistContextResponse,
 	WatchlistResponse,
 } from "./Responses"
@@ -24,6 +25,10 @@ export class DogsAPI extends APIBase {
 
 	async GetDogSelectFieldOptions() {
 		return this.buildAndGetData<DogSelectFieldOptionsResponse>("GetDogSelectFieldOptions")
+	}
+
+	async GetSurrenderDogOptions() {
+		return this.buildAndGetData<SurrenderDogOptionsResponse>("GetSurrenderDogOptions")
 	}
 
 	async GetPublishableDogs() {

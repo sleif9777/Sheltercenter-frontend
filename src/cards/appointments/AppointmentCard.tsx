@@ -12,7 +12,7 @@ import { Outcome } from "../../enums/AppointmentEnums"
 import { IAppointment } from "../../models/AppointmentModels"
 import { AppointmentCardActions } from "./AppointmentCardActions"
 import { AbleToMeet, LockedAppointmentDisclaimer, SingleBookingDisclaimer } from "./AppointmentCardAvailability"
-import { AboutSection, BookingInfoSection } from "./AppointmentCardSections"
+import { AboutSection, BookingInfoSection, SurrenderInfoSection } from "./AppointmentCardSections"
 import { AppointmentCardContext, AppointmentCardProps } from "./Types"
 import { getAppointmentCardTopDetails, unpackApptData } from "./Utils"
 
@@ -64,6 +64,7 @@ export function AppointmentCard({ apptID, context }: AppointmentCardProps) {
 				<>
 					<BookingInfoSection apptData={apptData} />
 					<AboutSection apptData={apptData} />
+					<SurrenderInfoSection apptData={apptData} />
 				</>
 			)}
 		</StandardCard>

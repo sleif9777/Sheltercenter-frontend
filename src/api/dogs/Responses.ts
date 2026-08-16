@@ -1,4 +1,4 @@
-import { AdopterWatchlist, DashboardDogHash, DogHash, DogSelectFieldOption, IDog } from "../../models/DogModels"
+import { AdopterWatchlist, DashboardDogHash, DogHash, DogSelectFieldOption, IDog, SurrenderDogOption } from "../../models/DogModels"
 
 export type DashboardsContextResponse = {
 	hash: DashboardDogHash
@@ -19,4 +19,8 @@ export type WatchlistContextResponse = {
 
 export type WatchlistResponse = {
 	watchlist: AdopterWatchlist
+}
+
+export type SurrenderDogOptionsResponse = {
+	options: SurrenderDogOption[]
 }

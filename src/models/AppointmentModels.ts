@@ -34,6 +34,14 @@ export interface IAppointment {
 	clothingDescription?: string
 	counselor?: string
 
+	surrenderedDogInstance?: {
+		ID: number
+		name: string
+		shelterluvID: number
+		photoURL: string
+		lastUpdated?: string
+	}
+
 	booking?: IBooking
 }
 

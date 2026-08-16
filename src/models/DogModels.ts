@@ -45,3 +45,11 @@ export type DashboardDogHash = {
 }
 
 export type AdopterWatchlist = WatchlistDog[]
+
+export type SurrenderDogOption = {
+	ID: number
+	name: string
+	shelterluvID: number
+	photoURL: string
+	lastUpdated?: string
+}
