@@ -29,6 +29,7 @@ export interface SessionState extends Omit<SessionContext, "securityLevel"> {
 	acknowledgeWatchlist: () => void
 	endSession: () => void
 	logOut: (userID?: number) => void
+	patchUser: (patch: Partial<IUser>) => void
 	removeCurrentAppt: () => void
 	setCurrentAppt: (appt: IAppointment) => void
 	setDashboardPreferences: (patch: Partial<DashboardPreferences>) => void
@@ -119,6 +120,25 @@ export const useSessionState = create<SessionState>()(
 					sessionExpires: undefined,
 					user: undefined,
 				}))
+			},
+
+			patchUser: (patch: Partial<IUser>) => {
+				set((state) => {
+					if (!state.user) return state
+					return {
+						accessToken: state.accessToken,
+						acknowledgements: state.acknowledgements,
+						adminUser: state.adminUser,
+						adopterUser: state.adopterUser,
+						dashboardPreferences: state.dashboardPreferences,
+						dashboardUser: state.dashboardUser,
+						greeterUser: state.greeterUser,
+						isAuthenticated: state.isAuthenticated,
+						refreshToken: state.refreshToken,
+						sessionExpires: state.sessionExpires,
+						user: { ...state.user, ...patch },
+					}
+				})
 			},
 
 			removeCurrentAppt: () => {

@@ -88,8 +88,8 @@ export function BookingInfoSection({ apptData }: { apptData: IAppointment }) {
 
 	return (
 		<>
-			<ContactInfoSection demographics={adopter.demographics} />
-			<NotesSection apptData={apptData} />
+			{!session.adopterUser && <ContactInfoSection demographics={adopter.demographics} />}
+			{!session.adopterUser && <NotesSection apptData={apptData} />}
 			<WatchlistSection apptData={apptData} />
 			{!session.adopterUser && <MessageSection apptData={apptData} />}
 		</>

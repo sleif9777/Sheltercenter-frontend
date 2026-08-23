@@ -471,6 +471,7 @@ function WildcardFields({ templateContent, onWildcardsChange, disabled = false, 
 								fieldLabel={label}
 								key={wildcard}
 								options={visitSlots}
+								sorted={false}
 								value={wildcardValues[wildcard] ?? null}
 								onChange={async (v) => handleWildcardChange(wildcard, v ?? "")}
 							/>
@@ -486,6 +487,7 @@ function WildcardFields({ templateContent, onWildcardsChange, disabled = false, 
 									errors={[]}
 									fieldLabel={label}
 									options={pickupSlots}
+									sorted={false}
 									value={wildcardValues[wildcard] ?? null}
 									onChange={async (v) => {
 										handleWildcardChange(wildcard, v ?? "")

@@ -17,6 +17,7 @@ import {
 	AdopterDirectoryListingResponse,
 	AdopterPreferencesResponse,
 	AdopterSelectFieldOptionsResponse,
+	CalendarRestrictionStatusResponse,
 	RecentlyUploadedAdoptersResponse,
 } from "./Responses"
 
@@ -54,6 +55,13 @@ export class AdoptersAPI extends APIBase {
 		return this.buildAndGetData<AdopterDemographicsResponse, AdopterIDRequest>("GetAdopterDemographics", {
 			adopterID,
 		})
+	}
+
+	async GetCalendarRestrictionStatus(adopterID: number) {
+		return this.buildAndGetData<CalendarRestrictionStatusResponse, AdopterIDRequest>(
+			"GetCalendarRestrictionStatus",
+			{ adopterID }
+		)
 	}
 
 	async GetAdopterPreferences(adopterID: number) {

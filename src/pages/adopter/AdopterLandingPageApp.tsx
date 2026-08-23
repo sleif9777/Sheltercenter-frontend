@@ -43,6 +43,18 @@ export function AdopterLandingPageApp() {
 		}
 	}, [session.user?.adopterID])
 
+	useEffect(() => {
+		const handleVisibilityChange = async () => {
+			if (document.visibilityState !== "visible" || !session.user?.adopterID) return
+			const resp = await new AdoptersAPI().GetCalendarRestrictionStatus(session.user.adopterID)
+			if (resp.restrictCalendar !== session.user.restrictCalendar) {
+				session.patchUser({ restrictCalendar: resp.restrictCalendar })
+			}
+		}
+		document.addEventListener("visibilitychange", handleVisibilityChange)
+		return () => document.removeEventListener("visibilitychange", handleVisibilityChange)
+	}, [session.user?.adopterID, session.user?.restrictCalendar, session.patchUser])
+
 	const currentAppt = session.user?.currentAppt
 	const apptIsInPast = currentAppt?.isoInstant != null && moment(currentAppt.isoInstant).isBefore(moment())
 
@@ -285,6 +297,9 @@ function MessageAdoptionsButton({
 				}
 				if (qt.value === AdopterInquiryTemplate.PICK_UP_MY_DOG) {
 					return pendingAdoptionStatus === PendingAdoptionStatus.READY_TO_ROLL
+				}
+				if (qt.value === AdopterInquiryTemplate.SURRENDER_MY_DOG) {
+					return pendingAdoptionStatus == null
 				}
 				return true
 			})

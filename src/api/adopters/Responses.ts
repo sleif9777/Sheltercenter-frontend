@@ -31,3 +31,7 @@ export type AdopterDirectoryListingResponse = {
 export type AdopterAlertsResponse = {
 	alerts: AdopterAlert[]
 }
+
+export type CalendarRestrictionStatusResponse = {
+	restrictCalendar: boolean
+}

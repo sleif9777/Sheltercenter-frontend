@@ -23,6 +23,7 @@ export interface SelectInputProps {
 	disabled?: boolean
 	onChange: SelectChangeHandler
 	showRequired?: boolean
+	sorted?: boolean
 	addlProps?: Partial<ComponentProps<typeof Autocomplete<SelectInputOption<string>, false, false, false>>>
 	placeholder?: string
 }
@@ -42,6 +43,7 @@ export default function SelectInput({
 	hidden,
 	disabled,
 	placeholder,
+	sorted = true,
 	onChange,
 	addlProps,
 }: SelectInputComponentProps): ReactNode {
@@ -70,7 +72,7 @@ export default function SelectInput({
 				getOptionLabel={(option) => option.label}
 				id={elemID}
 				isOptionEqualToValue={(option, value) => option.value === value.value}
-				options={options?.sort((a, b) => a.label.localeCompare(b.label)) ?? []}
+				options={sorted ? (options?.slice().sort((a, b) => a.label.localeCompare(b.label)) ?? []) : (options ?? [])}
 				renderInput={(params) => (
 					<TextField
 						{...params}
