@@ -46,7 +46,13 @@ export function AdopterLandingPageApp() {
 	useEffect(() => {
 		const handleVisibilityChange = async () => {
 			if (document.visibilityState !== "visible" || !session.user?.adopterID) return
-			const resp = await new AdoptersAPI().GetCalendarRestrictionStatus(session.user.adopterID)
+			const adopterID = session.user.adopterID
+			new AdoptersAPI().GetAdopterPreferences(adopterID).then((resp) => setPrefs(resp.pref))
+			new PendingAdoptionsAPI().GetAdopterCurrentPendingAdoptionStatus(adopterID).then((resp) => {
+				setPendingAdoptionStatus(resp.status)
+				setReadyToRollInstant(resp.readyToRollInstant)
+			})
+			const resp = await new AdoptersAPI().GetCalendarRestrictionStatus(adopterID)
 			if (resp.restrictCalendar !== session.user.restrictCalendar) {
 				session.patchUser({ restrictCalendar: resp.restrictCalendar })
 			}
@@ -54,6 +60,19 @@ export function AdopterLandingPageApp() {
 		document.addEventListener("visibilitychange", handleVisibilityChange)
 		return () => document.removeEventListener("visibilitychange", handleVisibilityChange)
 	}, [session.user?.adopterID, session.user?.restrictCalendar, session.patchUser])
+
+	useEffect(() => {
+		if (!session.user?.adopterID) return
+		const adopterID = session.user.adopterID
+		const interval = setInterval(() => {
+			new AdoptersAPI().GetAdopterPreferences(adopterID).then((resp) => setPrefs(resp.pref))
+			new PendingAdoptionsAPI().GetAdopterCurrentPendingAdoptionStatus(adopterID).then((resp) => {
+				setPendingAdoptionStatus(resp.status)
+				setReadyToRollInstant(resp.readyToRollInstant)
+			})
+		}, 5 * 60 * 1000)
+		return () => clearInterval(interval)
+	}, [session.user?.adopterID])
 
 	const currentAppt = session.user?.currentAppt
 	const apptIsInPast = currentAppt?.isoInstant != null && moment(currentAppt.isoInstant).isBefore(moment())
