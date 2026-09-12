@@ -25,7 +25,6 @@ import { MessageForm, QuickText, WildcardDefaults } from "../../forms/users/Mess
 import { AdopterDemographics } from "../../models/AdopterModels"
 import { IAppointment } from "../../models/AppointmentModels"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
-import { DateTime } from "../../utils/DateTime"
 import { StringUtils } from "../../utils/StringUtils"
 import { getAvailableTypes, getNotYetAvailableDogsFromWatchlist } from "./AppointmentCardAvailability"
 import { createQuickTexts } from "./MessageTemplates"
@@ -302,40 +301,9 @@ function WatchlistSection({ apptData }: { apptData: IAppointment }) {
 }
 
 export function SurrenderInfoSection({ apptData }: { apptData: IAppointment }) {
-	if (apptData.type !== AppointmentType.SURRENDER) {
+	if (apptData.type !== AppointmentType.SURRENDER || !apptData.notes) {
 		return
 	}
 
-	const { surrenderedDogInstance, notes, description } = apptData
-
-	const dogDisplay = surrenderedDogInstance ? (
-		<div className="flex items-center gap-3">
-			{surrenderedDogInstance.photoURL && (
-				<img
-					alt={surrenderedDogInstance.name}
-					className="h-12 w-12 shrink-0 rounded object-cover"
-					src={surrenderedDogInstance.photoURL}
-				/>
-			)}
-			<div>
-				<div className="font-medium">{surrenderedDogInstance.name}</div>
-				<div className="text-sm text-gray-500">SL-{surrenderedDogInstance.shelterluvID}</div>
-				{surrenderedDogInstance.lastUpdated && (
-					<div className="text-sm text-gray-500">
-						Last updated: {new DateTime(surrenderedDogInstance.lastUpdated).GetShortDate()}
-					</div>
-				)}
-			</div>
-		</div>
-	) : (
-		description
-	)
-
-	const items: ValueLabelPair<ReactNode>[] = [{ label: "Dog", value: dogDisplay }]
-
-	if (notes) {
-		items.push({ label: "Notes", value: notes })
-	}
-
-	return <CardTableSection items={items} showBorder title="Surrender Info" />
+	return <CardTableSection items={[{ label: "Notes", value: apptData.notes }]} showBorder />
 }

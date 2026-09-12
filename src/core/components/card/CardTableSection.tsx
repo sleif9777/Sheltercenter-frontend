@@ -20,7 +20,7 @@ export function CardTableSection({
 	) as ValueLabelPair<Defined<ReactNode>>[]
 
 	return (
-		<div className={showBorder ? "border-b" : ""}>
+		<div className={showBorder ? "border-b last:border-b-0" : ""}>
 			<table className="w-full">
 				<thead>
 					<tr>

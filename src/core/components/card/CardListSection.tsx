@@ -83,7 +83,7 @@ export function CardListSection({
 	title?: string
 }) {
 	return (
-		<div className={"flex w-full flex-col " + (showBorder ? "border-b" : "")}>
+		<div className={"flex w-full flex-col " + (showBorder ? "border-b last:border-b-0" : "")}>
 			<span className="text-left text-lg font-medium whitespace-nowrap">{title}</span>
 			<TwoColumnList items={items} />
 		</div>
