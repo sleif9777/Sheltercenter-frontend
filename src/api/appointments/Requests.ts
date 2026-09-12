@@ -38,7 +38,7 @@ export type MarkTemplateSentRequest = {
 export type CreateAppointmentRequest = Pick<IAppointment, "type" | "locked" | "notes"> & {
 	fka?: string
 	pendingAdoptionID: number
-	surrenderDogID?: number
+	surrenderDogName?: string
 } & ISODateRequest &
 	TimeRequest
 

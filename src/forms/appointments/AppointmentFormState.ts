@@ -23,7 +23,7 @@ export const useAppointmentFormState = createFormState<CreateAppointmentRequest>
 	notes: [
 		(s) => s.type != AppointmentType.VISIT || (s.notes ?? "").length >= 1 || "Dog cannot be blank",
 	],
-	surrenderDogID: [(s) => s.type != AppointmentType.SURRENDER || (s.surrenderDogID ?? 0) > 0 || "Must select a dog"],
+	surrenderDogName: [(s) => s.type != AppointmentType.SURRENDER || (s.surrenderDogName ?? "").length >= 1 || "Dog name cannot be blank"],
 	pendingAdoptionID: [
 		(s) => s.type != AppointmentType.PAPERWORK || (s.pendingAdoptionID ?? 0) > 0 || "Must select a pending adoption",
 	],
