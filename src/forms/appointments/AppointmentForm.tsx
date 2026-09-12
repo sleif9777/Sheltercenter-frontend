@@ -77,11 +77,19 @@ function Fieldset({
 			<AppointmentTypeField {...bindField("type")} />
 			{isAdoptionAppointment(formState["type"]) && <LockedField {...bindField("locked")} />}
 			{isPaperworkAppointment(formState["type"]) && (
-				<PendingAdoptionSelectField
-					errors={errors["pendingAdoptionID"]}
-					setField={setField}
-					value={formState["pendingAdoptionID"]}
-				/>
+				<>
+					<PendingAdoptionSelectField
+						errors={errors["pendingAdoptionID"]}
+						setField={setField}
+						value={formState["pendingAdoptionID"]}
+					/>
+					<TextInput
+						errors={errors["notes"]}
+						fieldLabel="Description (if not in list above)"
+						value={formState["notes"] ?? ""}
+						onChange={(v) => setField("notes", v)}
+					/>
+				</>
 			)}
 			{isAdminAppointment(formState["type"]) && !isSurrenderAppointment(formState["type"]) && (
 				<NotesField type={formState["type"]} {...bindField("notes")} />
@@ -159,6 +167,7 @@ export function AppointmentTypeField({
 
 	return (
 		<RadioInput
+			columnOverride="columns-2"
 			fieldLabel="Type"
 			options={options}
 			value={value}
@@ -205,7 +214,6 @@ function PendingAdoptionSelectField({
 			fieldLabel="Adoption"
 			options={options}
 			placeholder="—CHOOSE ADOPTION—"
-			showRequired
 			value={String(value ?? "")}
 			onChange={handleAdoptionChange}
 		/>
