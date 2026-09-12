@@ -29,4 +29,11 @@ export const useAppointmentFormState = createFormState<CreateAppointmentRequest>
 			"Required when no adoption is selected",
 	],
 	surrenderDogName: [(s) => s.type != AppointmentType.SURRENDER || (s.surrenderDogName ?? "").length >= 1 || "Dog name cannot be blank"],
+	pendingAdoptionID: [
+		(s) =>
+			s.type != AppointmentType.PAPERWORK ||
+			(s.pendingAdoptionID ?? 0) > 0 ||
+			(s.notes ?? "").length > 0 ||
+			"Must select a pending adoption",
+	],
 })

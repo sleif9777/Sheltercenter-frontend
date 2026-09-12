@@ -77,19 +77,7 @@ function Fieldset({
 			<AppointmentTypeField {...bindField("type")} />
 			{isAdoptionAppointment(formState["type"]) && <LockedField {...bindField("locked")} />}
 			{isPaperworkAppointment(formState["type"]) && (
-				<>
-					<PendingAdoptionSelectField
-						errors={errors["pendingAdoptionID"]}
-						setField={setField}
-						value={formState["pendingAdoptionID"]}
-					/>
-					<TextInput
-						errors={errors["notes"]}
-						fieldLabel="Description (if not in list above)"
-						value={formState["notes"] ?? ""}
-						onChange={(v) => setField("notes", v)}
-					/>
-				</>
+				<PaperworkFields errors={errors} formState={formState} setField={setField} />
 			)}
 			{isAdminAppointment(formState["type"]) && !isSurrenderAppointment(formState["type"]) && (
 				<NotesField type={formState["type"]} {...bindField("notes")} />
@@ -173,6 +161,52 @@ export function AppointmentTypeField({
 			value={value}
 			onChange={(newType: AppointmentType) => onChange(newType)}
 		/>
+	)
+}
+
+function PaperworkFields({
+	formState,
+	setField,
+	errors,
+}: {
+	formState: CreateAppointmentRequest
+	setField: AppointmentFormFieldUpdater
+	errors: ErrorMap<CreateAppointmentRequest>
+}) {
+	const [notListed, setNotListed] = useState(false)
+
+	const handleNotListedChange = useCallback(
+		(checked: boolean) => {
+			setNotListed(checked)
+			if (checked) {
+				setField("pendingAdoptionID", 0)
+			} else {
+				setField("notes", undefined)
+			}
+		},
+		[setField]
+	)
+
+	return (
+		<>
+			{!notListed && (
+				<PendingAdoptionSelectField
+					errors={errors["pendingAdoptionID"]}
+					setField={setField}
+					value={formState["pendingAdoptionID"]}
+				/>
+			)}
+			<CheckboxInput fieldLabel="Not Listed" value={notListed} onChange={handleNotListedChange} />
+			{notListed && (
+				<TextInput
+					errors={errors["notes"]}
+					fieldLabel="Description"
+					showRequired
+					value={formState["notes"] ?? ""}
+					onChange={(v) => setField("notes", v)}
+				/>
+			)}
+		</>
 	)
 }
 
