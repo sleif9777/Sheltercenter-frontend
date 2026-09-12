@@ -11,7 +11,7 @@ import { showToast } from "../../core/components/messages/ToastProvider"
 import { ModalState } from "../../core/components/modal/Modal"
 import { PendingAdoptionStatus } from "../../enums/PendingAdoptionEnums"
 import { IPendingAdoption } from "../../models/PendingAdoptionModels"
-import { deltaToPlainText } from "../users/MessageForm"
+import { deltaToPlainText } from "../../utils/QuillUtils"
 
 type QuillOp = { insert: string; attributes?: { bold?: boolean } }
 
