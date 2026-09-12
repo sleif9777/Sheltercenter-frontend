@@ -66,5 +66,9 @@ export type DayOfWeekDayStats = {
 }
 
 export type DayOfWeekStatsResponse = {
-	days: Record<string, DayOfWeekDayStats>
+	periods: {
+		ytd: { days: Record<string, DayOfWeekDayStats> }
+		pytd: { days: Record<string, DayOfWeekDayStats> }
+		prev_year: { days: Record<string, DayOfWeekDayStats> }
+	}
 }

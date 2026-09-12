@@ -100,11 +100,20 @@ const METRIC_COL_WITH_HW_TOOLTIP: ColumnDef = {
 
 const DOW_ORDER = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
+type DowPeriodKey = "ytd" | "pytd" | "prev_year"
+const DOW_PERIOD_LABELS: Record<DowPeriodKey, string> = {
+	ytd: "YTD",
+	pytd: "PYTD",
+	prev_year: "Prev Year",
+}
+const DOW_PERIOD_KEYS: DowPeriodKey[] = ["ytd", "pytd", "prev_year"]
+
 export default function ReportingApp() {
 	usePageTitle("Reporting")
 	const [stats, setStats] = useState<ReportingStatsResponse | null>(null)
 	const [dowStats, setDowStats] = useState<DayOfWeekStatsResponse | null>(null)
 	const [pctPeriod, setPctPeriod] = useState<PeriodKey>("ytd")
+	const [dowPeriod, setDowPeriod] = useState<DowPeriodKey>("ytd")
 	const [exporting, setExporting] = useState(false)
 
 	useEffect(() => {
@@ -135,7 +144,7 @@ export default function ReportingApp() {
 
 	const dowRows: Row[] = dowStats
 		? DOW_ORDER.map((day) => {
-				const d = dowStats.days[day] ?? {
+				const d = dowStats.periods[dowPeriod]?.days[day] ?? {
 					total: 0,
 					adoptions: 0,
 					chosen: 0,
@@ -253,6 +262,24 @@ export default function ReportingApp() {
 					<FontAwesomeIcon className="text-sm text-pink-400" icon={faCircleInfo} />
 				</TooltipProvider>
 			</h2>
+			<div className="mx-2 mt-1 flex flex-wrap items-center gap-3 text-sm">
+				<span className="font-medium text-gray-600">Period:</span>
+				{DOW_PERIOD_KEYS.map((key) => (
+					<label className="flex cursor-pointer items-center gap-1" key={key}>
+						<input
+							checked={dowPeriod === key}
+							className="accent-pink-700"
+							name="dowPeriod"
+							onChange={() => setDowPeriod(key)}
+							type="radio"
+							value={key}
+						/>
+						<span className={dowPeriod === key ? "font-semibold text-pink-700" : "text-gray-600"}>
+							{DOW_PERIOD_LABELS[key]}
+						</span>
+					</label>
+				))}
+			</div>
 			<ReportTable columns={dowColumns} rows={dowRows} />
 
 			<div className="mx-2 mt-6 flex flex-wrap gap-6 border-t border-pink-700 pt-4 text-sm">
