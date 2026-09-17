@@ -285,14 +285,12 @@ function BookAppointmentButton() {
 		window.location.href = "/calendar/"
 	}, [])
 
-	if (currentAppt) {
-		return
-	}
-
 	return (
 		<>
-			<LargeButton label="Book New Appointment" onClick={handleClick} />
-			<p className="text-sm text-gray-500">Ready to pick a date and time? Browse available slots here.</p>
+			<LargeButton label={currentAppt ? "See Open Appointments" : "Book New Appointment"} onClick={handleClick} />
+			<p className="text-sm text-gray-500">
+				{(currentAppt ? "Need to reschedule?" : "Ready to pick a date and time?") + " Browse available slots here."}
+			</p>
 		</>
 	)
 }
@@ -311,17 +309,17 @@ function MessageAdoptionsButton({
 
 	const quickTexts: QuickText[] = includeQTs
 		? createQuickTexts().filter((qt) => {
-				if (qt.value === AdopterInquiryTemplate.VISIT_MY_DOG) {
-					return pendingAdoptionStatus != null && pendingAdoptionStatus !== PendingAdoptionStatus.READY_TO_ROLL
-				}
-				if (qt.value === AdopterInquiryTemplate.PICK_UP_MY_DOG) {
-					return pendingAdoptionStatus === PendingAdoptionStatus.READY_TO_ROLL
-				}
-				if (qt.value === AdopterInquiryTemplate.SURRENDER_MY_DOG) {
-					return pendingAdoptionStatus == null
-				}
-				return true
-			})
+			if (qt.value === AdopterInquiryTemplate.VISIT_MY_DOG) {
+				return pendingAdoptionStatus != null && pendingAdoptionStatus !== PendingAdoptionStatus.READY_TO_ROLL
+			}
+			if (qt.value === AdopterInquiryTemplate.PICK_UP_MY_DOG) {
+				return pendingAdoptionStatus === PendingAdoptionStatus.READY_TO_ROLL
+			}
+			if (qt.value === AdopterInquiryTemplate.SURRENDER_MY_DOG) {
+				return pendingAdoptionStatus == null
+			}
+			return true
+		})
 		: []
 
 	if (!session.user?.adopterID) {
