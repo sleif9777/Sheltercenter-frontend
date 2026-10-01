@@ -47,7 +47,8 @@ export function replaceWildcardsInDelta(content: ReactQuill.Value | undefined, w
 
             Object.entries(wildcardValues).forEach(([wildcard, value]) => {
                 if (value) {
-                    newInsert = newInsert.replace(new RegExp(wildcard.replace(/\$/g, "\\$"), "g"), value)
+                    const escaped = wildcard.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+                    newInsert = newInsert.replace(new RegExp(escaped, "g"), value.replace(/\$/g, "$$$$"))
                 }
             })
 
