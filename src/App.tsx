@@ -12,6 +12,7 @@ import { AdopterUploadApp } from "./pages/adopter/AdopterUploadApp.tsx"
 import { ChosenBoardApp } from "./pages/chosenBoard/ChosenBoardApp.tsx"
 import DailyReportApp from "./pages/dailyReport/DailyReportApp.tsx"
 import DashboardsApp from "./pages/dashboards/DashboardsApp.tsx"
+import { CancelAppointmentApp } from "./pages/cancel/CancelAppointmentApp.tsx"
 import { ErrorApp } from "./pages/error/ErrorApp.tsx"
 import InProgressAppointmentsApp from "./pages/inProgressAppointments/InProgressAppointmentsApp.tsx"
 import { LoginApp } from "./pages/login/LoginApp.tsx"
@@ -107,33 +108,36 @@ function App() {
 				{/* Main column */}
 				<div className="flex flex-1 flex-col not-print:min-h-screen lg:w-[85%] print:w-full">
 					<div className="md:flex-1 md:overflow-auto print:overflow-visible" id="main-content">
-						{session.isAuthenticated ? (
-							<Routes>
-								<Route element={<DashboardsApp />} index={session.dashboardUser} />
-									<Route element={<AdopterLandingPageApp />} index={session.adopterUser} />
-								<Route element={<AdopterLandingPageApp />} path="/my_home/" />
-								<Route element={<AdopterPreferencesApp />} path="/preferences/" />
-								<Route element={<WatchlistApp />} path="/watchlist/" />
-								<Route element={<DashboardsApp />} path="/dashboards/" />
-								<Route element={<AdopterUploadApp />} path="/adopters/upload/" />
-								<Route element={<ChosenBoardApp />} path="/chosen_board/" />
-								<Route element={<ScheduleApp />} index={!session.adopterUser} />
-								<Route element={<ScheduleApp />} path="/calendar" />
-								<Route element={<TemplateApp />} path="/calendar_template/" />
-								<Route element={<PrintViewApp />} path="/print_view/:date/" />
-								<Route element={<DailyReportApp />} path="/daily_report/:date/" />
-								<Route element={<AdopterDirectoryApp />} path="/adopters/directory/" />
-								<Route element={<AdopterDetailsApp />} path="/adopters/detail/:id" />
-								<Route element={<InProgressAppointmentsApp />} path="/in_progress/" />
-								<Route element={<RecentAdoptionsApp />} path="/recent_adoptions/" />
-								<Route element={<ReportingApp />} path="/reporting/" />
-								<Route element={<RecentUploadsApp />} path="/recent_uploads/" />
-								<Route element={<PrivacyPolicyApp />} path="/privacy/" />
-								<Route element={<ErrorApp />} path="/*/" />
-							</Routes>
-						) : (
-							<LoginApp />
-						)}
+						<Routes>
+							<Route element={<CancelAppointmentApp />} path="/cancel" />
+							{session.isAuthenticated ? (
+								<>
+									<Route element={<DashboardsApp />} index={session.dashboardUser} />
+										<Route element={<AdopterLandingPageApp />} index={session.adopterUser} />
+									<Route element={<AdopterLandingPageApp />} path="/my_home/" />
+									<Route element={<AdopterPreferencesApp />} path="/preferences/" />
+									<Route element={<WatchlistApp />} path="/watchlist/" />
+									<Route element={<DashboardsApp />} path="/dashboards/" />
+									<Route element={<AdopterUploadApp />} path="/adopters/upload/" />
+									<Route element={<ChosenBoardApp />} path="/chosen_board/" />
+									<Route element={<ScheduleApp />} index={!session.adopterUser} />
+									<Route element={<ScheduleApp />} path="/calendar" />
+									<Route element={<TemplateApp />} path="/calendar_template/" />
+									<Route element={<PrintViewApp />} path="/print_view/:date/" />
+									<Route element={<DailyReportApp />} path="/daily_report/:date/" />
+									<Route element={<AdopterDirectoryApp />} path="/adopters/directory/" />
+									<Route element={<AdopterDetailsApp />} path="/adopters/detail/:id" />
+									<Route element={<InProgressAppointmentsApp />} path="/in_progress/" />
+									<Route element={<RecentAdoptionsApp />} path="/recent_adoptions/" />
+									<Route element={<ReportingApp />} path="/reporting/" />
+									<Route element={<RecentUploadsApp />} path="/recent_uploads/" />
+									<Route element={<PrivacyPolicyApp />} path="/privacy/" />
+									<Route element={<ErrorApp />} path="/*/" />
+								</>
+							) : (
+								<Route element={<LoginApp />} path="*" />
+							)}
+						</Routes>
 					</div>
 				</div>
 			</div>

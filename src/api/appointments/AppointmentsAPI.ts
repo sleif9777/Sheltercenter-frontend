@@ -23,6 +23,7 @@ import {
 	ReportingAppointmentResponse,
 	ReportingStatsResponse,
 	ScheduleContextResponse,
+	TokenAppointmentResponse,
 } from "./Responses"
 
 export class AppointmentsAPI extends APIBase {
@@ -99,6 +100,10 @@ export class AppointmentsAPI extends APIBase {
 		})
 	}
 
+	async GetByToken(token: string) {
+		return this.buildAndGetFullResponse<TokenAppointmentResponse, { token: string }>("GetByToken", { token })
+	}
+
 	/// SECTION: POST commands
 
 	async CancelAllAndClose(isoDate: string) {
@@ -107,6 +112,10 @@ export class AppointmentsAPI extends APIBase {
 
 	async CancelAppointment(apptID: number) {
 		return this.buildAndPost<AppointmentIDRequest>("CancelAppointment", { apptID })
+	}
+
+	async CancelByToken(token: string) {
+		return this.buildAndPost<{ token: string }>("CancelByToken", { token })
 	}
 
 	async CheckInAppointment(request: CheckInAppointmentRequest) {

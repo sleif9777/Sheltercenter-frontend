@@ -56,6 +56,10 @@ export type RecentAdoptionsResponse = {
 	adoptions: RecentAdoption[]
 }
 
+export type TokenAppointmentResponse = {
+	instantDisplay: string
+}
+
 export type DayOfWeekDayStats = {
 	total: number
 	adoptions: number
