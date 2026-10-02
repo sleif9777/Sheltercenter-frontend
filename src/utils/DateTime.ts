@@ -160,11 +160,11 @@ function slotsForDay(dateUtil: DateTime, eligibleDays: Set<Weekday>, now: moment
 }
 
 export function generateVisitTimeSlots(): string[] {
-	const now = moment().tz(TZ_EST)
+	const earliestAllowed = moment().tz(TZ_EST).add(3, "hours")
 	const slots: string[] = []
 	for (let i = 0; i < 7; i++) {
 		const dateUtil = new DateTime(new DateTime().GetDiffedDate(i))
-		slots.push(...slotsForDay(dateUtil, VISIT_DAYS, now))
+		slots.push(...slotsForDay(dateUtil, VISIT_DAYS, earliestAllowed))
 	}
 	return slots
 }
