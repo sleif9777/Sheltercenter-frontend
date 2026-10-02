@@ -52,6 +52,17 @@ export function ScheduleApp() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
+	useEffect(() => {
+		if (!session.adopterUser || !session.user?.adopterID) return
+		const adopterID = session.user.adopterID
+		new AdoptersAPI().GetCalendarRestrictionStatus(adopterID).then((resp) => {
+			if (resp.restrictCalendar !== session.user?.restrictCalendar) {
+				session.patchUser({ restrictCalendar: resp.restrictCalendar })
+			}
+		})
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
 	return (
 		<FullWidthPage
 			subtitle={schedule.dateUtil.GetWeekdayStr()}
