@@ -13,6 +13,7 @@ import {
 	faXmark,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { HttpStatusCode } from "axios"
 import { useCallback, useEffect, useState } from "react"
 
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
@@ -271,10 +272,18 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 		}
 
 		try {
-			await new AppointmentsAPI().ScheduleAppointment({
+			const resp = await new AppointmentsAPI().ScheduleAppointment({
 				adopterID: session.user.adopterID ?? 0,
 				apptID: apptID,
 			})
+
+			// Errors are returned rather than thrown, so only a 201 confirms the booking
+			if (resp.status !== HttpStatusCode.Created) {
+				showToast({ level: MessageLevel.Error, message: "This appointment is no longer available. Please choose another time." })
+				await schedule.refresh()
+				return
+			}
+
 			setConfirmedAppt(appt)
 			confirmModal.open()
 			session.setCurrentAppt(appt)

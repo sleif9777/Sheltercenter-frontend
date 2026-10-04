@@ -1,3 +1,4 @@
+import { HttpStatusCode } from "axios"
 import { useCallback, useEffect, useState } from "react"
 
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
@@ -5,6 +6,8 @@ import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { ScheduleAppointmentWithPreferencesRequest } from "../../api/appointments/Requests"
 import SelectInput, { SelectInputOption } from "../../core/components/formInputs/SelectInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
+import { MessageLevel } from "../../core/components/messages/Message"
+import { showToast } from "../../core/components/messages/ToastProvider"
 import { ModalState } from "../../core/components/modal/Modal"
 import { SessionState } from "../../core/session/SessionState"
 import { IAppointment } from "../../models/AppointmentModels"
@@ -55,7 +58,16 @@ export function BookingForm({
 	// --- prepare POST request ---
 	const handleSubmit: FormSubmitHandler<ScheduleAppointmentWithPreferencesRequest> = useCallback(
 		async (req) => {
-			await new AppointmentsAPI().ScheduleAppointment(req)
+			const resp = await new AppointmentsAPI().ScheduleAppointment(req)
+
+			// Errors are returned rather than thrown, so only a 201 confirms the booking
+			if (resp.status !== HttpStatusCode.Created) {
+				showToast({
+					level: MessageLevel.Error,
+					message: `Booking failed. The appointment may already be booked, or ${session.adopterUser ? "you" : "the adopter"} may have another booking.`,
+				})
+			}
+
 			await schedule.refresh()
 		},
 		[schedule]
