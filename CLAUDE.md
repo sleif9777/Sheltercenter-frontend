@@ -57,7 +57,10 @@ npm run dev      # dev server at http://localhost:5173
 npm run build    # production build → dist/
 npm start        # serve dist/ the way production does (needs a build first)
 npm run lint     # ESLint check
+npm test         # Vitest suite (npm run test:watch to re-run on save)
 ```
+
+Tests live next to the code as `*.test.ts(x)` and run in jsdom with the America/New_York time zone and `VITE_BACKEND_API_ROOT=http://api.test` (see `vitest.config.ts`). Shared setup and fixtures are in `src/test/`. Mock HTTP with `vi.spyOn(axios, "get" | "post")`; the setup file resets the session store and localStorage after every test.
 
 ---
 
