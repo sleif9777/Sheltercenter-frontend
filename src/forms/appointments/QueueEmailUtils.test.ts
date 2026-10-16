@@ -26,13 +26,16 @@ describe("QueueEmailUtils", () => {
 		expect(positions.get(3)).toBe(2)
 	})
 
-	it("keeps already-sent adopters in the numbering but only emails them when resend is set", () => {
+	it("starts already-sent adopters unchecked and emails every checked row", () => {
 		const rows = toEditorRows([row(1, true), row(2), row(3, true)])
-		rows[2].resend = true
 
+		expect(rows.map((r) => r.included)).toEqual([false, true, false])
+		expect(getEmailEntries(rows)).toEqual([{ apptID: 2, position: 1 }])
+
+		rows[2].included = true
 		expect(getEmailEntries(rows)).toEqual([
-			{ apptID: 2, position: 2 },
-			{ apptID: 3, position: 3 },
+			{ apptID: 2, position: 1 },
+			{ apptID: 3, position: 2 },
 		])
 	})
 

@@ -70,7 +70,7 @@ export function QueueEmailForm({ modalState }: { modalState: ModalState }) {
 			<div className="min-h-0 flex-1 overflow-y-auto pr-1">
 				<p className="mb-2">
 					Adopters booked on <b>{new DateTime(schedule.isoDate).GetShortDate(true)}</b> through the 4:00 PM timeslot, in order of timeslot then booking
-					time. Drag to reorder; uncheck to remove someone from the queue.
+					time. Drag to reorder; uncheck to remove someone from the queue. Adopters already emailed start unchecked.
 				</p>
 				<QueueList dragIndex={dragIndex} move={move} positions={positions} rows={rows} setDragIndex={setDragIndex} updateRow={updateRow} />
 			</div>
@@ -156,19 +156,7 @@ function QueueList({
 								{r.timeDisplay} · {r.typeDisplay} · booked {r.bookedDisplay}
 							</span>
 						</div>
-						{r.alreadySent && (
-							<label className="flex cursor-pointer items-center gap-x-1 text-xs">
-								<span className="rounded-sm bg-green-200 px-1 font-semibold text-green-800 uppercase">Sent</span>
-								<input
-									checked={r.resend}
-									className="accent-pink-700"
-									disabled={!r.included}
-									type="checkbox"
-									onChange={(e) => updateRow(r.apptID, { resend: e.target.checked })}
-								/>
-								Resend
-							</label>
-						)}
+						{r.alreadySent && <span className="rounded-sm bg-green-200 px-1 text-xs font-semibold text-green-800 uppercase">Sent</span>}
 						<div className="flex flex-col">
 							<button
 								aria-label="Move up"

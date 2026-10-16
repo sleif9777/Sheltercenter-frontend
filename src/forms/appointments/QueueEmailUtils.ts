@@ -3,11 +3,11 @@ import { QueueRow } from "../../api/appointments/Responses"
 
 export type QueueEditorRow = QueueRow & {
 	included: boolean
-	resend: boolean
 }
 
+/** Adopters already sent X in Queue start unchecked; checking them includes and re-emails them. */
 export function toEditorRows(rows: QueueRow[]): QueueEditorRow[] {
-	return rows.map((r) => ({ ...r, included: true, resend: false }))
+	return rows.map((r) => ({ ...r, included: !r.alreadySent }))
 }
 
 /** Queue position (1-based) for each included row, keyed by appointment ID. Excluded rows don't take a number. */
@@ -19,11 +19,11 @@ export function getQueuePositions(rows: QueueEditorRow[]): Map<number, number> {
 	return positions
 }
 
-/** Included rows to email: anyone not already sent, plus already-sent rows explicitly marked to resend. */
+/** Every included row is emailed with its queue position. */
 export function getEmailEntries(rows: QueueEditorRow[]): QueueEmailEntry[] {
 	const positions = getQueuePositions(rows)
 
-	return rows.filter((r) => r.included && (!r.alreadySent || r.resend)).map((r) => ({ apptID: r.apptID, position: positions.get(r.apptID)! }))
+	return rows.filter((r) => r.included).map((r) => ({ apptID: r.apptID, position: positions.get(r.apptID)! }))
 }
 
 export function moveRow<T>(rows: T[], from: number, to: number): T[] {
