@@ -102,13 +102,16 @@ export default function DashboardsApp() {
 		return () => clearInterval(interval)
 	}, [cycleEnabled])
 
+	// ponytail: App.scss forces `ul { columns: 1 !important }` on coarse-pointer devices, which includes the FireStick.
+	// `tv:columns-N!` (variant in index.css) re-asserts columns for this page only; layered !important beats unlayered.
+	// `tv:[zoom:0.5]`: Silk's CSS viewport is 960x480, too small for 5 columns; 0.5 lays out at 1920x960 like a desktop 1080p.
 	return (
 		<FullWidthPage title={DASHBOARD_MODE_TITLES[mode]}>
-			<div className="flex flex-col gap-4">
+			<div className="flex flex-col gap-4 tv:[zoom:0.5]">
 				<div className="m-auto flex items-center gap-4">
 					<RadioInput
 						className=""
-						columnOverride="columns-3"
+						columnOverride="columns-3 tv:columns-3!"
 						options={DASHBOARD_MODE_OPTIONS}
 						value={mode}
 						onChange={(v: DashboardMode) => {
@@ -141,7 +144,7 @@ export default function DashboardsApp() {
 				<div key={mode} className="dashboard-fade-in">
 					{mode === DashboardMode.WHO_WENT_HOME && (
 						<DashboardSection
-							className="columns-5"
+							className="columns-5 tv:columns-5!"
 							dogs={sortByUnavailableDateThenName(dogHash.newlyInHome)}
 							hashKey="newlyInHome"
 							mode={mode}
@@ -151,21 +154,21 @@ export default function DashboardsApp() {
 					{mode === DashboardMode.CHOSEN && (
 						<div className="m-auto flex flex-row gap-4">
 							<DashboardSection
-								className="columns-2"
+								className="columns-2 tv:columns-2!"
 								dogs={sortByName(dogHash.chosen.needsSN)}
 								hashKey="needsSN"
 								mode={mode}
 								title="Needs Spay/Neuter"
 							/>
 							<DashboardSection
-								className="columns-2"
+								className="columns-2 tv:columns-2!"
 								dogs={sortByName(dogHash.chosen.readyToRoll)}
 								hashKey="readyToRoll"
 								mode={mode}
 								title="Ready to Roll"
 							/>
 							<DashboardSection
-								className="columns-2"
+								className="columns-2 tv:columns-2!"
 								dogs={sortByName(dogHash.chosen.needsWC)}
 								hashKey="needsWC"
 								mode={mode}
@@ -175,7 +178,7 @@ export default function DashboardsApp() {
 					)}
 
 					{mode === DashboardMode.FTA && (
-						<DashboardSection className="columns-5" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />
+						<DashboardSection className="columns-5 tv:columns-5!" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />
 					)}
 				</div>
 			</div>
