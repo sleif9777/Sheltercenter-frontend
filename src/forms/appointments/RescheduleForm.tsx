@@ -71,7 +71,7 @@ export function RescheduleForm({ appt, modalState }: { appt: IAppointment; modal
 		>
 			<div className="flex flex-col gap-y-3 text-left">
 				<p>
-					Currently booked for <b>{new DateTime(appt.isoDate).GetShortDate(true)}</b> at <b>{appt.timeDisplay}</b>.
+					Currently booked for <b>{new DateTime(appt.isoDate).GetShortDate(true)}</b> at <b>{appt.timeDisplay?.replace(/^0/, "")}</b>.
 				</p>
 				<div className="max-w-2xs">
 					<DateInput
