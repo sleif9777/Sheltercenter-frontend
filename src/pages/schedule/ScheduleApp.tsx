@@ -24,6 +24,7 @@ import { useSessionState } from "../../core/session/SessionState"
 import { AppointmentForm } from "../../forms/appointments/AppointmentForm"
 import { CheckOutForm } from "../../forms/appointments/CheckOutForm"
 import { JumpToDateForm } from "../../forms/appointments/JumpToDateForm"
+import { QueueEmailForm } from "../../forms/appointments/QueueEmailForm"
 import { WalkInForm } from "../../forms/appointments/WalkInForm"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
@@ -77,6 +78,7 @@ export function ScheduleApp() {
 							<LockToggleButton key={4} />,
 							<LockToggleButton isUnlock key={5} />,
 							<CancelAndCloseButton key={6} />,
+							<QueueEmailModal key={7} />,
 						]
 					: [<HelpModal key={2} />]),
 			]}
@@ -193,6 +195,26 @@ function LockToggleButton({ isUnlock }: { isUnlock?: boolean }) {
 				onSubmit={handleClick}
 			/>
 		</>
+	)
+}
+
+function QueueEmailModal() {
+	const session = useSessionState(),
+		modalState = useModalState()
+
+	if (!session.adminUser) {
+		return
+	}
+
+	return (
+		<ToolbarModal
+			modal={
+				<Modal modalState={modalState} modalTitle="Email X in Queue">
+					<QueueEmailForm modalState={modalState} />
+				</Modal>
+			}
+			text="X in Queue"
+		/>
 	)
 }
 

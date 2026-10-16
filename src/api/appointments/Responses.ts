@@ -93,3 +93,22 @@ export type OpenAdoptionSlotsResponse = {
 	isoDate: string
 	slots: OpenAdoptionSlot[]
 }
+
+export type QueueRow = {
+	adopterName: string
+	alreadySent: boolean
+	apptID: number
+	bookedDisplay: string
+	timeDisplay: string
+	typeDisplay: string
+}
+
+export type QueueForDateResponse = {
+	isoDate: string
+	queue: QueueRow[]
+}
+
+export type SendQueueEmailsResponse = {
+	failed: string[]
+	sent: number
+}
