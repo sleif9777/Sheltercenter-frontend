@@ -30,6 +30,7 @@ import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
 import { ToolbarAreYouSure, ToolbarButton, ToolbarLink, ToolbarModal } from "../../layouts/Toolbar/Toolbar"
 import { AdopterAlert } from "../../models/AdopterModels"
+import { SecurityLevel } from "../../enums/UserEnums"
 import { AppointmentHash, AppointmentMissingOutcome, HashAppointment } from "../../models/AppointmentModels"
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
 import { AdopterAlertsResponse } from "../../api/adopters/Responses"
@@ -202,7 +203,8 @@ function QueueEmailModal() {
 	const session = useSessionState(),
 		modalState = useModalState()
 
-	if (!session.adminUser) {
+	// Superusers only for now
+	if (session.user?.security !== SecurityLevel.SUPERUSER) {
 		return
 	}
 

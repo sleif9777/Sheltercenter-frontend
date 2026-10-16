@@ -27,6 +27,7 @@ import { showToast } from "../../core/components/messages/ToastProvider"
 import { Modal, ModalState, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
 import { Outcome } from "../../enums/AppointmentEnums"
+import { SecurityLevel } from "../../enums/UserEnums"
 import { isAdoptionAppointment } from "../../forms/appointments/AppointmentForm"
 import { CheckInForm } from "../../forms/appointments/CheckInForm"
 import { CheckOutForm } from "../../forms/appointments/CheckOutForm"
@@ -162,7 +163,8 @@ function CancelButton({ appt }: AppointmentCardActionProps) {
 function RescheduleButton({ appt, session }: AppointmentCardActionProps) {
 	const modalState = useModalState()
 
-	if (!session.adminUser || !appt.hasCurrentBooking || appt.checkInTime || appt.outcome != null) {
+	// Superusers only for now
+	if (session.user?.security !== SecurityLevel.SUPERUSER || !appt.hasCurrentBooking || appt.checkInTime || appt.outcome != null) {
 		return
 	}
 
