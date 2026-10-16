@@ -7,6 +7,7 @@ export type PrimaryEmailRequest = {
 
 export type ImportSpreadsheetBatchRequest = {
 	importFile: File | null
+	skipApprovalEmails: boolean
 }
 
 export type SaveUserFormRequest = {

@@ -3,6 +3,7 @@ import { useCallback, useState } from "react"
 
 import { CardTableSection } from "../../core/components/card/CardTableSection"
 import { CardColor } from "../../core/components/card/CardEnums"
+import { CheckboxInput } from "../../core/components/formInputs/CheckboxInput"
 import { FileInput } from "../../core/components/formInputs/FileInput"
 import { FormSubmitHandler } from "../../core/components/formInputs/SubmissionButton"
 import { Message, MessageLevel } from "../../core/components/messages/Message"
@@ -113,8 +114,13 @@ function Fieldset({
 	})
 
 	return (
-		<>
+		<div className="flex flex-col gap-y-2">
 			<FileInput {...bindField("importFile")} inputKey={resetKey} />
-		</>
+			<CheckboxInput
+				{...bindField("skipApprovalEmails")}
+				fieldLabel="Don't send approval emails"
+				helpText="Adopters are imported as usual, but no approval emails go out. They stay pending, so a later upload or the pending-emails job will still email them."
+			/>
+		</div>
 	)
 }

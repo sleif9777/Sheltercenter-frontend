@@ -15,6 +15,7 @@ export class UsersAPI extends APIBase {
 	async ImportSpreadsheetBatch(request: ImportSpreadsheetBatchRequest) {
 		const formData = new FormData()
 		formData.append("importFile", request.importFile!) // validated as part of form provider
+		formData.append("skipApprovalEmails", String(request.skipApprovalEmails))
 
 		return this.buildAndPostFormData<ImportSpreadsheetBatchResponse>("ImportSpreadsheetBatch", formData)
 	}

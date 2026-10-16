@@ -5,6 +5,7 @@ export type ImportSpreadsheetBatchFormFieldUpdater = FormFieldUpdateCallback<Imp
 
 const initialState: ImportSpreadsheetBatchRequest = {
 	importFile: null,
+	skipApprovalEmails: false,
 }
 
 export const useImportSpreadsheetBatchFormState = createFormState<ImportSpreadsheetBatchRequest>(initialState, {
