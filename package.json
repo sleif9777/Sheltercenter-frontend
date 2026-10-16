@@ -10,14 +10,6 @@
 		"preview": "vite preview",
 		"start": "serve dist --single --no-clipboard --listen tcp://0.0.0.0:${PORT:-3000}"
 	},
-	"editor.formatOnSave": true,
-	"[typescriptreact]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"[typescript]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"eslint.format.enable": false,
 	"dependencies": {
 		"@emotion/react": "^11.14.0",
 		"@emotion/styled": "^11.14.0",
@@ -33,11 +25,9 @@
 		"@tailwindcss/vite": "^4.1.18",
 		"@vitejs/plugin-react": "^4.3.4",
 		"axios": "^1.7.9",
-		"dotenv": "^16.4.7",
 		"email-validator": "^2.0.4",
+		"moment": "^2.31.0",
 		"moment-timezone": "^0.5.46",
-		"nvm": "^0.0.4",
-		"persist-and-sync": "^1.2.1",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-quill": "^2.0.0",
@@ -48,7 +38,8 @@
 		"sass-embedded": "^1.83.1",
 		"serve": "14.2.6",
 		"tailwindcss": "^4.1.18",
-		"vite": "^6.0.5"
+		"vite": "^6.0.5",
+		"zustand": "^5.0.15"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.17.0",
@@ -71,5 +62,8 @@
 		"prettier-plugin-tailwindcss": "^0.7.2",
 		"typescript": "~5.6.2",
 		"typescript-eslint": "^8.18.2"
+	},
+	"engines": {
+		"node": "24.x"
 	}
 }
