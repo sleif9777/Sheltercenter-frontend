@@ -44,6 +44,10 @@ export type CreateAppointmentRequest = Pick<IAppointment, "type" | "locked" | "n
 
 export type ScheduleAppointmentRequest = AppointmentIDRequest & AdopterIDRequest
 
+export type RescheduleAppointmentRequest = {
+	newApptID: number
+} & AppointmentIDRequest
+
 export type ScheduleAppointmentWithPreferencesRequest = AdopterPreferencesRequest & ScheduleAppointmentRequest
 
 export type CheckInAppointmentRequest = Pick<IAppointment, "clothingDescription" | "counselor"> & AppointmentIDRequest

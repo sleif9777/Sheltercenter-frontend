@@ -76,3 +76,20 @@ export type DayOfWeekStatsResponse = {
 		prev_year: { days: Record<string, DayOfWeekDayStats> }
 	}
 }
+
+export type OpenAdoptionAppt = {
+	ID: number
+	locked: boolean
+	typeDisplay: string
+}
+
+export type OpenAdoptionSlot = {
+	appts: OpenAdoptionAppt[]
+	key: number
+	label: string
+}
+
+export type OpenAdoptionSlotsResponse = {
+	isoDate: string
+	slots: OpenAdoptionSlot[]
+}

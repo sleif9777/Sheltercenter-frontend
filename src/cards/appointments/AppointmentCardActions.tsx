@@ -1,4 +1,5 @@
 import {
+	faCalendarDays,
 	faEdit,
 	faEnvelope,
 	faGhost,
@@ -29,6 +30,7 @@ import { Outcome } from "../../enums/AppointmentEnums"
 import { isAdoptionAppointment } from "../../forms/appointments/AppointmentForm"
 import { CheckInForm } from "../../forms/appointments/CheckInForm"
 import { CheckOutForm } from "../../forms/appointments/CheckOutForm"
+import { RescheduleForm } from "../../forms/appointments/RescheduleForm"
 import { BookingForm } from "../../forms/bookings/BookingForm"
 import { MessageForm } from "../../forms/users/MessageForm"
 import { IAppointment } from "../../models/AppointmentModels"
@@ -83,6 +85,7 @@ export function AppointmentCardActions({
 								)}
 							</>
 						))}
+					{isAdoptionAppointment(appt.type) && <RescheduleButton {...actionProps} />}
 					{appt.hasCurrentBooking ? <CancelButton {...actionProps} /> : <DeleteButton {...actionProps} />}
 				</>
 			)}
@@ -154,6 +157,25 @@ function CancelButton({ appt }: AppointmentCardActionProps) {
 	}
 
 	return <CardActionAreYouSure icon={faTrash} modalTitle="Cancel Appointment" youWantTo="cancel this appointment" onSubmit={handleCancel} />
+}
+
+function RescheduleButton({ appt, session }: AppointmentCardActionProps) {
+	const modalState = useModalState()
+
+	if (!session.adminUser || !appt.hasCurrentBooking || appt.checkInTime || appt.outcome != null) {
+		return
+	}
+
+	const firstName = appt.booking?.adopter.demographics.firstName ?? "Adopter"
+
+	return (
+		<>
+			<CardActionButton primaryIcon={faCalendarDays} primaryTooltipContent="Reschedule" onClick={modalState.open} />
+			<Modal modalState={modalState} modalTitle={"Reschedule " + firstName}>
+				<RescheduleForm appt={appt} modalState={modalState} />
+			</Modal>
+		</>
+	)
 }
 
 function GhostButton({ appt }: AppointmentCardActionProps) {

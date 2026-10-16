@@ -10,6 +10,7 @@ import {
 	GetScheduleContextRequest,
 	ISODateRequest,
 	MarkTemplateSentRequest,
+	RescheduleAppointmentRequest,
 	ScheduleAppointmentRequest,
 	ToggleLockForDateRequest,
 	ToggleLockForSingleApptRequest,
@@ -19,6 +20,7 @@ import {
 	AppointmentsMissingOutcomesResponse,
 	DayOfWeekStatsResponse,
 	EmptyDatesResponse,
+	OpenAdoptionSlotsResponse,
 	RecentAdoptionsResponse,
 	ReportingAppointmentResponse,
 	ReportingStatsResponse,
@@ -68,6 +70,10 @@ export class AppointmentsAPI extends APIBase {
 
 	async GetEmptyDates() {
 		return this.buildAndGetData<EmptyDatesResponse, {}>("GetEmptyDates")
+	}
+
+	async GetOpenAdoptionSlots(isoDate: string) {
+		return this.buildAndGetData<OpenAdoptionSlotsResponse, ISODateRequest>("GetOpenAdoptionSlots", { isoDate })
 	}
 
 	async GetRecentAdoptions() {
@@ -145,6 +151,10 @@ export class AppointmentsAPI extends APIBase {
 	async MarkTemplateSent(apptID: number, templateID: number) {
 		// TODO enum templateID
 		return this.buildAndPost<MarkTemplateSentRequest>("MarkTemplateSent", { apptID, templateID })
+	}
+
+	async RescheduleAppointment(request: RescheduleAppointmentRequest) {
+		return this.buildAndPost<RescheduleAppointmentRequest>("RescheduleAppointment", request)
 	}
 
 	async ScheduleAppointment(data: ScheduleAppointmentRequest) {
