@@ -35,7 +35,7 @@
 		"react-toastify": "^11.0.5",
 		"react-tooltip": "^5.28.0",
 		"rsuite": "^5.76.3",
-		"sass-embedded": "^1.83.1",
+		"sass-embedded": "^1.97.3",
 		"serve": "14.2.6",
 		"tailwindcss": "^4.1.18",
 		"vite": "^6.0.5",
