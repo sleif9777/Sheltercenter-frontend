@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from "react"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { AppointmentCardDataResponse } from "../../api/appointments/Responses"
 import { StandardCard } from "../../core/components/card/Card"
-import { CardColor } from "../../core/components/card/CardEnums"
 import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { useSessionState } from "../../core/session/SessionState"
 import { Outcome } from "../../enums/AppointmentEnums"
@@ -14,7 +13,7 @@ import { AppointmentCardActions } from "./AppointmentCardActions"
 import { AbleToMeet, LockedAppointmentDisclaimer, SingleBookingDisclaimer } from "./AppointmentCardAvailability"
 import { AboutSection, BookingInfoSection, SurrenderInfoSection } from "./AppointmentCardSections"
 import { AppointmentCardContext, AppointmentCardProps } from "./Types"
-import { getAppointmentCardTopDetails, unpackApptData } from "./Utils"
+import { getAppointmentCardColor, getAppointmentCardTopDetails, unpackApptData } from "./Utils"
 
 export function AppointmentCard({ apptID, context }: AppointmentCardProps) {
 	const session = useSessionState()
@@ -45,10 +44,12 @@ export function AppointmentCard({ apptID, context }: AppointmentCardProps) {
 		return <div>Loading appointment data...</div>
 	}
 
+	const cardColor = getAppointmentCardColor(apptData, session)
+
 	return (
 		<StandardCard
-			actions={<AppointmentCardActions appt={apptData} context={context} session={session} />}
-			color={CardColor.GRAY}
+			actions={<AppointmentCardActions appt={apptData} color={cardColor} context={context} session={session} />}
+			color={cardColor}
 			description={<AppointmentDescription apptData={apptData} context={context} />}
 			hideTitleBorder={!apptData.hasCurrentBooking || !!apptData.checkOutTime || apptData.outcome == Outcome.NO_SHOW}
 			twoColItems={getAppointmentCardTopDetails(apptData, session)}

@@ -39,6 +39,7 @@ export function SubmissionButton({ addlProps, colorOverride, disabled, onClick, 
 		[CardColor.BLUE]: { hoverBg: "hover:bg-blue-200", hoverText: "hover:text-blue-900" },
 		[CardColor.PINK]: { hoverBg: "hover:bg-pink-200", hoverText: "hover:text-pink-700" },
 		[CardColor.PURPLE]: { hoverBg: "hover:bg-purple-200", hoverText: "hover:text-purple-700" },
+		[CardColor.YELLOW]: { hoverBg: "hover:bg-yellow-200", hoverText: "hover:text-yellow-800" },
 	}[colorOverride ?? CardColor.PINK]
 
 	const hoverBgClass = disabled ? "" : hoverText

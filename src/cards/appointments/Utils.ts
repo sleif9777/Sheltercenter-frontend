@@ -1,7 +1,9 @@
 import { ReactNode } from "react"
 
+import { CardColor } from "../../core/components/card/CardEnums"
 import { CardItem } from "../../core/components/card/CardListSection"
 import { SessionState } from "../../core/session/SessionState"
+import { AppointmentType } from "../../enums/AppointmentEnums"
 import { AdopterPreferences, BookingAdopter } from "../../models/AdopterModels"
 import { IAppointment } from "../../models/AppointmentModels"
 import { StringUtils } from "../../utils/StringUtils"
@@ -11,6 +13,25 @@ export function unpackApptData(apptData: IAppointment) {
 	const adopter = apptData.booking?.adopter
 
 	return { adopter, booking }
+}
+
+const AppointmentTypeColor: Record<AppointmentType, CardColor> = {
+	[AppointmentType.ADULTS]: CardColor.BLUE,
+	[AppointmentType.PUPPIES]: CardColor.BLUE,
+	[AppointmentType.ALL_AGES]: CardColor.BLUE,
+	[AppointmentType.PAPERWORK]: CardColor.YELLOW,
+	[AppointmentType.SURRENDER]: CardColor.RED,
+	[AppointmentType.VISIT]: CardColor.GRAY,
+	[AppointmentType.DONATION_DROP_OFF]: CardColor.GRAY,
+	[AppointmentType.FUN_SIZE]: CardColor.BLUE,
+}
+
+export function getAppointmentCardColor(appt: IAppointment, session: SessionState): CardColor {
+	if (session.adopterUser) {
+		return CardColor.GRAY
+	}
+
+	return AppointmentTypeColor[appt.type]
 }
 
 export function getCanViewBookingForm(appt: IAppointment, session: SessionState): boolean {

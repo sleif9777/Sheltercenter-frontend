@@ -4,4 +4,5 @@ export enum CardColor {
 	PINK = "pink",
 	RED = "red",
 	PURPLE = "purple",
+	YELLOW = "yellow",
 }

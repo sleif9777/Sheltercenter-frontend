@@ -49,6 +49,7 @@ export function FormProvider<T extends object>({
 		[CardColor.BLUE]: { bg: "bg-blue-100", border: "border-blue-900", text: "text-blue-900" },
 		[CardColor.PINK]: { bg: "bg-pink-100", border: "border-pink-800", text: "text-pink-800" },
 		[CardColor.PURPLE]: { bg: "bg-purple-100", border: "border-purple-800", text: "text-purple-800" },
+		[CardColor.YELLOW]: { bg: "bg-yellow-100", border: "border-yellow-700", text: "text-yellow-800" },
 	}[colorOverride ?? CardColor.PINK]
 
 	const handleSubmit: SubmitClickHandler = useCallback(

@@ -39,9 +39,11 @@ import { getCanViewBookingForm } from "./Utils"
 
 export function AppointmentCardActions({
 	appt,
+	color,
 	context,
 	session,
 }: {
+	color: CardColor
 	context: AppointmentCardContext
 } & AppointmentCardActionProps) {
 	const actionProps = {
@@ -54,7 +56,7 @@ export function AppointmentCardActions({
 	}
 
 	return (
-		<CardActionSection color={CardColor.GRAY}>
+		<CardActionSection color={color}>
 			{appt.checkOutTime ? (
 				<>
 					<PrintButton {...actionProps} />
