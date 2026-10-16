@@ -31,8 +31,9 @@ export default [
 
 		rules: {
 			// --- React ---
-			...reactHooks.configs.recommended.rules,
-			
+			"react-hooks/exhaustive-deps": "warn",
+			"react-hooks/rules-of-hooks": "error",
+
 			// --- Prettier (config lives in .prettierrc) ---
 			"prettier/prettier": "warn",
 

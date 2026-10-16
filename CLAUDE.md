@@ -55,6 +55,7 @@ VITE_BACKEND_API_ROOT="http://localhost:8000"
 ```bash
 npm run dev      # dev server at http://localhost:5173
 npm run build    # production build → dist/
+npm start        # serve dist/ the way production does (needs a build first)
 npm run lint     # ESLint check
 ```
 
@@ -62,12 +63,12 @@ npm run lint     # ESLint check
 
 ## Stack
 
-- React 18 + TypeScript 5.6
-- Vite 6 (build tool)
+- React 18 + TypeScript 5.9
+- Vite 8 (build tool), Node 24 LTS
 - Tailwind CSS 4
 - Axios (HTTP client)
 - React Router 7
-- Zustand via `persist-and-sync` (session state)
+- Zustand with its `persist` middleware (session state)
 - MUI 6 + rsuite 5 (UI components)
 - React Quill (rich text editor for email templates)
 - React Toastify (notifications)
