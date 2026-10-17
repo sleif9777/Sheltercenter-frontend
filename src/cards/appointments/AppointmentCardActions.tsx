@@ -239,7 +239,11 @@ function CheckOutButton({ appt }: AppointmentCardActionProps) {
 					apptID={apptID}
 					defaults={{
 						dogID: appt.chosenDogID ? String(appt.chosenDogID) : undefined,
+						hasExistingSecondDog: !!appt.secondDog,
+						hasSecondDog: !!appt.secondDog,
 						outcome: appt.outcome,
+						secondDogID: appt.secondDog?.chosenDogID ? String(appt.secondDog.chosenDogID) : undefined,
+						secondOutcome: appt.secondDog?.outcome,
 					}}
 					modalState={modalState}
 				/>
@@ -319,9 +323,7 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 		}
 	}, [appt, apptID, confirmModal, schedule, session])
 
-	const confirmationModal = confirmedAppt ? (
-		<BookingConfirmationModal appt={confirmedAppt} modalState={confirmModal} />
-	) : null
+	const confirmationModal = confirmedAppt ? <BookingConfirmationModal appt={confirmedAppt} modalState={confirmModal} /> : null
 
 	if (!session.user?.adopterID || session.user.currentAppt || session.user.restrictCalendar) {
 		return confirmationModal
@@ -330,7 +332,10 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 	if (appt.locked) {
 		return (
 			<>
-				<button className="cursor-pointer rounded-md bg-pink-700 px-3 py-1 text-sm font-medium text-white hover:bg-pink-400" onClick={lockedModalState.open}>
+				<button
+					className="cursor-pointer rounded-md bg-pink-700 px-3 py-1 text-sm font-medium text-white hover:bg-pink-400"
+					onClick={lockedModalState.open}
+				>
 					Message Us
 				</button>
 				<Modal modalState={lockedModalState} modalTitle="Message Adoptions">

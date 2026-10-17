@@ -64,4 +64,7 @@ export type CheckOutAppointmentRequest = {
 	outcome: Outcome
 	noDecisionEmailOption: NoDecisionEmailOption
 	dogID?: string
+	// Optional second dog chosen in the same visit. Null removes an existing second dog.
+	secondOutcome?: Outcome | null
+	secondDogID?: string | null
 } & AppointmentIDRequest

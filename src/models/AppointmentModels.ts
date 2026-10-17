@@ -27,6 +27,11 @@ export interface IAppointment {
 	outcomeDisplay?: string
 	chosenDog?: string
 	chosenDogID?: number
+	secondDog?: {
+		outcome: Outcome
+		chosenDog: string
+		chosenDogID?: number
+	}
 
 	checkInTime?: string
 	checkOutTime?: string
