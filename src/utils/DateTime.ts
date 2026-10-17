@@ -24,6 +24,7 @@ enum DateTimeFormat {
 	ShortDateWithWeekday = "ddd M/D/YYYY", // Wed 1/1/2026
 	TimeOnly = "h:mm A", // 3:15 AM
 	Weekday = "dddd", // Saturday
+	WeekdayShort = "ddd", // Sat
 	SlotLabel = "ddd (M/D) h:mma", // Mon (8/17) 1:00pm
 }
 
@@ -34,6 +35,16 @@ export class DateTime {
 
 	constructor(iso?: string) {
 		this.instant = moment(iso).tz(TZ_EST)
+	}
+
+	// Date-only strings ("2026-10-14") are calendar dates in Eastern time. The constructor would parse them at the
+	// device's local midnight first, which shifts the day on devices set to UTC or any zone east of Eastern.
+	static FromISODate(isoDate?: string | null): DateTime {
+		const dt = new DateTime()
+		if (isoDate) {
+			dt.instant = moment.tz(isoDate, DateTimeFormat.ISODate, TZ_EST)
+		}
+		return dt
 	}
 
 	CloseTime(): moment.Moment {
@@ -104,6 +115,10 @@ export class DateTime {
 
 	GetWeekdayStr(): string {
 		return WeekdayLabel[this.GetWeekday()]
+	}
+
+	GetWeekdayShortStr(): string {
+		return this.Format(DateTimeFormat.WeekdayShort)
 	}
 
 	Format(f: DateTimeFormat) {

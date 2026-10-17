@@ -1,4 +1,5 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import { usePageTitle } from "../../utils/usePageTitle"
@@ -9,6 +10,8 @@ import { SelectInputOption } from "../../core/components/formInputs/SelectInput"
 import { DateTime } from "../../utils/DateTime"
 import { Weekday } from "../../enums/TemplateEnums"
 import { useSessionState } from "../../core/session/SessionState"
+import DashboardDebugOverlay from "./DashboardDebugOverlay"
+import { getDashboardScroller } from "./dashboardScroller"
 
 type DashboardDogHashKey = Omit<keyof DashboardDogHash, "chosen"> | keyof DashboardDogHash["chosen"]
 
@@ -25,6 +28,15 @@ const CYCLE_MS = 10_000
 const SCROLL_HOLD_MS = 5_000
 const SCROLL_STEP_PX = 1
 const SCROLL_TICK_MS = 40
+// Give up on a pass only if the scroller stays this far behind for this many ticks in a row.
+const SCROLL_STUCK_TOLERANCE_PX = 2
+const SCROLL_MAX_STUCK_TICKS = 25
+// Wait this long at most for an in-flight refresh before measuring the list.
+const REFRESH_WAIT_MAX_MS = 15_000
+const REFRESH_POLL_MS = 250
+
+// TV layout is designed at 1920px wide; zoom scales it to the real viewport (Silk reports 960px on a 1080p stick).
+const TV_DESIGN_WIDTH_PX = 1920
 
 const DASHBOARD_MODE_TITLES: Record<DashboardMode, string> = {
 	[DashboardMode.WHO_WENT_HOME]: "Who Went Home This Week",
@@ -32,32 +44,42 @@ const DASHBOARD_MODE_TITLES: Record<DashboardMode, string> = {
 	[DashboardMode.FTA]: "Foster to Adopt",
 }
 
+// Card colors are literal hex (Tailwind v3 palette values) instead of theme classes like `bg-red-200`.
+// Tailwind v4 theme colors are oklch-only, and older Silk builds render those as transparent.
+// Weekdays use 200 shades so they still read on a washed-out monitor.
 // Keyed by Weekday (Monday-first), matching DateTime.GetWeekday().
 const DAY_OF_WEEK_COLORS: Record<Weekday, string> = {
-	[Weekday.MONDAY]: "bg-red-200 border-red-800 text-red-800",
-	[Weekday.TUESDAY]: "bg-orange-100 border-orange-800 text-orange-800",
-	[Weekday.WEDNESDAY]: "bg-yellow-100 border-yellow-800 text-yellow-800",
-	[Weekday.THURSDAY]: "bg-green-100 border-green-800 text-green-800",
-	[Weekday.FRIDAY]: "bg-blue-100 border-blue-800 text-blue-800",
-	[Weekday.SATURDAY]: "bg-purple-100 border-purple-800 text-purple-800",
-	[Weekday.SUNDAY]: "bg-rose-200 border-rose-800 text-rose-800", // just in case
+	[Weekday.MONDAY]: "border-[#991b1b] bg-[#fecaca] text-[#991b1b]", // red
+	[Weekday.TUESDAY]: "border-[#9a3412] bg-[#fed7aa] text-[#9a3412]", // orange
+	[Weekday.WEDNESDAY]: "border-[#854d0e] bg-[#fef08a] text-[#854d0e]", // yellow
+	[Weekday.THURSDAY]: "border-[#166534] bg-[#bbf7d0] text-[#166534]", // green
+	[Weekday.FRIDAY]: "border-[#1e40af] bg-[#bfdbfe] text-[#1e40af]", // blue
+	[Weekday.SATURDAY]: "border-[#6b21a8] bg-[#e9d5ff] text-[#6b21a8]", // purple
+	[Weekday.SUNDAY]: "border-[#9f1239] bg-[#fecdd3] text-[#9f1239]", // rose, just in case
+}
+const DEFAULT_CARD_COLOR = "border-[#e5e7eb] bg-[#ffffff]" // gray-200 / white
+const FTA_CARD_COLOR = "border-[#be185d] bg-[#fbcfe8]" // pink-700 / pink-200
+const CHOSEN_CARD_COLOR = "border-[#93c5fd] bg-[#bfdbfe]" // blue-300 / blue-200
+
+function showsWeekday(dog: DashboardDog, key: DashboardDogHashKey, mode: DashboardMode): boolean {
+	return mode === DashboardMode.WHO_WENT_HOME && key == "newlyInHome" && !!dog.unavailableDate
 }
 
 function getDogCardColor(dog: DashboardDog, key: DashboardDogHashKey, mode: DashboardMode): string {
-	if (mode === DashboardMode.WHO_WENT_HOME && key == "newlyInHome" && dog.unavailableDate) {
-		const day = new DateTime(dog.unavailableDate).GetWeekday()
-		return DAY_OF_WEEK_COLORS[day] ?? "bg-white border-gray-200"
+	if (showsWeekday(dog, key, mode)) {
+		const day = DateTime.FromISODate(dog.unavailableDate).GetWeekday()
+		return DAY_OF_WEEK_COLORS[day] ?? DEFAULT_CARD_COLOR
 	}
 
 	if (key == "fta" || key == "readyToRoll") {
-		return "bg-pink-200 border-pink-700"
+		return FTA_CARD_COLOR
 	}
 
 	if (key == "needsSN" || key == "needsWC") {
-		return "bg-blue-200 border-blue-300"
+		return CHOSEN_CARD_COLOR
 	}
 
-	return "bg-white border-gray-200"
+	return DEFAULT_CARD_COLOR
 }
 
 function sortByName(dogs: DashboardDog[]) {
@@ -66,8 +88,8 @@ function sortByName(dogs: DashboardDog[]) {
 
 function sortByUnavailableDateThenName(dogs: DashboardDog[]) {
 	return [...dogs].sort((a, b) => {
-		const dateA = new DateTime(a.unavailableDate)
-		const dateB = new DateTime(b.unavailableDate)
+		const dateA = DateTime.FromISODate(a.unavailableDate)
+		const dateB = DateTime.FromISODate(b.unavailableDate)
 		const diff = dateB.DiffWithDate(dateA)
 		if (diff !== 0) {
 			return diff > 0 ? -1 : 1
@@ -76,11 +98,23 @@ function sortByUnavailableDateThenName(dogs: DashboardDog[]) {
 	})
 }
 
+function getTvZoom(): number {
+	return window.innerWidth / TV_DESIGN_WIDTH_PX
+}
+
 export default function DashboardsApp() {
 	usePageTitle("Dashboards")
-	const { dogHash, isRefreshing, mode, refresh } = useDashboardsState()
+	const { dogHash, isRefreshing, lastRefreshFailed, lastUpdated, mode, refresh } = useDashboardsState()
 	const session = useSessionState()
 	const { cycleEnabled, hideNav } = session.dashboardPreferences
+	const [searchParams] = useSearchParams()
+	const showDebug = searchParams.get("debug") === "1"
+
+	// TV mode is tied to the dashboard login, not to pointer/hover media queries, which Silk reports inconsistently.
+	const tvMode = session.dashboardUser
+	const [tvZoom, setTvZoom] = useState(getTvZoom)
+	// Bumped when the page becomes visible again (screensaver, sleep), so the auto-scroll loop restarts cleanly.
+	const [resumeCount, setResumeCount] = useState(0)
 
 	useEffect(() => {
 		refresh()
@@ -96,6 +130,53 @@ export default function DashboardsApp() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
+	useEffect(() => {
+		if (!tvMode) return
+
+		const onResize = () => setTvZoom(getTvZoom())
+		onResize()
+		window.addEventListener("resize", onResize)
+		return () => window.removeEventListener("resize", onResize)
+	}, [tvMode])
+
+	// Keep the monitor awake where Silk supports it, and recover after the page was hidden.
+	// Chromium pauses timers on hidden pages and drops wake locks, so both need redoing on return.
+	useEffect(() => {
+		if (!tvMode) return
+
+		let lock: WakeLockSentinel | null = null
+		let disposed = false
+
+		async function requestWakeLock() {
+			if (!("wakeLock" in navigator) || document.visibilityState !== "visible") return
+			try {
+				const acquired = await navigator.wakeLock.request("screen")
+				if (disposed) {
+					acquired.release().catch(() => {})
+				} else {
+					lock = acquired
+				}
+			} catch {
+				// Unsupported or denied; the device's screensaver settings are the fallback.
+			}
+		}
+
+		function onVisibilityChange() {
+			if (document.visibilityState !== "visible") return
+			requestWakeLock()
+			useDashboardsState.getState().refresh()
+			setResumeCount((count) => count + 1)
+		}
+
+		requestWakeLock()
+		document.addEventListener("visibilitychange", onVisibilityChange)
+		return () => {
+			disposed = true
+			document.removeEventListener("visibilitychange", onVisibilityChange)
+			lock?.release().catch(() => {})
+		}
+	}, [tvMode])
+
 	// One loop per mode: auto-scroll overflowing lists (dashboard login only), then cycle once the scroll is done.
 	useEffect(() => {
 		const autoScroll = session.dashboardUser
@@ -103,18 +184,35 @@ export default function DashboardsApp() {
 
 		let cancelled = false
 		const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-		const scroller = document.getElementById("main-content")
+
+		async function waitForRefresh() {
+			for (let waited = 0; !cancelled && useDashboardsState.getState().isRefreshing && waited < REFRESH_WAIT_MAX_MS; waited += REFRESH_POLL_MS) {
+				await sleep(REFRESH_POLL_MS)
+			}
+		}
 
 		async function scrollThrough() {
-			if (!autoScroll || !scroller) return
+			if (!autoScroll) return
+			// Resolved per pass: #main-content when it scrolls, otherwise the document (older Silk builds).
+			const scroller = getDashboardScroller()
+			if (!scroller) return
 			scroller.scrollTop = 0
-			if (scroller.scrollHeight <= scroller.clientHeight) return
 
+			// Measure after any in-flight refresh and the hold, so late data and layout have settled.
+			await waitForRefresh()
 			await sleep(SCROLL_HOLD_MS)
-			while (!cancelled && scroller.scrollTop + scroller.clientHeight < scroller.scrollHeight - 1) {
-				const before = scroller.scrollTop
-				scroller.scrollTop += SCROLL_STEP_PX
-				if (scroller.scrollTop === before) break
+			const maxScroll = () => scroller.scrollHeight - scroller.clientHeight
+			if (cancelled || maxScroll() <= 1) return
+
+			// Track the position as a float. With a fractional pixel ratio (e.g. a 720p HDMI handshake), `scrollTop += 1`
+			// can round back to the same value, so only stop when the scroller stays behind for a while.
+			let pos = 0
+			let stuckTicks = 0
+			while (!cancelled && pos < maxScroll()) {
+				pos = Math.min(pos + SCROLL_STEP_PX, maxScroll())
+				scroller.scrollTo(0, pos)
+				stuckTicks = Math.abs(scroller.scrollTop - pos) > SCROLL_STUCK_TOLERANCE_PX ? stuckTicks + 1 : 0
+				if (stuckTicks >= SCROLL_MAX_STUCK_TICKS) break
 				await sleep(SCROLL_TICK_MS)
 			}
 			await sleep(SCROLL_HOLD_MS)
@@ -141,22 +239,21 @@ export default function DashboardsApp() {
 		return () => {
 			cancelled = true
 		}
-	}, [mode, cycleEnabled, session.dashboardUser])
+	}, [mode, cycleEnabled, session.dashboardUser, resumeCount])
 
-	// ponytail: App.scss forces `ul { columns: 1 !important }` on coarse-pointer devices, which includes the FireStick.
-	// `tv:columns-N!` (variant in index.css) re-asserts columns for this page only; layered !important beats unlayered.
-	// `tv:[zoom:0.5]`: Silk's CSS viewport is 960x480, too small for 5 columns; 0.5 lays out at 1920x960 like a desktop 1080p.
-	// Lists add `tv:[zoom:1.5]` (0.75 net) so cards are readable from across the room. Very long names could overflow.
+	// TV mode: `.tv-mode` enables the `tv:` variant (index.css) and exempts these lists from App.scss's forced single column.
+	// The wrapper zooms the 1920px design down to the real viewport; lists add `tv:[zoom:1.5]` so cards are readable
+	// from across the room (0.75 net on a 960px viewport). Very long names could overflow.
 	return (
 		<FullWidthPage>
-			<div className="tv:[zoom:0.5] flex flex-col gap-4">
-				{/* Sticky inside #main-content, so only the dog lists scroll (manually or via auto-scroll). */}
+			<div className={`flex flex-col gap-4 ${tvMode ? "tv-mode" : ""}`} style={tvMode ? { zoom: tvZoom } : undefined}>
+				{/* Sticky inside the scroller, so only the dog lists scroll (manually or via auto-scroll). */}
 				<div className="sticky top-0 z-10 flex flex-col gap-4 bg-white pb-2">
 					<h1 className="text-3xl font-medium select-none md:text-5xl">{DASHBOARD_MODE_TITLES[mode]}</h1>
 					<div className="m-auto flex items-center gap-4">
 						<RadioInput
 							className=""
-							columnOverride="columns-3 tv:columns-3!"
+							columnOverride="columns-3"
 							options={DASHBOARD_MODE_OPTIONS}
 							value={mode}
 							onChange={(v: DashboardMode) => {
@@ -166,7 +263,7 @@ export default function DashboardsApp() {
 								}
 							}}
 						/>
-						{isRefreshing && <span className="text-sm text-gray-500">Refreshing...</span>}
+						<RefreshStatus failed={lastRefreshFailed} isRefreshing={isRefreshing} lastUpdated={lastUpdated} />
 					</div>
 
 					{session.dashboardUser && (
@@ -181,48 +278,52 @@ export default function DashboardsApp() {
 					)}
 				</div>
 
-				<div key={mode} className="dashboard-fade-in">
+				<div className="dashboard-fade-in" key={mode}>
 					{mode === DashboardMode.WHO_WENT_HOME && (
 						<DashboardSection
-							className="tv:columns-5! tv:[zoom:1.5] columns-5"
+							className="tv:[zoom:1.5] columns-5"
 							dogs={sortByUnavailableDateThenName(dogHash.newlyInHome)}
 							hashKey="newlyInHome"
 							mode={mode}
 						/>
 					)}
 
+					{/* Fixed thirds instead of `w-fit`: fit-content around multi-column lists sizes differently across Chromium versions. */}
 					{mode === DashboardMode.CHOSEN && (
-						<div className="tv:[zoom:1.5] m-auto flex w-fit flex-row gap-4">
+						<div className="tv:[zoom:1.5] grid grid-cols-3 gap-4">
+							<DashboardSection className="columns-2" dogs={sortByName(dogHash.chosen.needsSN)} hashKey="needsSN" mode={mode} title="Needs Spay/Neuter" />
 							<DashboardSection
-								className="tv:columns-2! columns-2"
-								dogs={sortByName(dogHash.chosen.needsSN)}
-								hashKey="needsSN"
-								mode={mode}
-								title="Needs Spay/Neuter"
-							/>
-							<DashboardSection
-								className="tv:columns-2! columns-2"
+								className="columns-2"
 								dogs={sortByName(dogHash.chosen.readyToRoll)}
 								hashKey="readyToRoll"
 								mode={mode}
 								title="Ready to Roll"
 							/>
-							<DashboardSection
-								className="tv:columns-2! columns-2"
-								dogs={sortByName(dogHash.chosen.needsWC)}
-								hashKey="needsWC"
-								mode={mode}
-								title="Needs Well Check"
-							/>
+							<DashboardSection className="columns-2" dogs={sortByName(dogHash.chosen.needsWC)} hashKey="needsWC" mode={mode} title="Needs Well Check" />
 						</div>
 					)}
 
-					{mode === DashboardMode.FTA && (
-						<DashboardSection className="tv:columns-5! tv:[zoom:1.5] columns-5" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />
-					)}
+					{mode === DashboardMode.FTA && <DashboardSection className="tv:[zoom:1.5] columns-5" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />}
 				</div>
 			</div>
+			{showDebug && <DashboardDebugOverlay dashboardUser={session.dashboardUser} />}
 		</FullWidthPage>
+	)
+}
+
+function RefreshStatus({ failed, isRefreshing, lastUpdated }: { failed: boolean; isRefreshing: boolean; lastUpdated?: string }) {
+	if (isRefreshing) {
+		return <span className="text-sm text-[#6b7280]">Refreshing...</span>
+	}
+	if (!lastUpdated) {
+		return null
+	}
+
+	const time = new DateTime(lastUpdated).GetTimeOnly()
+	return failed ? (
+		<span className="text-sm text-[#b91c1c]">Update failed. Showing data from {time}.</span>
+	) : (
+		<span className="text-sm text-[#6b7280]">Updated {time}</span>
 	)
 }
 
@@ -252,6 +353,12 @@ function DashboardSection({
 							<div className="flex flex-row items-center gap-2">
 								<img className="my-1 ml-1 aspect-square w-14 shrink-0 rounded-full" src={dog.photoURL} />
 								<span className="mr-1 text-lg font-medium uppercase">{dog.name}</span>
+								{/* Weekday text too, so the grouping still reads if the monitor washes out the colors. */}
+								{showsWeekday(dog, hashKey, mode) && (
+									<span className="mr-1 ml-auto shrink-0 text-sm font-semibold uppercase">
+										{DateTime.FromISODate(dog.unavailableDate).GetWeekdayShortStr()}
+									</span>
+								)}
 							</div>
 						</li>
 					))}

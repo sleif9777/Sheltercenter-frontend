@@ -53,7 +53,8 @@ and (max-device-width: 1024px)  {
 		display: block;
 	}
 
-	ul {
+	// The TV dashboard sets its own columns; Silk on Fire TV can match this query.
+	ul:not(.tv-mode ul) {
 		columns: 1 !important;
 	}
 

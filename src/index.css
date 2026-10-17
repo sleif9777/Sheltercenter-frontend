@@ -1,3 +1,4 @@
 @import "tailwindcss";
-/* FireStick/Silk: coarse pointer but can hover (phones report hover: none) */
-@custom-variant tv (@media (pointer: coarse) and (hover: hover));
+/* Dashboard TV mode, opted into by the dashboard login (DashboardsApp adds .tv-mode).
+   Not a pointer/hover media query: Silk on Fire TV reports those inconsistently across sticks and over time. */
+@custom-variant tv (&:where(.tv-mode, .tv-mode *));
