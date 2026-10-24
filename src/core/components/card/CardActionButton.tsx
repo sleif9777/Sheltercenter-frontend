@@ -35,16 +35,14 @@ export function CardActionButton({
 	primaryTooltipContent,
 }: CardActionButtonProps) {
 	const [toggled, setToggled] = useState<boolean>(toggle ? toggle.default : false)
-	const [icon, setIcon] = useState<IconProp>(toggled ? toggle!.altIcon : primaryIcon)
-	const [tooltipContent, setTooltipContent] = useState<string>(
-		toggled ? toggle!.altTooltipContent : primaryTooltipContent
-	)
+	// Derived each render so callers that change primaryIcon/primaryTooltipContent (e.g. HeartwormButton) stay current.
+	const showAlt = !!toggle && toggled
+	const icon = showAlt ? toggle.altIcon : primaryIcon
+	const tooltipContent = showAlt ? toggle.altTooltipContent : primaryTooltipContent
 
 	const handleClick = () => {
 		if (toggle) {
 			setToggled(!toggled)
-			setIcon(toggled ? toggle.altIcon : primaryIcon)
-			setTooltipContent(toggled ? toggle.altTooltipContent : primaryTooltipContent)
 		}
 
 		onClick?.()
