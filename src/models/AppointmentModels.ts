@@ -22,6 +22,7 @@ export interface IAppointment {
 	hasCurrentBooking: boolean
 	isAdminAppt: boolean
 	notes?: string
+	visitAdopter?: string
 
 	outcome?: Outcome
 	outcomeDisplay?: string

@@ -13,6 +13,13 @@ export const CHANGE_LOG_ENTRIES: ChangeLogEntry[] = [
 	{
 		date: "2026-10-24",
 		details:
+			'Pick the pending adoption from the list, or check "Adoption Not Listed" to type in the dog (and the adopter, if known). The adopter\'s name now shows on the visit card.',
+		title: "Visit appointments are linked to pending adoptions",
+		type: "improvement",
+	},
+	{
+		date: "2026-10-24",
+		details:
 			"Enter the dog's original Saving Grace name, then check \"keeping their new name\" if the family renamed them. The new name is filed as the dog's name and the original as its FKA.",
 		title: "Surrender appointments ask for the dog's original name first",
 		type: "feature",

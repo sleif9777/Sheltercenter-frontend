@@ -307,3 +307,12 @@ export function SurrenderInfoSection({ apptData }: { apptData: IAppointment }) {
 
 	return <CardTableSection items={[{ label: "Notes", value: apptData.notes }]} showBorder />
 }
+
+export function VisitInfoSection({ apptData }: { apptData: IAppointment }) {
+	// Older visits only recorded the dog, so there may be no adopter to show
+	if (apptData.type !== AppointmentType.VISIT || !apptData.visitAdopter) {
+		return
+	}
+
+	return <CardTableSection items={[{ label: "Adopter", value: apptData.visitAdopter }]} showBorder />
+}

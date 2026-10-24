@@ -39,6 +39,7 @@ export type CreateAppointmentRequest = Pick<IAppointment, "type" | "locked" | "n
 	fka?: string
 	pendingAdoptionID: number
 	surrenderDogName?: string
+	visitAdopter?: string
 } & ISODateRequest &
 	TimeRequest
 

@@ -83,13 +83,14 @@ function Fieldset({
 			{isPaperworkAppointment(formState["type"]) && (
 				<PaperworkFields errors={errors} formState={formState} setField={setField} />
 			)}
-			{isAdminAppointment(formState["type"]) && !isSurrenderAppointment(formState["type"]) && (
-				<NotesField type={formState["type"]} {...bindField("notes")} />
+			{isVisitAppointment(formState["type"]) && (
+				<VisitFields errors={errors} formState={formState} setField={setField} />
 			)}
+			{isDonationAppointment(formState["type"]) && <NotesField {...bindField("notes")} />}
 			{isSurrenderAppointment(formState["type"]) && (
 				<>
 					<SurrenderNameFields errors={errors} formState={formState} setField={setField} />
-					<NotesField type={formState["type"]} {...bindField("notes")} />
+					<NotesField {...bindField("notes")} />
 				</>
 			)}
 		</div>
@@ -207,6 +208,65 @@ function PaperworkFields({
 	)
 }
 
+function VisitFields({
+	formState,
+	setField,
+	errors,
+}: {
+	formState: AppointmentFormData
+	setField: AppointmentFormFieldUpdater
+	errors: ErrorMap<AppointmentFormData>
+}) {
+	const [notListed, setNotListed] = useState(false)
+
+	const handleNotListedChange = useCallback(
+		(checked: boolean) => {
+			setNotListed(checked)
+			if (checked) {
+				setField("pendingAdoptionID", 0)
+			} else {
+				setField("notes", undefined)
+				setField("visitAdopter", undefined)
+			}
+		},
+		[setField]
+	)
+
+	return (
+		<>
+			{!notListed && (
+				<PendingAdoptionSelectField
+					errors={errors["pendingAdoptionID"]}
+					setField={setField}
+					value={formState["pendingAdoptionID"]}
+				/>
+			)}
+			<CheckboxInput
+				fieldLabel="Adoption Not Listed"
+				value={notListed}
+				onChange={handleNotListedChange}
+			/>
+			{notListed && (
+				<>
+					<TextInput
+						errors={errors["notes"]}
+						fieldLabel="Dog"
+						showRequired
+						value={formState["notes"] ?? ""}
+						onChange={(v) => setField("notes", v)}
+					/>
+					<TextInput
+						errors={errors["visitAdopter"]}
+						fieldLabel="Adopter"
+						value={formState["visitAdopter"] ?? ""}
+						onChange={(v) => setField("visitAdopter", v)}
+					/>
+				</>
+			)}
+		</>
+	)
+}
+
 function PendingAdoptionSelectField({
 	errors,
 	value,
@@ -255,24 +315,9 @@ function LockedField({ value, onChange }: BooleanInputProps) {
 	return <CheckboxInput fieldLabel="Lock Appointment?" value={value} onChange={onChange} />
 }
 
-function NotesField({
-	errors,
-	value,
-	onChange,
-	type,
-}: OptionalValueInputProps<string> & {
-	type: AppointmentType
-}) {
-	const label = typeRequiresDogName(type) ? "Dog" : "Notes"
-
+function NotesField({ errors, value, onChange }: OptionalValueInputProps<string>) {
 	return (
-		<TextInput
-			errors={errors}
-			fieldLabel={label}
-			showRequired={!isDonationAppointment(type) && !isSurrenderAppointment(type)}
-			value={value ?? ""}
-			onChange={(v) => onChange(v)}
-		/>
+		<TextInput errors={errors} fieldLabel="Notes" value={value ?? ""} onChange={(v) => onChange(v)} />
 	)
 }
 
@@ -332,10 +377,6 @@ export function isAdoptionAppointment(type: AppointmentType) {
 	)
 }
 
-function isAdminAppointment(type: AppointmentType) {
-	return !isAdoptionAppointment(type) && !isPaperworkAppointment(type)
-}
-
 function isPaperworkAppointment(type: AppointmentType) {
 	return type == AppointmentType.PAPERWORK
 }
@@ -350,8 +391,4 @@ function isVisitAppointment(type: AppointmentType) {
 
 function isDonationAppointment(type: AppointmentType) {
 	return type == AppointmentType.DONATION_DROP_OFF
-}
-
-function typeRequiresDogName(type: AppointmentType) {
-	return isPaperworkAppointment(type) || isVisitAppointment(type)
 }
