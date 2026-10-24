@@ -85,6 +85,7 @@ export function Toggleable({
 
 // Wrapper with button-like styling
 export function CheckboxInput({
+	centered,
 	className,
 	colorClasses,
 	customIcon,
@@ -104,6 +105,7 @@ export function CheckboxInput({
 	return (
 		<Toggleable
 			addlProps={addlProps}
+			centered={centered}
 			className={className + " h-full border px-1.5 " + borderClass}
 			colorClasses={colorClasses}
 			customIcon={customIcon}

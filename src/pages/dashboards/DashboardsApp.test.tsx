@@ -64,6 +64,11 @@ describe("DashboardsApp hiding", () => {
 		expect(screen.queryAllByRole("button").filter((b) => b.querySelector("[data-icon^=eye]"))).toHaveLength(0)
 	})
 
+	it("centers the preview checkbox", () => {
+		renderAs(SecurityLevel.ADMIN)
+		expect(screen.getByText(PREVIEW_LABEL).closest(".m-auto")).not.toBeNull()
+	})
+
 	it("does not offer the preview to non-admins", () => {
 		renderAs(SecurityLevel.GREETER)
 		expect(screen.queryByText(PREVIEW_LABEL)).not.toBeInTheDocument()
