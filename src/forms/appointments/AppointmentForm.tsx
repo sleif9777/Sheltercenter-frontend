@@ -15,11 +15,15 @@ import { ModalState } from "../../core/components/modal/Modal"
 import { AppointmentType } from "../../enums/AppointmentEnums"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
-import { CreateAppointmentRequest } from "../../api/appointments/Requests"
 import { PendingAdoptionsAPI } from "../../api/pendingAdoptions/PendingAdoptionsAPI"
 import { FormProvider } from "../FormProvider"
 import { ErrorMap } from "../FormState"
-import { AppointmentFormFieldUpdater, useAppointmentFormState } from "./AppointmentFormState"
+import {
+	AppointmentFormData,
+	AppointmentFormFieldUpdater,
+	toCreateAppointmentRequest,
+	useAppointmentFormState,
+} from "./AppointmentFormState"
 
 export function AppointmentForm({ modalState }: { modalState?: ModalState }) {
 	// --- form state ---
@@ -27,9 +31,9 @@ export function AppointmentForm({ modalState }: { modalState?: ModalState }) {
 	const schedule = useScheduleState()
 
 	// --- prepare POST request ---
-	const handleSubmit: FormSubmitHandler<CreateAppointmentRequest> = useCallback(
-		async (req: CreateAppointmentRequest) => {
-			await new AppointmentsAPI().CreateAppointment(req)
+	const handleSubmit: FormSubmitHandler<AppointmentFormData> = useCallback(
+		async (data: AppointmentFormData) => {
+			await new AppointmentsAPI().CreateAppointment(toCreateAppointmentRequest(data))
 			schedule.refresh()
 		},
 		[schedule]
@@ -53,14 +57,14 @@ function Fieldset({
 	setField,
 	errors,
 }: {
-	formState: CreateAppointmentRequest
+	formState: AppointmentFormData
 	setField: AppointmentFormFieldUpdater
-	errors: ErrorMap<CreateAppointmentRequest>
+	errors: ErrorMap<AppointmentFormData>
 }) {
 	// helper to bind formData fields to value + onChange
-	const bindField = <K extends keyof CreateAppointmentRequest>(field: K) => ({
+	const bindField = <K extends keyof AppointmentFormData>(field: K) => ({
 		errors: errors[field],
-		onChange: (v: CreateAppointmentRequest[K]) => setField(field, v),
+		onChange: (v: AppointmentFormData[K]) => setField(field, v),
 		value: formState[field],
 	})
 
@@ -84,14 +88,7 @@ function Fieldset({
 			)}
 			{isSurrenderAppointment(formState["type"]) && (
 				<>
-					<TextInput
-						errors={errors["surrenderDogName"]}
-						fieldLabel="Dog Name"
-						showRequired
-						value={formState["surrenderDogName"] ?? ""}
-						onChange={(v) => setField("surrenderDogName", v)}
-					/>
-					<FKAField {...bindField("fka")} />
+					<SurrenderNameFields errors={errors} formState={formState} setField={setField} />
 					<NotesField type={formState["type"]} {...bindField("notes")} />
 				</>
 			)}
@@ -169,9 +166,9 @@ function PaperworkFields({
 	setField,
 	errors,
 }: {
-	formState: CreateAppointmentRequest
+	formState: AppointmentFormData
 	setField: AppointmentFormFieldUpdater
-	errors: ErrorMap<CreateAppointmentRequest>
+	errors: ErrorMap<AppointmentFormData>
 }) {
 	const [notListed, setNotListed] = useState(false)
 
@@ -279,8 +276,50 @@ function NotesField({
 	)
 }
 
-function FKAField({ errors, value, onChange }: OptionalValueInputProps<string>) {
-	return <TextInput errors={errors} fieldLabel="FKA" value={value ?? ""} onChange={(v) => onChange(v)} />
+function SurrenderNameFields({
+	formState,
+	setField,
+	errors,
+}: {
+	formState: AppointmentFormData
+	setField: AppointmentFormFieldUpdater
+	errors: ErrorMap<AppointmentFormData>
+}) {
+	const handleKeepsNewNameChange = useCallback(
+		(checked: boolean) => {
+			setField("surrenderKeepsNewName", checked)
+			if (!checked) {
+				setField("surrenderNewName", undefined)
+			}
+		},
+		[setField]
+	)
+
+	return (
+		<>
+			<TextInput
+				errors={errors["surrenderOriginalName"]}
+				fieldLabel="Original Name at Saving Grace"
+				showRequired
+				value={formState["surrenderOriginalName"] ?? ""}
+				onChange={(v) => setField("surrenderOriginalName", v)}
+			/>
+			<CheckboxInput
+				fieldLabel="This dog will be keeping their new non-Saving Grace name"
+				value={formState["surrenderKeepsNewName"]}
+				onChange={handleKeepsNewNameChange}
+			/>
+			{formState["surrenderKeepsNewName"] && (
+				<TextInput
+					errors={errors["surrenderNewName"]}
+					fieldLabel="New Name"
+					showRequired
+					value={formState["surrenderNewName"] ?? ""}
+					onChange={(v) => setField("surrenderNewName", v)}
+				/>
+			)}
+		</>
+	)
 }
 
 // TODO: move these to a util
