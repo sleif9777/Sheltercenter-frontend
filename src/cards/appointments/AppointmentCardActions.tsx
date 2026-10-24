@@ -15,7 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { HttpStatusCode } from "axios"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { CardActionAreYouSure } from "../../core/components/card/CardActionAreYouSure"
@@ -290,14 +290,22 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 	const schedule = useScheduleState()
 	const apptID = appt.ID
 	const [confirmedAppt, setConfirmedAppt] = useState<IAppointment | null>(null)
+	// The disabled prop only applies after a re-render, so this blocks a repeat click that lands before then
+	const isBookingRef = useRef(false)
 
 	const handleBookClick = useCallback(async () => {
+		if (isBookingRef.current) {
+			return
+		}
+
 		schedule.setNowBookingAppt(apptID)
 
 		if (!session.user?.adopterID) {
 			schedule.setNowBookingAppt(0)
 			return
 		}
+
+		isBookingRef.current = true
 
 		try {
 			const resp = await new AppointmentsAPI().ScheduleAppointment({
@@ -322,6 +330,7 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 		} catch {
 			showToast({ level: MessageLevel.Error, message: "Booking failed. Please try again." })
 		} finally {
+			isBookingRef.current = false
 			schedule.setNowBookingAppt(0)
 		}
 	}, [appt, apptID, confirmModal, schedule, session])
