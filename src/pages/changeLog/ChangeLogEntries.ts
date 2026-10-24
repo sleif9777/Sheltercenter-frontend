@@ -20,7 +20,7 @@ export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 	{
 		date: "2026-10-24",
 		details:
-			"Enter the dog's original Saving Grace name, then check \"keeping their new name\" if the family renamed them. The new name is filed as the dog's name and the original as its FKA.",
+			"Enter the dog's original Saving Grace name, then check \"keeping their new name\" if the family renamed them and that new name will be used at Saving Grace instead. The new name is filed as the dog's name and the original as its FKA.",
 		title: "Surrender appointments ask for the dog's original name first",
 		type: ChangeLogEntryType.IMPROVEMENT,
 	},
@@ -29,18 +29,6 @@ export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 		details: "Superusers and admins can review what has changed in the scheduler and when.",
 		title: "Added this Change Log page",
 		type: ChangeLogEntryType.FEATURE,
-	},
-	{
-		date: "2026-10-24",
-		details: "Approval and re-approval now immediately restore an adopter's ability to book.",
-		title: "Adopter calendar access stays current",
-		type: ChangeLogEntryType.FIX,
-	},
-	{
-		date: "2026-10-24",
-		details: "Uploading and approving adopters is limited to admin accounts.",
-		title: "Only admins can upload or approve adopters",
-		type: ChangeLogEntryType.FIX,
 	},
 	{
 		date: "2026-10-24",
