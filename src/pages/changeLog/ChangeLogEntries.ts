@@ -22,7 +22,7 @@ export const CHANGE_LOG_ENTRIES: ChangeLogEntry[] = [
 		details:
 			"Enter the dog's original Saving Grace name, then check \"keeping their new name\" if the family renamed them. The new name is filed as the dog's name and the original as its FKA.",
 		title: "Surrender appointments ask for the dog's original name first",
-		type: "feature",
+		type: "improvement",
 	},
 	{
 		date: "2026-10-24",
@@ -61,7 +61,7 @@ export const CHANGE_LOG_ENTRIES: ChangeLogEntry[] = [
 	{
 		date: "2026-10-24",
 		title: "Ready to Roll dashboard cards show the paperwork appointment",
-		type: "feature",
+		type: "improvement",
 	},
 	{
 		date: "2026-10-24",
@@ -97,7 +97,7 @@ export const CHANGE_LOG_ENTRIES: ChangeLogEntry[] = [
 	{
 		date: "2026-10-15",
 		title: "Dashboards auto-scroll and fit the TV screens better",
-		type: "feature",
+		type: "improvement",
 	},
 	{
 		date: "2026-10-15",
@@ -107,7 +107,7 @@ export const CHANGE_LOG_ENTRIES: ChangeLogEntry[] = [
 	{
 		date: "2026-10-15",
 		title: "Calendar appointment cards are color-coded by appointment type",
-		type: "feature",
+		type: "improvement",
 	},
 	{
 		date: "2026-10-15",
