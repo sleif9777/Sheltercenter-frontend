@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 
+import { CheckboxInput } from "../../core/components/formInputs/CheckboxInput"
 import { RequiredEnumInputProps } from "../../core/components/formInputs/InputHandlers"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import SelectInput, { SelectInputOption } from "../../core/components/formInputs/SelectInput"
@@ -83,6 +84,7 @@ function Fieldset({
 			{/* <ChosenDogField {...bindField("dog")} /> */}
 			<DogSelectField errors={errors["dogID"]} value={formData.dogID.toString()} onChange={handleDogChange} />
 			<CircumstanceField {...bindField("circumstance")} />
+			<CheckboxInput fieldLabel="Send chosen-dog email to adopter" {...bindField("sendEmail")} />
 		</div>
 	)
 }

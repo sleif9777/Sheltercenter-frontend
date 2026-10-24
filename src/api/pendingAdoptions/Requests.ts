@@ -17,6 +17,7 @@ export type ChangeDogRequest = {
 export type CreatePendingAdoptionRequest = {
 	dogID: number
 	circumstance: CircumstanceOptions
+	sendEmail: boolean
 } & AdopterIDRequest
 
 export type MarkHeartwormRequest = {

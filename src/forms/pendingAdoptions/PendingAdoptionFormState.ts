@@ -7,6 +7,7 @@ const initialState: CreatePendingAdoptionRequest = {
 	adopterID: 0,
 	circumstance: 0,
 	dogID: 0,
+	sendEmail: true,
 }
 
 export const usePendingAdoptionFormState = createFormState<CreatePendingAdoptionRequest>(initialState, {
