@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { MemoryRouter } from "react-router-dom"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -67,6 +67,17 @@ describe("DashboardsApp hiding", () => {
 	it("centers the preview checkbox", () => {
 		renderAs(SecurityLevel.ADMIN)
 		expect(screen.getByText(PREVIEW_LABEL).closest(".m-auto")).not.toBeNull()
+	})
+
+	it("renders the confirmation outside the faded hidden-dog card", async () => {
+		renderAs(SecurityLevel.ADMIN)
+		const hiddenButton = screen.getAllByRole("button").filter((b) => b.querySelector("[data-icon^=eye]"))[1]
+
+		await userEvent.click(hiddenButton)
+
+		const dialog = screen.getByRole("dialog")
+		expect(dialog.closest("li")).toBeNull()
+		expect(within(dialog).getByText("Show this dog")).toBeInTheDocument()
 	})
 
 	it("does not offer the preview to non-admins", () => {

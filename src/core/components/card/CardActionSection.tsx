@@ -12,6 +12,8 @@ export function CardActionSection({ children, color }: { children: ReactNode; co
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	const closeTimeout = useRef<number | null>(null)
+	// Set by the container's React capture handler, which also sees clicks inside portaled modals opened from it
+	const mouseDownInside = useRef(false)
 
 	// Helpers
 	const handleMouseEnter = () => {
@@ -40,11 +42,12 @@ export function CardActionSection({ children, color }: { children: ReactNode; co
 			return
 		}
 
-		const handleClickOutside = (e: MouseEvent) => {
-			if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+		const handleClickOutside = () => {
+			if (!mouseDownInside.current) {
 				setStickyOpen(false)
 				setOpen(false)
 			}
+			mouseDownInside.current = false
 		}
 
 		document.addEventListener("mousedown", handleClickOutside)
@@ -58,7 +61,13 @@ export function CardActionSection({ children, color }: { children: ReactNode; co
 
 			{/* Dropdown for sm and below */}
 			<div className="relative flex w-full justify-end pr-1 lg:hidden">
-				<div className="relative" ref={containerRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+				<div
+					className="relative"
+					ref={containerRef}
+					onMouseDownCapture={() => (mouseDownInside.current = true)}
+					onMouseEnter={handleMouseEnter}
+					onMouseLeave={handleMouseLeave}
+				>
 					{/* Dropdown menu */}
 					{(open || stickyOpen) && (
 						<div className={`${bg} absolute top-full right-0 z-20 mt-1 rounded-md border p-1 shadow-lg`}>

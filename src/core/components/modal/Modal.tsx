@@ -1,6 +1,7 @@
 import { faXmark } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 
 export interface ModalState {
 	isOpen: boolean
@@ -123,7 +124,9 @@ export function Modal({ children, modalState, modalTitle, preventCloseBeforeComp
 		return null
 	}
 
-	return (
+	// Portaled out of the trigger's DOM so ancestors (opacity, transforms, zoom, CSS columns) can't trap or fade it.
+	// React events still bubble through the trigger's tree.
+	return createPortal(
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 			{/* Backdrop click */}
 			{!preventCloseBeforeComplete && (
@@ -158,6 +161,7 @@ export function Modal({ children, modalState, modalTitle, preventCloseBeforeComp
 				{/* Body */}
 				<div className="flex min-h-0 flex-1">{children}</div>
 			</div>
-		</div>
+		</div>,
+		document.getElementById("modal-root") ?? document.body
 	)
 }

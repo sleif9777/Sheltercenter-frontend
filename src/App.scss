@@ -1,4 +1,6 @@
-#root {
+// #modal-root holds portaled modals, so they get the same base styles as the app
+#root,
+#modal-root {
 	font-family: 'Lato', Helvetica, Arial, Lucida, sans-serif;
 	width: 100%;
 	margin: 0 auto;
