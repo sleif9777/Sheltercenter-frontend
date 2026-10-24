@@ -18,6 +18,7 @@ import { showToast } from "../../core/components/messages/ToastProvider"
 import { AreYouSure } from "../../core/components/modal/AreYouSure"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
+import { syncAdopterSession } from "../../core/session/syncAdopterSession"
 import { PendingAdoptionStatus } from "../../enums/PendingAdoptionEnums"
 import { MessageForm, QuickText } from "../../forms/users/MessageForm"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
@@ -32,54 +33,42 @@ export function AdopterLandingPageApp() {
 	const [prefs, setPrefs] = useState<AdopterPreferences>()
 	const [pendingAdoptionStatus, setPendingAdoptionStatus] = useState<PendingAdoptionStatus | null>(null)
 	const [readyToRollInstant, setReadyToRollInstant] = useState<string | null>(null)
+	const [now, setNow] = useState(() => moment())
+	const adopterID = session.user?.adopterID
 
-	useEffect(() => {
-		if (session.user?.adopterID) {
-			new AdoptersAPI().GetAdopterPreferences(session.user.adopterID).then((resp) => setPrefs(resp.pref))
-			new PendingAdoptionsAPI().GetAdopterCurrentPendingAdoptionStatus(session.user.adopterID).then((resp) => {
-				setPendingAdoptionStatus(resp.status)
-				setReadyToRollInstant(resp.readyToRollInstant)
-			})
-		}
-	}, [session.user?.adopterID])
-
-	useEffect(() => {
-		const handleVisibilityChange = async () => {
-			if (document.visibilityState !== "visible" || !session.user?.adopterID) return
-			const adopterID = session.user.adopterID
-			new AdoptersAPI().GetAdopterPreferences(adopterID).then((resp) => setPrefs(resp.pref))
+	const refresh = useCallback(async () => {
+		if (!adopterID) return
+		setNow(moment())
+		await Promise.all([
+			new AdoptersAPI().GetAdopterPreferences(adopterID).then((resp) => setPrefs(resp.pref)),
 			new PendingAdoptionsAPI().GetAdopterCurrentPendingAdoptionStatus(adopterID).then((resp) => {
 				setPendingAdoptionStatus(resp.status)
 				setReadyToRollInstant(resp.readyToRollInstant)
-			})
-			const resp = await new AdoptersAPI().GetCalendarRestrictionStatus(adopterID)
-			if (resp.restrictCalendar !== session.user.restrictCalendar) {
-				session.patchUser({ restrictCalendar: resp.restrictCalendar })
-			}
-		}
-		document.addEventListener("visibilitychange", handleVisibilityChange)
-		return () => document.removeEventListener("visibilitychange", handleVisibilityChange)
-	}, [session.user?.adopterID, session.user?.restrictCalendar, session.patchUser])
+			}),
+			syncAdopterSession(adopterID),
+		])
+	}, [adopterID])
 
+	// Staff restore calendar access and record outcomes while this tab sits open, so keep it current: re-check each
+	// minute while visible, and immediately when the tab comes back into view
 	useEffect(() => {
-		if (!session.user?.adopterID) return
-		const adopterID = session.user.adopterID
-		const interval = setInterval(async () => {
-			new AdoptersAPI().GetAdopterPreferences(adopterID).then((resp) => setPrefs(resp.pref))
-			new PendingAdoptionsAPI().GetAdopterCurrentPendingAdoptionStatus(adopterID).then((resp) => {
-				setPendingAdoptionStatus(resp.status)
-				setReadyToRollInstant(resp.readyToRollInstant)
-			})
-			const resp = await new AdoptersAPI().GetCalendarRestrictionStatus(adopterID)
-			if (resp.restrictCalendar !== session.user?.restrictCalendar) {
-				session.patchUser({ restrictCalendar: resp.restrictCalendar })
-			}
-		}, 5 * 60 * 1000)
-		return () => clearInterval(interval)
-	}, [session.user?.adopterID, session.user?.restrictCalendar, session.patchUser])
+		if (!adopterID) return
+
+		const refreshIfVisible = () => {
+			if (document.visibilityState === "visible") refresh()
+		}
+
+		refresh()
+		const interval = window.setInterval(refreshIfVisible, 60_000)
+		document.addEventListener("visibilitychange", refreshIfVisible)
+		return () => {
+			window.clearInterval(interval)
+			document.removeEventListener("visibilitychange", refreshIfVisible)
+		}
+	}, [adopterID, refresh])
 
 	const currentAppt = session.user?.currentAppt
-	const apptIsInPast = currentAppt?.isoInstant != null && moment(currentAppt.isoInstant).isBefore(moment())
+	const apptIsInPast = currentAppt?.isoInstant != null && moment(currentAppt.isoInstant).isBefore(now)
 
 	return (
 		<FullWidthPage title={<WelcomeTitle />}>
@@ -156,8 +145,23 @@ export function AdopterLandingPageApp() {
 						</div>
 					</>
 				)}
+				<RefreshButton onRefresh={refresh} />
 			</div>
 		</FullWidthPage>
+	)
+}
+
+function RefreshButton({ onRefresh }: { onRefresh: () => Promise<void> }) {
+	const handleClick = useCallback(async () => {
+		await onRefresh()
+		showToast({ level: MessageLevel.Success, message: "Up to date!" })
+	}, [onRefresh])
+
+	return (
+		<>
+			<LargeButton label="Refresh" onClick={handleClick} />
+			<p className="text-sm text-gray-500">Just heard from us about your account or appointment? Refresh to see the latest.</p>
+		</>
 	)
 }
 

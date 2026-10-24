@@ -21,6 +21,7 @@ import { TooltipProvider } from "../../core/components/messages/TooltipProvider"
 import { AreYouSure } from "../../core/components/modal/AreYouSure"
 import { Modal, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
+import { syncAdopterSession } from "../../core/session/syncAdopterSession"
 import { AppointmentForm } from "../../forms/appointments/AppointmentForm"
 import { CheckOutForm } from "../../forms/appointments/CheckOutForm"
 import { JumpToDateForm } from "../../forms/appointments/JumpToDateForm"
@@ -55,12 +56,7 @@ export function ScheduleApp() {
 
 	useEffect(() => {
 		if (!session.adopterUser || !session.user?.adopterID) return
-		const adopterID = session.user.adopterID
-		new AdoptersAPI().GetCalendarRestrictionStatus(adopterID).then((resp) => {
-			if (resp.restrictCalendar !== session.user?.restrictCalendar) {
-				session.patchUser({ restrictCalendar: resp.restrictCalendar })
-			}
-		})
+		syncAdopterSession(session.user.adopterID)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -105,6 +101,8 @@ function useAdopterBookingCutoffRefresh() {
 		const handleVisibility = () => {
 			if (document.visibilityState === "visible") {
 				useScheduleState.getState().refresh()
+				const adopterID = useSessionState.getState().user?.adopterID
+				if (adopterID) syncAdopterSession(adopterID)
 			}
 		}
 

@@ -6,6 +6,7 @@ import {
 	DirectoryAdopter,
 	RecentlyUploadedAdopter,
 } from "../../models/AdopterModels"
+import { IUser } from "../../models/UserModels"
 
 export type AdopterSelectFieldOptionsResponse = {
 	options: AdopterSelectFieldOption[]
@@ -34,4 +35,5 @@ export type AdopterAlertsResponse = {
 
 export type CalendarRestrictionStatusResponse = {
 	restrictCalendar: boolean
+	currentAppt?: IUser["currentAppt"] | null
 }
