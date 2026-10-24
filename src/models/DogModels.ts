@@ -21,7 +21,10 @@ export type DogSelectFieldOption = Pick<IDog, "ID" | "name">
 
 export type HashDog = Pick<IDog, "ID" | "name" | "ageMonths" | "interestCount" | "weight">
 
-export type DashboardDog = Pick<IDog, "ID" | "name" | "unavailableDate" | "photoURL">
+export type DashboardDog = Pick<IDog, "ID" | "name" | "unavailableDate" | "photoURL"> & {
+	// Chosen dogs only; null until a paperwork appointment is booked.
+	paperworkAppointmentInst?: string | null
+}
 
 export type WatchlistDog = Pick<IDog, "ID" | "name" | "ageMonths" | "funSize" | "availableDate" | "availableNow">
 

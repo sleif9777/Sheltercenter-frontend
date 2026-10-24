@@ -25,6 +25,7 @@ enum DateTimeFormat {
 	TimeOnly = "h:mm A", // 3:15 AM
 	Weekday = "dddd", // Saturday
 	WeekdayShort = "ddd", // Sat
+	WeekdayShortTime = "ddd h:mm", // Sat 3:15
 	SlotLabel = "ddd (M/D) h:mma", // Mon (8/17) 1:00pm
 }
 
@@ -119,6 +120,10 @@ export class DateTime {
 
 	GetWeekdayShortStr(): string {
 		return this.Format(DateTimeFormat.WeekdayShort)
+	}
+
+	GetWeekdayShortTime(): string {
+		return this.Format(DateTimeFormat.WeekdayShortTime)
 	}
 
 	Format(f: DateTimeFormat) {

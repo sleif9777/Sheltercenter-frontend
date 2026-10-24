@@ -65,6 +65,10 @@ function showsWeekday(dog: DashboardDog, key: DashboardDogHashKey, mode: Dashboa
 	return mode === DashboardMode.WHO_WENT_HOME && key == "newlyInHome" && !!dog.unavailableDate
 }
 
+function showsPaperworkAppointment(dog: DashboardDog, key: DashboardDogHashKey, mode: DashboardMode): boolean {
+	return mode === DashboardMode.CHOSEN && key == "readyToRoll" && !!dog.paperworkAppointmentInst
+}
+
 function getDogCardColor(dog: DashboardDog, key: DashboardDogHashKey, mode: DashboardMode): string {
 	if (showsWeekday(dog, key, mode)) {
 		const day = DateTime.FromISODate(dog.unavailableDate).GetWeekday()
@@ -357,6 +361,11 @@ function DashboardSection({
 								{showsWeekday(dog, hashKey, mode) && (
 									<span className="mr-1 ml-auto shrink-0 text-sm font-semibold uppercase">
 										{DateTime.FromISODate(dog.unavailableDate).GetWeekdayShortStr()}
+									</span>
+								)}
+								{showsPaperworkAppointment(dog, hashKey, mode) && (
+									<span className="mr-1 ml-auto shrink-0 text-sm font-semibold uppercase">
+										{new DateTime(dog.paperworkAppointmentInst!).GetWeekdayShortTime()}
 									</span>
 								)}
 							</div>
