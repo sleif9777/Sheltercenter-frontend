@@ -307,7 +307,10 @@ export function AdopterBookButton({ appt }: { appt: IAppointment }) {
 
 			// Errors are returned rather than thrown, so only a 201 confirms the booking
 			if (resp.status !== HttpStatusCode.Created) {
-				showToast({ level: MessageLevel.Error, message: "This appointment is no longer available. Please choose another time." })
+				showToast({
+					level: MessageLevel.Error,
+					message: resp.data?.error ?? "This appointment is no longer available. Please choose another time.",
+				})
 				await schedule.refresh()
 				return
 			}

@@ -46,7 +46,8 @@ export const useScheduleState = create<ScheduleState>((set, get) => {
 		getDayDiff: (compareDate?: DateTime) => {
 			const { dateUtil } = get()
 
-			return dateUtil.DiffWithDate(compareDate ?? today)
+			// Fresh "today" so a tab left open overnight doesn't compare against yesterday
+			return dateUtil.DiffWithDate(compareDate ?? new DateTime())
 		},
 
 		isPast: () => {
@@ -68,7 +69,7 @@ export const useScheduleState = create<ScheduleState>((set, get) => {
 
 		isToday: () => {
 			const { dateUtil } = get()
-			return dateUtil.GetISODate() == today.GetISODate()
+			return dateUtil.GetISODate() == new DateTime().GetISODate()
 		},
 
 		// unschedulable = over 14 days away

@@ -64,6 +64,8 @@ export function ScheduleApp() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
+	useAdopterBookingCutoffRefresh()
+
 	return (
 		<FullWidthPage
 			subtitle={schedule.dateUtil.GetWeekdayStr()}
@@ -88,6 +90,30 @@ export function ScheduleApp() {
 			<CalendarContent />
 		</FullWidthPage>
 	)
+}
+
+// The booking cutoff is only evaluated on render, so keep an adopter's open tab current: re-render each
+// minute to hide slots as they close, and reload when the tab comes back into view
+function useAdopterBookingCutoffRefresh() {
+	const session = useSessionState()
+	const [, setTick] = useState(0)
+
+	useEffect(() => {
+		if (!session.adopterUser) return
+
+		const interval = window.setInterval(() => setTick((t) => t + 1), 60_000)
+		const handleVisibility = () => {
+			if (document.visibilityState === "visible") {
+				useScheduleState.getState().refresh()
+			}
+		}
+
+		document.addEventListener("visibilitychange", handleVisibility)
+		return () => {
+			window.clearInterval(interval)
+			document.removeEventListener("visibilitychange", handleVisibility)
+		}
+	}, [session.adopterUser])
 }
 
 function UserInstructions() {
