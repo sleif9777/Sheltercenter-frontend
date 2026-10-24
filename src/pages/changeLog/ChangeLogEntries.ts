@@ -50,6 +50,8 @@ export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 	},
 	{
 		date: "2026-10-24",
+		details:
+			'Click a dog\'s eye icon to hide or show it. Check "Preview as non-admin viewer" at the bottom of the page to see, and screenshot, the list as everyone else sees it.',
 		title: "Admins can hide dogs from the Who Went Home and FTA dashboards",
 		type: ChangeLogEntryType.FEATURE,
 	},

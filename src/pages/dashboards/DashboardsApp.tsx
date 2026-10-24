@@ -1,4 +1,4 @@
-import { faEyeSlash, faPlus, faXmark } from "@fortawesome/free-solid-svg-icons"
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 
@@ -7,6 +7,7 @@ import { usePageTitle } from "../../utils/usePageTitle"
 import { DashboardMode, useDashboardsState } from "./DashboardsAppState"
 import { DashboardDog, DashboardDogHash } from "../../models/DogModels"
 import { CardActionAreYouSure } from "../../core/components/card/CardActionAreYouSure"
+import { CheckboxInput } from "../../core/components/formInputs/CheckboxInput"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import { MessageLevel } from "../../core/components/messages/Message"
 import { showToast } from "../../core/components/messages/ToastProvider"
@@ -119,7 +120,9 @@ export default function DashboardsApp() {
 	const showDebug = searchParams.get("debug") === "1"
 
 	// Admins and superusers can hide Who Went Home / FTA dogs; everyone else never receives hidden dogs.
-	const canHide = session.adminUser
+	// Admins can preview the non-admin view to screenshot it for emails.
+	const [previewAsViewer, setPreviewAsViewer] = useState(false)
+	const canHide = session.adminUser && !previewAsViewer
 
 	// TV mode is tied to the dashboard login, not to pointer/hover media queries, which Silk reports inconsistently.
 	const tvMode = session.dashboardUser
@@ -319,6 +322,16 @@ export default function DashboardsApp() {
 						<DashboardSection canHide={canHide} className="tv:[zoom:1.5] columns-5" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />
 					)}
 				</div>
+
+				{session.adminUser && (mode === DashboardMode.WHO_WENT_HOME || mode === DashboardMode.FTA) && (
+					<CheckboxInput
+						centered
+						fieldLabel="Preview as non-admin viewer"
+						helpText="Shows the list without hidden dogs or hide buttons, as everyone else sees it."
+						value={previewAsViewer}
+						onChange={setPreviewAsViewer}
+					/>
+				)}
 			</div>
 			{showDebug && <DashboardDebugOverlay dashboardUser={session.dashboardUser} />}
 		</FullWidthPage>
@@ -341,7 +354,7 @@ function RefreshStatus({ failed, isRefreshing, lastUpdated }: { failed: boolean;
 	)
 }
 
-// Mirrors the Chosen Board's HeartwormButton: the badge marks a hidden dog, and on hover previews what a click does.
+// Shows the dog's current state (eye = shown, eye-slash = hidden) and flips on hover to preview what a click does.
 function HideButton({ dog }: { dog: DashboardDog }) {
 	const hidden = !!dog.hidden
 	const [hovered, setHovered] = useState(false)
@@ -353,16 +366,10 @@ function HideButton({ dog }: { dog: DashboardDog }) {
 		}
 	}
 
-	const overlayIcon = hovered ? (hidden ? faXmark : faPlus) : hidden ? faPlus : undefined
-
-	const badgeClass = hovered ? (hidden ? "bg-red-600" : "bg-green-600") : "bg-green-600"
-
 	return (
 		<CardActionAreYouSure
-			icon={faEyeSlash}
-			modalTitle={hidden ? "Show on dashboard" : "Hide from dashboard"}
-			overlayClassName={badgeClass}
-			overlayIcon={overlayIcon}
+			icon={hidden !== hovered ? faEyeSlash : faEye}
+			modalTitle={hidden ? "Show this dog" : "Hide this dog"}
 			youWantTo={hidden ? `show ${dog.name} to all dashboard viewers` : `hide ${dog.name} from non-admin dashboard viewers`}
 			onMouseEnter={() => setHovered(true)}
 			onMouseLeave={() => setHovered(false)}
