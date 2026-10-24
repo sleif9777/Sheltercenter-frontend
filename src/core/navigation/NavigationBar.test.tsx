@@ -43,4 +43,14 @@ describe("NavigationBar", () => {
 		expect(screen.getByText("Available Dogs")).toBeInTheDocument()
 		expect(screen.queryByText("Book Appointment")).not.toBeInTheDocument()
 	})
+
+	it("shows the Change Log only to superusers", () => {
+		renderNavAs(SecurityLevel.ADMIN)
+		expect(screen.queryByText("Change Log")).not.toBeInTheDocument()
+	})
+
+	it("shows superusers the Change Log", () => {
+		renderNavAs(SecurityLevel.SUPERUSER)
+		expect(screen.getByText("Change Log")).toBeInTheDocument()
+	})
 })

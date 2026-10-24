@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { ToastProvider } from "./core/components/messages/ToastProvider.tsx"
 import { NavigationBar } from "./core/navigation/NavigationBar.tsx"
 import { useSessionState } from "./core/session/SessionState.ts"
+import { SecurityLevel } from "./enums/UserEnums.ts"
 import AdopterDetailsApp from "./pages/adopter/AdopterDetailsApp.tsx"
 import AdopterDirectoryApp from "./pages/adopter/AdopterDirectoryApp.tsx"
 import { AdopterLandingPageApp } from "./pages/adopter/AdopterLandingPageApp.tsx"
@@ -13,6 +14,7 @@ import { ChosenBoardApp } from "./pages/chosenBoard/ChosenBoardApp.tsx"
 import DailyReportApp from "./pages/dailyReport/DailyReportApp.tsx"
 import DashboardsApp from "./pages/dashboards/DashboardsApp.tsx"
 import { CancelAppointmentApp } from "./pages/cancel/CancelAppointmentApp.tsx"
+import ChangeLogApp from "./pages/changeLog/ChangeLogApp.tsx"
 import { ErrorApp } from "./pages/error/ErrorApp.tsx"
 import InProgressAppointmentsApp from "./pages/inProgressAppointments/InProgressAppointmentsApp.tsx"
 import { LoginApp } from "./pages/login/LoginApp.tsx"
@@ -70,9 +72,9 @@ function App() {
 
 	return (
 		<BrowserRouter>
-			<div className="flex flex-col md:h-screen md:overflow-hidden md:flex-row print:h-auto print:overflow-visible">
+			<div className="flex flex-col md:h-screen md:flex-row md:overflow-hidden print:h-auto print:overflow-visible">
 				<a
-					className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-100 focus:rounded focus:bg-pink-700 focus:px-4 focus:py-2 focus:text-white"
+					className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-100 focus:rounded focus:bg-pink-700 focus:px-4 focus:py-2 focus:text-white"
 					href="#main-content"
 				>
 					Skip to main content
@@ -97,11 +99,7 @@ function App() {
 					<div
 						className={`fixed top-0 right-0 z-40 h-full w-64 bg-white transition-all duration-300 md:static md:h-screen md:shrink-0 md:translate-x-0 print:hidden ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"} ${desktopCollapsed ? "md:w-14" : "md:w-[15%] md:min-w-32"} `}
 					>
-						<NavigationBar
-							collapsed={desktopCollapsed}
-							onNavigate={() => setMobileMenuOpen(false)}
-							onToggleCollapse={toggleDesktopCollapsed}
-						/>
+						<NavigationBar collapsed={desktopCollapsed} onNavigate={() => setMobileMenuOpen(false)} onToggleCollapse={toggleDesktopCollapsed} />
 					</div>
 				)}
 
@@ -113,7 +111,7 @@ function App() {
 							{session.isAuthenticated ? (
 								<>
 									<Route element={<DashboardsApp />} index={session.dashboardUser} />
-										<Route element={<AdopterLandingPageApp />} index={session.adopterUser} />
+									<Route element={<AdopterLandingPageApp />} index={session.adopterUser} />
 									<Route element={<AdopterLandingPageApp />} path="/my_home/" />
 									<Route element={<AdopterPreferencesApp />} path="/preferences/" />
 									<Route element={<WatchlistApp />} path="/watchlist/" />
@@ -131,6 +129,7 @@ function App() {
 									<Route element={<RecentAdoptionsApp />} path="/recent_adoptions/" />
 									<Route element={<ReportingApp />} path="/reporting/" />
 									<Route element={<RecentUploadsApp />} path="/recent_uploads/" />
+									{session.user?.security === SecurityLevel.SUPERUSER && <Route element={<ChangeLogApp />} path="/change_log/" />}
 									<Route element={<PrivacyPolicyApp />} path="/privacy/" />
 									<Route element={<ErrorApp />} path="/*/" />
 								</>

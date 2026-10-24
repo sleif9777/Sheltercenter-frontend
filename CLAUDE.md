@@ -130,6 +130,7 @@ All routes are defined in `App.tsx`. Authenticated routes:
 | `/recent_uploads/` | `RecentUploadsApp` | Admin |
 | `/daily_report/:date/` | `DailyReportApp` | Admin |
 | `/print_view/:date/` | `PrintViewApp` | Admin |
+| `/change_log/` | `ChangeLogApp` | Superuser only (entries in `pages/changeLog/ChangeLogEntries.ts`) |
 
 Unauthenticated: `/` → `LoginApp`
 

@@ -18,6 +18,7 @@ import {
 	faHome,
 	faLock,
 	faPersonWalking,
+	faScroll,
 	faSearch,
 	faSignOutAlt,
 	faStar,
@@ -31,6 +32,7 @@ import React from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 import Logo from "../../assets/logo.png"
+import { SecurityLevel } from "../../enums/UserEnums"
 import { TooltipProvider } from "../components/messages/TooltipProvider"
 import { useSessionState } from "../session/SessionState"
 
@@ -108,6 +110,7 @@ export function NavigationBar({ debug, onNavigate, collapsed = false, onToggleCo
 							</NavigationSection>
 						</>
 					)}
+					{session.user?.security === SecurityLevel.SUPERUSER && <ChangeLogButton collapsed={collapsed} onNavigate={onNavigate} />}
 					<PrivacyPolicyButton collapsed={collapsed} onNavigate={onNavigate} />
 					<SignOutButton collapsed={collapsed} onNavigate={onNavigate} />
 				</div>
@@ -201,8 +204,9 @@ function NavigationButton({
 				<div className="hidden w-full md:block">
 					<Link
 						aria-label={caption}
-						className={`flex items-center justify-center py-3 transition-colors ${disabled ? "pointer-events-none cursor-not-allowed text-gray-400" : "cursor-pointer text-pink-700 hover:bg-pink-200"
-							}`}
+						className={`flex items-center justify-center py-3 transition-colors ${
+							disabled ? "pointer-events-none cursor-not-allowed text-gray-400" : "cursor-pointer text-pink-700 hover:bg-pink-200"
+						}`}
 						to={route ?? "#"}
 						onClick={handleClick}
 					>
@@ -227,8 +231,9 @@ function NavigationButton({
 		<TooltipProvider tooltip={disabledTooltip}>
 			<div className={`w-full ${!isLast && !noBorder ? "border-b border-pink-700" : ""}`}>
 				<Link
-					className={`block px-4 py-3 text-center text-2xl font-medium uppercase transition-colors md:text-sm lg:text-lg xl:text-xl ${disabled ? "pointer-events-none cursor-not-allowed text-gray-400" : "cursor-pointer text-pink-700 hover:bg-pink-200"
-						}`}
+					className={`block px-4 py-3 text-center text-2xl font-medium uppercase transition-colors md:text-sm lg:text-lg xl:text-xl ${
+						disabled ? "pointer-events-none cursor-not-allowed text-gray-400" : "cursor-pointer text-pink-700 hover:bg-pink-200"
+					}`}
 					to={route ?? "#"}
 					onClick={handleClick}
 				>
@@ -369,6 +374,10 @@ function ReportingButton({ noBorder, collapsed, onNavigate }: NavigationButtonPr
 	return (
 		<NavigationButton caption="Reporting" collapsed={collapsed} icon={faChartBar} noBorder={noBorder} route="/reporting/" onNavigate={onNavigate} />
 	)
+}
+
+function ChangeLogButton({ collapsed, onNavigate }: NavigationButtonProps) {
+	return <NavigationButton caption="Change Log" collapsed={collapsed} icon={faScroll} route="/change_log/" onNavigate={onNavigate} />
 }
 
 function RecentUploadsButton({ noBorder, collapsed, onNavigate }: NavigationButtonProps) {

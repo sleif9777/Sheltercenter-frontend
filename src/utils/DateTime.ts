@@ -83,6 +83,10 @@ export class DateTime {
 		return diffedDate.format(DateTimeFormat.ISODate)
 	}
 
+	GetFullDate(): string {
+		return this.Format(DateTimeFormat.FullDate)
+	}
+
 	GetFullDateTime(): string {
 		return this.Format(DateTimeFormat.FullDateTime)
 	}
