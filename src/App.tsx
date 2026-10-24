@@ -4,7 +4,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { ToastProvider } from "./core/components/messages/ToastProvider.tsx"
 import { NavigationBar } from "./core/navigation/NavigationBar.tsx"
 import { useSessionState } from "./core/session/SessionState.ts"
-import { SecurityLevel } from "./enums/UserEnums.ts"
 import AdopterDetailsApp from "./pages/adopter/AdopterDetailsApp.tsx"
 import AdopterDirectoryApp from "./pages/adopter/AdopterDirectoryApp.tsx"
 import { AdopterLandingPageApp } from "./pages/adopter/AdopterLandingPageApp.tsx"
@@ -129,7 +128,7 @@ function App() {
 									<Route element={<RecentAdoptionsApp />} path="/recent_adoptions/" />
 									<Route element={<ReportingApp />} path="/reporting/" />
 									<Route element={<RecentUploadsApp />} path="/recent_uploads/" />
-									{session.user?.security === SecurityLevel.SUPERUSER && <Route element={<ChangeLogApp />} path="/change_log/" />}
+									{session.adminUser && <Route element={<ChangeLogApp />} path="/change_log/" />}
 									<Route element={<PrivacyPolicyApp />} path="/privacy/" />
 									<Route element={<ErrorApp />} path="/*/" />
 								</>

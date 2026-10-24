@@ -44,13 +44,13 @@ describe("NavigationBar", () => {
 		expect(screen.queryByText("Book Appointment")).not.toBeInTheDocument()
 	})
 
-	it("shows the Change Log only to superusers", () => {
-		renderNavAs(SecurityLevel.ADMIN)
+	it.each([SecurityLevel.ADOPTER, SecurityLevel.GREETER])("hides the Change Log from security level %i", (security) => {
+		renderNavAs(security)
 		expect(screen.queryByText("Change Log")).not.toBeInTheDocument()
 	})
 
-	it("shows superusers the Change Log", () => {
-		renderNavAs(SecurityLevel.SUPERUSER)
+	it.each([SecurityLevel.ADMIN, SecurityLevel.SUPERUSER])("shows the Change Log to security level %i", (security) => {
+		renderNavAs(security)
 		expect(screen.getByText("Change Log")).toBeInTheDocument()
 	})
 })

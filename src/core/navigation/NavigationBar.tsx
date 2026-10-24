@@ -32,7 +32,6 @@ import React from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 import Logo from "../../assets/logo.png"
-import { SecurityLevel } from "../../enums/UserEnums"
 import { TooltipProvider } from "../components/messages/TooltipProvider"
 import { useSessionState } from "../session/SessionState"
 
@@ -110,7 +109,7 @@ export function NavigationBar({ debug, onNavigate, collapsed = false, onToggleCo
 							</NavigationSection>
 						</>
 					)}
-					{session.user?.security === SecurityLevel.SUPERUSER && <ChangeLogButton collapsed={collapsed} onNavigate={onNavigate} />}
+					{session.adminUser && <ChangeLogButton collapsed={collapsed} onNavigate={onNavigate} />}
 					<PrivacyPolicyButton collapsed={collapsed} onNavigate={onNavigate} />
 					<SignOutButton collapsed={collapsed} onNavigate={onNavigate} />
 				</div>

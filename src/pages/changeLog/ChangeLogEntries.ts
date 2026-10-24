@@ -26,7 +26,7 @@ export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 	},
 	{
 		date: "2026-10-24",
-		details: "Superusers can review what has changed in the scheduler and when.",
+		details: "Superusers and admins can review what has changed in the scheduler and when.",
 		title: "Added this Change Log page",
 		type: ChangeLogEntryType.FEATURE,
 	},
