@@ -1,3 +1,4 @@
+import { faEyeSlash, faPlus, faXmark } from "@fortawesome/free-solid-svg-icons"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 
@@ -5,7 +6,10 @@ import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import { usePageTitle } from "../../utils/usePageTitle"
 import { DashboardMode, useDashboardsState } from "./DashboardsAppState"
 import { DashboardDog, DashboardDogHash } from "../../models/DogModels"
+import { CardActionAreYouSure } from "../../core/components/card/CardActionAreYouSure"
 import RadioInput from "../../core/components/formInputs/RadioInput"
+import { MessageLevel } from "../../core/components/messages/Message"
+import { showToast } from "../../core/components/messages/ToastProvider"
 import { SelectInputOption } from "../../core/components/formInputs/SelectInput"
 import { DateTime } from "../../utils/DateTime"
 import { Weekday } from "../../enums/TemplateEnums"
@@ -113,6 +117,9 @@ export default function DashboardsApp() {
 	const { cycleEnabled, hideNav } = session.dashboardPreferences
 	const [searchParams] = useSearchParams()
 	const showDebug = searchParams.get("debug") === "1"
+
+	// Admins and superusers can hide Who Went Home / FTA dogs; everyone else never receives hidden dogs.
+	const canHide = session.adminUser
 
 	// TV mode is tied to the dashboard login, not to pointer/hover media queries, which Silk reports inconsistently.
 	const tvMode = session.dashboardUser
@@ -285,6 +292,7 @@ export default function DashboardsApp() {
 				<div className="dashboard-fade-in" key={mode}>
 					{mode === DashboardMode.WHO_WENT_HOME && (
 						<DashboardSection
+							canHide={canHide}
 							className="tv:[zoom:1.5] columns-5"
 							dogs={sortByUnavailableDateThenName(dogHash.newlyInHome)}
 							hashKey="newlyInHome"
@@ -307,7 +315,9 @@ export default function DashboardsApp() {
 						</div>
 					)}
 
-					{mode === DashboardMode.FTA && <DashboardSection className="tv:[zoom:1.5] columns-5" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />}
+					{mode === DashboardMode.FTA && (
+						<DashboardSection canHide={canHide} className="tv:[zoom:1.5] columns-5" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />
+					)}
 				</div>
 			</div>
 			{showDebug && <DashboardDebugOverlay dashboardUser={session.dashboardUser} />}
@@ -331,32 +341,71 @@ function RefreshStatus({ failed, isRefreshing, lastUpdated }: { failed: boolean;
 	)
 }
 
+// Mirrors the Chosen Board's HeartwormButton: the badge marks a hidden dog, and on hover previews what a click does.
+function HideButton({ dog }: { dog: DashboardDog }) {
+	const hidden = !!dog.hidden
+	const [hovered, setHovered] = useState(false)
+
+	async function handleClick() {
+		const saved = await useDashboardsState.getState().setDogHidden(dog.ID, !hidden)
+		if (!saved) {
+			showToast({ level: MessageLevel.Error, message: `Could not ${hidden ? "show" : "hide"} ${dog.name}. Please try again.` })
+		}
+	}
+
+	const overlayIcon = hovered ? (hidden ? faXmark : faPlus) : hidden ? faPlus : undefined
+
+	const badgeClass = hovered ? (hidden ? "bg-red-600" : "bg-green-600") : "bg-green-600"
+
+	return (
+		<CardActionAreYouSure
+			icon={faEyeSlash}
+			modalTitle={hidden ? "Show on dashboard" : "Hide from dashboard"}
+			overlayClassName={badgeClass}
+			overlayIcon={overlayIcon}
+			youWantTo={hidden ? `show ${dog.name} to all dashboard viewers` : `hide ${dog.name} from non-admin dashboard viewers`}
+			onMouseEnter={() => setHovered(true)}
+			onMouseLeave={() => setHovered(false)}
+			onSubmit={handleClick}
+		/>
+	)
+}
+
 function DashboardSection({
+	canHide = false,
 	className,
 	hashKey,
 	title,
 	dogs,
 	mode,
 }: {
+	canHide?: boolean
 	className?: string
 	hashKey: DashboardDogHashKey
 	title?: string
 	dogs: DashboardDog[]
 	mode: DashboardMode
 }) {
+	// The server already withholds hidden dogs from non-admins; this also covers data persisted from an admin session.
+	const shownDogs = canHide ? dogs : dogs.filter((dog) => !dog.hidden)
+	const visibleCount = shownDogs.filter((dog) => !dog.hidden).length
+	const hiddenCount = shownDogs.length - visibleCount
+
 	return (
 		<div className="mx-3 flex flex-col gap-2">
 			{title && <h2 className="text-2xl font-semibold text-gray-700">{title}</h2>}
 			<h3 className="text-xl font-normal text-gray-700 uppercase">
-				Total: {dogs.length} {dogs.length == 1 ? "dog" : "dogs"}
+				Total: {visibleCount} {visibleCount == 1 ? "dog" : "dogs"}
+				{hiddenCount > 0 && <span className="text-[#6b7280]"> ({hiddenCount} hidden)</span>}
 			</h3>
-			{dogs.length > 0 && (
+			{shownDogs.length > 0 && (
 				<ul className={className ?? "flex flex-col gap-1"}>
-					{dogs.map((dog, i) => (
-						<li className={`mb-1 break-inside-avoid border-2 px-3 py-2 ${getDogCardColor(dog, hashKey, mode)}`} key={i}>
+					{shownDogs.map((dog, i) => (
+						<li className={`mb-1 break-inside-avoid border-2 px-3 py-2 ${getDogCardColor(dog, hashKey, mode)} ${dog.hidden ? "opacity-50" : ""}`} key={i}>
 							<div className="flex flex-row items-center gap-2">
 								<img className="my-1 ml-1 aspect-square w-14 shrink-0 rounded-full" src={dog.photoURL} />
 								<span className="mr-1 text-lg font-medium uppercase">{dog.name}</span>
+								{canHide && <HideButton dog={dog} />}
 								{/* Weekday text too, so the grouping still reads if the monitor washes out the colors. */}
 								{showsWeekday(dog, hashKey, mode) && (
 									<span className="mr-1 ml-auto shrink-0 text-sm font-semibold uppercase">

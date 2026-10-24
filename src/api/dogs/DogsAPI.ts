@@ -1,6 +1,6 @@
 import { AdopterIDRequest } from "../adopters/Requests"
 import { APIBase } from "../APIBase"
-import { DogIDRequest, ListModificationRequest } from "./Requests"
+import { DogIDRequest, ListModificationRequest, SetDashboardHiddenRequest } from "./Requests"
 import {
 	DashboardsContextResponse,
 	DogDemographicsResponse,
@@ -45,6 +45,10 @@ export class DogsAPI extends APIBase {
 
 	async AddDogToList(adopterID: number, dogID: number) {
 		return this.buildAndPost<ListModificationRequest>("AddDogToList", { adopterID, dogID })
+	}
+
+	async SetDashboardHidden(dogID: number, hidden: boolean) {
+		return this.buildAndPost<SetDashboardHiddenRequest>("SetDashboardHidden", { dogID, hidden })
 	}
 
 	async RemoveDogFromList(adopterID: number, dogID: number) {

@@ -24,6 +24,8 @@ export type HashDog = Pick<IDog, "ID" | "name" | "ageMonths" | "interestCount" |
 export type DashboardDog = Pick<IDog, "ID" | "name" | "unavailableDate" | "photoURL"> & {
 	// Chosen dogs only; null until a paperwork appointment is booked.
 	paperworkAppointmentInst?: string | null
+	// Who Went Home and FTA only; hidden dogs are only sent to admins and superusers.
+	hidden?: boolean
 }
 
 export type WatchlistDog = Pick<IDog, "ID" | "name" | "ageMonths" | "funSize" | "availableDate" | "availableNow">

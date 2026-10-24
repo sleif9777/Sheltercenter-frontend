@@ -1,7 +1,8 @@
+import { HttpStatusCode } from "axios"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-import { DashboardDogHash } from "../../models/DogModels"
+import { DashboardDog, DashboardDogHash } from "../../models/DogModels"
 import { DogsAPI } from "../../api/dogs/DogsAPI"
 import { DashboardsContextResponse } from "../../api/dogs/Responses"
 import { DateTime } from "../../utils/DateTime"
@@ -20,6 +21,19 @@ interface DashboardsAppState {
 	lastRefreshFailed: boolean
 	mode: DashboardMode
 	refresh: () => void
+	setDogHidden: (dogID: number, hidden: boolean) => Promise<boolean>
+}
+
+function withHidden(dogs: DashboardDog[], dogID: number, hidden: boolean): DashboardDog[] {
+	return dogs.map((dog) => (dog.ID === dogID ? { ...dog, hidden } : dog))
+}
+
+function setHiddenInHash(hash: DashboardDogHash, dogID: number, hidden: boolean): DashboardDogHash {
+	return {
+		...hash,
+		fta: withHidden(hash.fta, dogID, hidden),
+		newlyInHome: withHidden(hash.newlyInHome, dogID, hidden),
+	}
 }
 
 export const useDashboardsState = create<DashboardsAppState>()(
@@ -56,6 +70,20 @@ export const useDashboardsState = create<DashboardsAppState>()(
 				} finally {
 					set(() => ({ isRefreshing: false }))
 				}
+			},
+
+			// Optimistic, so the icon responds immediately; reverted if the save fails. Resolves to whether it saved.
+			setDogHidden: async (dogID: number, hidden: boolean) => {
+				set((state) => ({ dogHash: setHiddenInHash(state.dogHash, dogID, hidden) }))
+				// buildAndPost resolves with the error rather than rejecting, so check the status too.
+				const saved = await new DogsAPI()
+					.SetDashboardHidden(dogID, hidden)
+					.then((resp) => resp?.status === HttpStatusCode.Ok)
+					.catch(() => false)
+				if (!saved) {
+					set((state) => ({ dogHash: setHiddenInHash(state.dogHash, dogID, !hidden) }))
+				}
+				return saved
 			},
 		}),
 		{
