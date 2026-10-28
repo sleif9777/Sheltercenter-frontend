@@ -6,6 +6,8 @@ import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import { usePageTitle } from "../../utils/usePageTitle"
 import { DashboardMode, useDashboardsState } from "./DashboardsAppState"
 import { DashboardDog, DashboardDogHash } from "../../models/DogModels"
+import { DashboardCard } from "./DashboardCard"
+import { DashboardNotesSection } from "./DashboardNotes"
 import { CardActionAreYouSure } from "../../core/components/card/CardActionAreYouSure"
 import { CheckboxInput } from "../../core/components/formInputs/CheckboxInput"
 import RadioInput from "../../core/components/formInputs/RadioInput"
@@ -24,9 +26,18 @@ const DASHBOARD_MODE_OPTIONS: SelectInputOption<DashboardMode>[] = [
 	{ label: "Who Went Home", value: DashboardMode.WHO_WENT_HOME },
 	{ label: "Chosen", value: DashboardMode.CHOSEN },
 	{ label: "FTA", value: DashboardMode.FTA },
+	{ label: "Notes", value: DashboardMode.NOTES },
 ]
 
-const DASHBOARD_MODE_ORDER: DashboardMode[] = [DashboardMode.WHO_WENT_HOME, DashboardMode.CHOSEN, DashboardMode.FTA]
+const DASHBOARD_MODE_ORDER: DashboardMode[] = [DashboardMode.WHO_WENT_HOME, DashboardMode.CHOSEN, DashboardMode.FTA, DashboardMode.NOTES]
+
+// Literal class names so Tailwind generates them.
+const MODE_COLUMNS: Record<number, string> = { 3: "columns-3", 4: "columns-4" }
+
+// The Notes tab only shows while there is a note, except to admins and superusers, who need it to add the first one.
+function getVisibleModes(showNotes: boolean): DashboardMode[] {
+	return DASHBOARD_MODE_ORDER.filter((mode) => showNotes || mode !== DashboardMode.NOTES)
+}
 
 // Auto-scroll tuning for the TV; 1px every 40ms = 25px/s.
 const CYCLE_MS = 10_000
@@ -47,6 +58,7 @@ const DASHBOARD_MODE_TITLES: Record<DashboardMode, string> = {
 	[DashboardMode.WHO_WENT_HOME]: "Who Went Home This Week",
 	[DashboardMode.CHOSEN]: "Chosen Dogs",
 	[DashboardMode.FTA]: "Foster to Adopt",
+	[DashboardMode.NOTES]: "Notes",
 }
 
 // Card colors are literal hex (Tailwind v3 palette values) instead of theme classes like `bg-red-200`.
@@ -113,8 +125,13 @@ function getTvZoom(): number {
 
 export default function DashboardsApp() {
 	usePageTitle("Dashboards")
-	const { dogHash, isRefreshing, lastRefreshFailed, lastUpdated, mode, refresh } = useDashboardsState()
+	const { dogHash, isRefreshing, lastRefreshFailed, lastUpdated, mode, notes, refresh } = useDashboardsState()
 	const session = useSessionState()
+	// adminUser covers admins and superusers
+	const canEditNotes = session.adminUser
+	const showNotesTab = notes.length > 0 || canEditNotes
+	const visibleModes = getVisibleModes(showNotesTab)
+	const modeOptions = DASHBOARD_MODE_OPTIONS.filter((option) => visibleModes.includes(option.value))
 	const { cycleEnabled, hideNav } = session.dashboardPreferences
 	const [searchParams] = useSearchParams()
 	const showDebug = searchParams.get("debug") === "1"
@@ -143,6 +160,13 @@ export default function DashboardsApp() {
 		return () => clearInterval(interval)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
+	// Leave the Notes tab once its last note is removed (or a saved mode points at a tab this user can't see).
+	useEffect(() => {
+		if (mode === DashboardMode.NOTES && !showNotesTab) {
+			useDashboardsState.setState({ mode: DashboardMode.WHO_WENT_HOME })
+		}
+	}, [mode, showNotesTab])
 
 	useEffect(() => {
 		if (!tvMode) return
@@ -242,8 +266,10 @@ export default function DashboardsApp() {
 				if (cancelled) return
 
 				if (cycleEnabled) {
-					const nextIndex = (DASHBOARD_MODE_ORDER.indexOf(mode) + 1) % DASHBOARD_MODE_ORDER.length
-					useDashboardsState.setState({ mode: DASHBOARD_MODE_ORDER[nextIndex] })
+					// Read notes fresh: a refresh during this pass may have added or removed the Notes tab
+					const order = getVisibleModes(useDashboardsState.getState().notes.length > 0 || canEditNotes)
+					const nextIndex = (order.indexOf(mode) + 1) % order.length
+					useDashboardsState.setState({ mode: order[nextIndex] })
 					return // mode change restarts this effect
 				}
 			}
@@ -253,7 +279,7 @@ export default function DashboardsApp() {
 		return () => {
 			cancelled = true
 		}
-	}, [mode, cycleEnabled, session.dashboardUser, resumeCount])
+	}, [mode, cycleEnabled, canEditNotes, session.dashboardUser, resumeCount])
 
 	// TV mode: `.tv-mode` enables the `tv:` variant (index.css) and exempts these lists from App.scss's forced single column.
 	// The wrapper zooms the 1920px design down to the real viewport; lists add `tv:[zoom:1.5]` so cards are readable
@@ -267,8 +293,8 @@ export default function DashboardsApp() {
 					<div className="m-auto flex items-center gap-4">
 						<RadioInput
 							className=""
-							columnOverride="columns-3"
-							options={DASHBOARD_MODE_OPTIONS}
+							columnOverride={MODE_COLUMNS[modeOptions.length]}
+							options={modeOptions}
 							value={mode}
 							onChange={(v: DashboardMode) => {
 								useDashboardsState.setState({ mode: v })
@@ -321,6 +347,8 @@ export default function DashboardsApp() {
 					{mode === DashboardMode.FTA && (
 						<DashboardSection canHide={canHide} className="tv:[zoom:1.5] columns-5" dogs={sortByName(dogHash.fta)} hashKey="fta" mode={mode} />
 					)}
+
+					{mode === DashboardMode.NOTES && <DashboardNotesSection canEdit={canEditNotes} notes={notes} />}
 				</div>
 
 				{session.adminUser && (mode === DashboardMode.WHO_WENT_HOME || mode === DashboardMode.FTA) && (
@@ -408,27 +436,37 @@ function DashboardSection({
 			{shownDogs.length > 0 && (
 				<ul className={className ?? "flex flex-col gap-1"}>
 					{shownDogs.map((dog, i) => (
-						<li className={`mb-1 break-inside-avoid border-2 px-3 py-2 ${getDogCardColor(dog, hashKey, mode)} ${dog.hidden ? "opacity-50" : ""}`} key={i}>
-							<div className="flex flex-row items-center gap-2">
-								<img className="my-1 ml-1 aspect-square w-14 shrink-0 rounded-full" src={dog.photoURL} />
-								<span className="mr-1 text-lg font-medium uppercase">{dog.name}</span>
-								{canHide && <HideButton dog={dog} />}
-								{/* Weekday text too, so the grouping still reads if the monitor washes out the colors. */}
-								{showsWeekday(dog, hashKey, mode) && (
-									<span className="mr-1 ml-auto shrink-0 text-sm font-semibold uppercase">
-										{DateTime.FromISODate(dog.unavailableDate).GetWeekdayShortStr()}
-									</span>
-								)}
-								{showsPaperworkAppointment(dog, hashKey, mode) && (
-									<span className="mr-1 ml-auto shrink-0 text-sm font-semibold uppercase">
-										{new DateTime(dog.paperworkAppointmentInst!).GetWeekdayShortTime()}
-									</span>
-								)}
-							</div>
-						</li>
+						// Index keys: chosen dogs typed in by name have no ID
+						<DashboardDogCard canHide={canHide} dog={dog} hashKey={hashKey} key={i} mode={mode} />
 					))}
 				</ul>
 			)}
 		</div>
+	)
+}
+
+function DashboardDogCard({
+	canHide,
+	dog,
+	hashKey,
+	mode,
+}: {
+	canHide: boolean
+	dog: DashboardDog
+	hashKey: DashboardDogHashKey
+	mode: DashboardMode
+}) {
+	return (
+		<DashboardCard className={`${getDogCardColor(dog, hashKey, mode)} ${dog.hidden ? "opacity-50" : ""}`} photoURL={dog.photoURL}>
+			<span className="mr-1 text-lg font-medium uppercase">{dog.name}</span>
+			{canHide && <HideButton dog={dog} />}
+			{/* Weekday text too, so the grouping still reads if the monitor washes out the colors. */}
+			{showsWeekday(dog, hashKey, mode) && (
+				<span className="mr-1 ml-auto shrink-0 text-sm font-semibold uppercase">{DateTime.FromISODate(dog.unavailableDate).GetWeekdayShortStr()}</span>
+			)}
+			{showsPaperworkAppointment(dog, hashKey, mode) && (
+				<span className="mr-1 ml-auto shrink-0 text-sm font-semibold uppercase">{new DateTime(dog.paperworkAppointmentInst!).GetWeekdayShortTime()}</span>
+			)}
+		</DashboardCard>
 	)
 }

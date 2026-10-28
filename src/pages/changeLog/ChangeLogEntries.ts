@@ -13,6 +13,13 @@ export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 	{
 		date: "2026-10-27",
 		details:
+			'Admins and superusers can add short notes about a dog (like "Offsite" or "Trial") from the new Notes tab on the dashboard, for dogs in the system or typed in by name. Notes can be removed by hand or automatically after a chosen day. The tab only appears on the dashboard while there is at least one note.',
+		title: "Notes tab on the dashboard",
+		type: ChangeLogEntryType.FEATURE,
+	},
+	{
+		date: "2026-10-27",
+		details:
 			"Changing the dog on an adoption added from the Chosen Board no longer shows an error. After a change, the dashboard and emails no longer show the previous dog's photo.",
 		title: "Change Dog on the Chosen Board works for every adoption",
 		type: ChangeLogEntryType.FIX,

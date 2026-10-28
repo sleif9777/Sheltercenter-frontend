@@ -1,7 +1,9 @@
+import { IDashboardNote } from "../../models/DashboardNoteModels"
 import { AdopterWatchlist, DashboardDogHash, DogHash, DogSelectFieldOption, IDog, SurrenderDogOption } from "../../models/DogModels"
 
 export type DashboardsContextResponse = {
 	hash: DashboardDogHash
+	notes: IDashboardNote[]
 }
 
 export type DogDemographicsResponse = {

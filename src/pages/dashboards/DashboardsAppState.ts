@@ -2,6 +2,7 @@ import { HttpStatusCode } from "axios"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
+import { IDashboardNote } from "../../models/DashboardNoteModels"
 import { DashboardDog, DashboardDogHash } from "../../models/DogModels"
 import { DogsAPI } from "../../api/dogs/DogsAPI"
 import { DashboardsContextResponse } from "../../api/dogs/Responses"
@@ -11,6 +12,7 @@ export enum DashboardMode {
 	WHO_WENT_HOME,
 	CHOSEN,
 	FTA,
+	NOTES,
 }
 
 interface DashboardsAppState {
@@ -20,6 +22,7 @@ interface DashboardsAppState {
 	lastUpdated?: string
 	lastRefreshFailed: boolean
 	mode: DashboardMode
+	notes: IDashboardNote[]
 	refresh: () => void
 	setDogHidden: (dogID: number, hidden: boolean) => Promise<boolean>
 }
@@ -51,6 +54,7 @@ export const useDashboardsState = create<DashboardsAppState>()(
 			isRefreshing: false,
 			lastRefreshFailed: false,
 			mode: DashboardMode.WHO_WENT_HOME,
+			notes: [],
 
 			refresh: async () => {
 				set(() => ({
@@ -64,6 +68,7 @@ export const useDashboardsState = create<DashboardsAppState>()(
 						dogHash: resp.hash,
 						lastRefreshFailed: false,
 						lastUpdated: new DateTime().instant.toISOString(),
+						notes: resp.notes ?? [],
 					}))
 				} catch {
 					set(() => ({ lastRefreshFailed: true }))
@@ -92,6 +97,7 @@ export const useDashboardsState = create<DashboardsAppState>()(
 				dogHash: state.dogHash,
 				lastUpdated: state.lastUpdated,
 				mode: state.mode,
+				notes: state.notes,
 			}),
 		}
 	)
