@@ -114,11 +114,12 @@ export function AdopterLandingPageApp() {
 										Your current appointment is <span className="font-semibold">{currentAppt.instantDisplay}.</span>
 										<CancelAppointmentButton />
 										<BookAppointmentButton />
+										<ManageWatchlistButton />
 										<MessageAdoptionsButton />
 										<UpdatePreferencesButton />
 										<ReportBugButton />
 									</div>
-									<div className="m-auto flex w-sm flex-col gap-y-1">
+									<div className="m-auto hidden w-sm flex-col gap-y-1 md:flex">
 										{currentAppt.ID && <AppointmentCard apptID={currentAppt.ID} context={AppointmentCardContext.CURRENT_APPOINTMENT} />}
 									</div>
 								</>
@@ -270,6 +271,9 @@ function UpdatePreferencesButton() {
 }
 
 function ManageWatchlistButton() {
+	const session = useSessionState()
+	const currentAppt = session.user?.currentAppt
+
 	const handleClick = useCallback(async () => {
 		window.location.href = "/watchlist/"
 	}, [])
@@ -278,8 +282,9 @@ function ManageWatchlistButton() {
 		<>
 			<LargeButton label="Manage My Dog Watchlist" onClick={handleClick} />
 			<p className="text-sm text-gray-500">
-				Wondering if a specific dog will be at your appointment? Add them to your watchlist before booking — your appointment view will show which of your watchlisted
-				dogs are expected to be available. You'll also be notified if a dog on your watchlist is adopted prior to your appointment.
+				{currentAppt
+					? "Keep track of specific dogs you'd like to meet. You'll be notified if a dog on your watchlist is adopted prior to your appointment."
+					: "Wondering if a specific dog will be at your appointment? Add them to your watchlist before booking — your appointment view will show which of your watchlisted dogs are expected to be available. You'll also be notified if a dog on your watchlist is adopted prior to your appointment."}
 			</p>
 		</>
 	)
@@ -317,17 +322,17 @@ function MessageAdoptionsButton({
 
 	const quickTexts: QuickText[] = includeQTs
 		? createQuickTexts().filter((qt) => {
-			if (qt.value === AdopterInquiryTemplate.VISIT_MY_DOG) {
-				return pendingAdoptionStatus != null && pendingAdoptionStatus !== PendingAdoptionStatus.READY_TO_ROLL
-			}
-			if (qt.value === AdopterInquiryTemplate.PICK_UP_MY_DOG) {
-				return pendingAdoptionStatus === PendingAdoptionStatus.READY_TO_ROLL
-			}
-			if (qt.value === AdopterInquiryTemplate.SURRENDER_MY_DOG) {
-				return pendingAdoptionStatus == null
-			}
-			return true
-		})
+				if (qt.value === AdopterInquiryTemplate.VISIT_MY_DOG) {
+					return pendingAdoptionStatus != null && pendingAdoptionStatus !== PendingAdoptionStatus.READY_TO_ROLL
+				}
+				if (qt.value === AdopterInquiryTemplate.PICK_UP_MY_DOG) {
+					return pendingAdoptionStatus === PendingAdoptionStatus.READY_TO_ROLL
+				}
+				if (qt.value === AdopterInquiryTemplate.SURRENDER_MY_DOG) {
+					return pendingAdoptionStatus == null
+				}
+				return true
+			})
 		: []
 
 	if (!session.user?.adopterID) {
