@@ -21,13 +21,13 @@ describe("ChangeLogApp", () => {
 
 	it("lists every entry under its date, newest date first", () => {
 		vi.useFakeTimers({ toFake: ["Date"] })
-		vi.setSystemTime(new Date("2026-10-24T16:00:00Z"))
+		vi.setSystemTime(new Date("2026-10-27T16:00:00Z"))
 		renderPage()
 		for (const entry of CHANGE_LOG_ENTRIES) {
 			expect(screen.getByText(entry.title)).toBeVisible()
 		}
 		const headings = screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent)
-		expect(headings[0]).toBe("Oct 24, 2026")
+		expect(headings[0]).toBe("Oct 27, 2026")
 		expect(headings[headings.length - 1]).toBe("Oct 1, 2026")
 		expect(screen.queryByText("Older Changes")).not.toBeInTheDocument()
 	})

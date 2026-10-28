@@ -11,6 +11,13 @@ export interface IChangeLogEntry {
 // Add new entries at the top. Write them for shelter staff, not developers.
 export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 	{
+		date: "2026-10-27",
+		details:
+			"Changing the dog on an adoption added from the Chosen Board no longer shows an error. After a change, the dashboard and emails no longer show the previous dog's photo.",
+		title: "Change Dog on the Chosen Board works for every adoption",
+		type: ChangeLogEntryType.FIX,
+	},
+	{
 		date: "2026-10-24",
 		details:
 			'Pick the pending adoption from the list, or check "Adoption Not Listed" to type in the dog (and the adopter, if known). The adopter\'s name now shows on the visit card.',
