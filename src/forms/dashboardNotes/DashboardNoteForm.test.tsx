@@ -109,6 +109,18 @@ describe("DashboardNoteForm", () => {
 
 		await userEvent.click(screen.getByText("Remove Automatically"))
 
-		expect(screen.getByText("Last Day Shown")).toBeInTheDocument()
+		// Untouched: required star only, no error icon yet
+		const label = screen.getByText("Last Day Shown").closest("label")!
+		expect(label.querySelector("[data-icon=star]")).not.toBeNull()
+		expect(label.querySelector("[data-icon=circle-exclamation]")).toBeNull()
+	})
+
+	it("keeps the dog field in the same place when Dog Not Listed swaps it", async () => {
+		render(<DashboardNoteForm modalState={modalState} />)
+		const labelOrder = () => screen.getAllByText(/^(Dog|Dog Not Listed|Note)$/).map((el) => el.textContent)
+
+		expect(labelOrder()).toEqual(["Dog", "Dog Not Listed", "Note"])
+		await userEvent.click(screen.getByText("Dog Not Listed"))
+		expect(labelOrder()).toEqual(["Dog", "Dog Not Listed", "Note"])
 	})
 })

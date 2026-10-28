@@ -29,9 +29,9 @@ export function DateInput({
 				elemID={elemID}
 				errors={errors}
 				fieldLabel={fieldLabel}
-				showError={(errors ?? []).length > 0}
-				showRecommended={!dirty && showRecommended}
-				showRequired={!dirty && showRequired}
+				showError={dirty && (errors ?? []).length > 0}
+				showRecommended={!dirty && showRecommended && !value}
+				showRequired={!dirty && showRequired && !value}
 			/>
 			<DatePicker
 				className="modal-date-picker"
@@ -46,10 +46,14 @@ export function DateInput({
 				value={value?.instant.toDate()}
 				weekStart={0}
 				onBlur={() => setDirty(true)}
-				onChange={(date) => onChange(new DateTime(date?.toISOString()))}
+				onChange={(date) => {
+					// oneTap pickers can close without blurring, so picking a date counts as touching the field too
+					setDirty(true)
+					onChange(new DateTime(date?.toISOString()))
+				}}
 				{...addlProps}
 			/>
-			{errors && <InputErrorLabel errors={errors} />}
+			{errors && dirty && <InputErrorLabel errors={errors} />}
 		</>
 	)
 }

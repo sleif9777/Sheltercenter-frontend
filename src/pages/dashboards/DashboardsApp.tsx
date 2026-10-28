@@ -290,7 +290,7 @@ export default function DashboardsApp() {
 				{/* Sticky inside the scroller, so only the dog lists scroll (manually or via auto-scroll). */}
 				<div className="sticky top-0 z-10 flex flex-col gap-4 bg-white pb-2">
 					<h1 className="text-3xl font-medium select-none md:text-5xl">{DASHBOARD_MODE_TITLES[mode]}</h1>
-					<div className="m-auto flex items-center gap-4">
+					<div className="m-auto flex flex-col items-center gap-1">
 						<RadioInput
 							className=""
 							columnOverride={MODE_COLUMNS[modeOptions.length]}

@@ -83,20 +83,25 @@ function Fieldset({
 
 	return (
 		<div className="flex flex-col gap-y-1">
-			{!formData.notListed && <DogSelectField errors={errors["dogID"]} fieldLabel="Dog" value={formData.dogID.toString()} onChange={handleDogChange} />}
-			<CheckboxInput fieldLabel="Dog Not Listed" value={formData.notListed} onChange={handleNotListedChange} />
-			{formData.notListed && (
+			{/* The lookup and the typed name share one slot, so checking "Dog Not Listed" swaps them in place */}
+			{formData.notListed ? (
 				<TextInput errors={errors["dogName"]} fieldLabel="Dog" showRequired value={formData.dogName} onChange={(v) => setField("dogName", v)} />
+			) : (
+				<DogSelectField errors={errors["dogID"]} fieldLabel="Dog" value={formData.dogID.toString()} onChange={handleDogChange} />
 			)}
-			<TextInput errors={errors["note"]} fieldLabel="Note" showRequired value={formData.note} onChange={(v) => setField("note", v)} />
+			<CheckboxInput fieldLabel="Dog Not Listed" value={formData.notListed} onChange={handleNotListedChange} />
+			<TextInput className="mt-3" errors={errors["note"]} fieldLabel="Note" showRequired value={formData.note} onChange={(v) => setField("note", v)} />
 			<div className="flex flex-row gap-x-2">
 				{NOTE_QUICK_OPTIONS.map((option) => (
 					<SubmissionButton addlProps={{ type: "button" }} key={option} label={option} onClick={() => setField("note", option)} />
 				))}
 			</div>
-			<CheckboxInput fieldLabel="Remove Automatically" value={formData.expires} onChange={handleExpiresChange} />
+			<div className="mt-3">
+				<CheckboxInput fieldLabel="Remove Automatically" value={formData.expires} onChange={handleExpiresChange} />
+			</div>
 			{formData.expires && (
-				<div className="max-w-2xs">
+				// DateInput renders its label bare; a flex column lets the label's text-left take effect, as in TextInput
+				<div className="flex max-w-2xs flex-col gap-1 text-left">
 					<DateInput
 						addlProps={{
 							cleanable: false,
