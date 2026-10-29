@@ -81,6 +81,23 @@ export function RichTextInput({
 				.quill-wrapper .ql-editor:focus {
 					outline: none;
 				}
+
+				/* Stretch the typing area to fill the box, so a click anywhere below the text places the cursor */
+				.quill-wrapper .quill {
+					display: flex;
+					flex-direction: column;
+				}
+
+				.quill-wrapper .ql-container {
+					display: flex;
+					flex: 1;
+					flex-direction: column;
+				}
+
+				.quill-wrapper .ql-editor {
+					flex: 1;
+					height: auto;
+				}
 			`}</style>
 			<div className="quill-wrapper rounded border-2 border-gray-300 transition-all duration-200 focus-within:border-pink-500 focus-within:shadow-[0_0_0_2px_rgba(236,72,153,0.3)] hover:border-pink-500">
 				<ReactQuill
