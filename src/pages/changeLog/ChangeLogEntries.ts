@@ -13,6 +13,20 @@ export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 	{
 		date: "2026-10-28",
 		details:
+			'On an adopter\'s home page, their appointment card now sits at the top of its column instead of floating in the middle. If they haven\'t filled in their preferences or watchlist yet, the card links to "Add My Preferences" and "Add My Watchlist".',
+		title: "Adopter appointment card links to preferences and watchlist",
+		type: ChangeLogEntryType.IMPROVEMENT,
+	},
+	{
+		date: "2026-10-28",
+		details:
+			"Reopening a message form after sending a message from a template no longer shows that template still selected over an empty, locked message. Clicking anywhere in a message box now puts the cursor there, not just on the first line.",
+		title: "Message forms reset properly and are easier to click into",
+		type: ChangeLogEntryType.FIX,
+	},
+	{
+		date: "2026-10-28",
+		details:
 			'The "Hope to see you again soon" email now reminds adopters that they don\'t need to reapply, and shows the date their approval lasts until. This is left out if their approval has already expired.',
 		title: "No-decision email explains adopters don't need to reapply",
 		type: ChangeLogEntryType.IMPROVEMENT,
