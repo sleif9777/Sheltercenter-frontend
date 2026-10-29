@@ -67,7 +67,7 @@ export function AppointmentCard({ apptID, context }: AppointmentCardProps) {
 					<AboutSection apptData={apptData} />
 					<SurrenderInfoSection apptData={apptData} />
 					<VisitInfoSection apptData={apptData} />
-					{context == AppointmentCardContext.CURRENT_APPOINTMENT && session.adopterUser && <AdopterSetupSection apptData={apptData} />}
+					{context == AppointmentCardContext.CURRENT_APPOINTMENT && session.adopterUser && <AdopterSetupSection />}
 				</>
 			)}
 		</StandardCard>

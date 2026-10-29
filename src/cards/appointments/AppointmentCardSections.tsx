@@ -1,8 +1,10 @@
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { ReactNode } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import { useStore } from "zustand"
 
+import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
+import { DogsAPI } from "../../api/dogs/DogsAPI"
 import { CardItem, CardListSection } from "../../core/components/card/CardListSection"
 import { CardTableSection } from "../../core/components/card/CardTableSection"
 import { ValueLabelPair } from "../../core/components/formInputs/SelectInput"
@@ -22,7 +24,7 @@ import {
 import { BookingMessageTemplate } from "../../enums/BookingEnums"
 import { EnumLabel } from "../../enums/EnumLabel"
 import { MessageForm, QuickText, WildcardDefaults } from "../../forms/users/MessageForm"
-import { AdopterDemographics } from "../../models/AdopterModels"
+import { AdopterDemographics, AdopterPreferences } from "../../models/AdopterModels"
 import { IAppointment } from "../../models/AppointmentModels"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
 import { StringUtils } from "../../utils/StringUtils"
@@ -301,38 +303,50 @@ function WatchlistSection({ apptData }: { apptData: IAppointment }) {
 }
 
 // On the adopter's own card, points them to whatever they haven't filled in yet, which would otherwise
-// leave the card nearly empty
-export function AdopterSetupSection({ apptData }: { apptData: IAppointment }) {
-	const { adopter } = unpackApptData(apptData)
+// leave the card nearly empty. Adopters' card data never includes the booking, so this looks up their
+// own preferences and watchlist, and shows nothing if either lookup fails.
+export function AdopterSetupSection() {
+	const adopterID = useSessionState().user?.adopterID
+	const [missing, setMissing] = useState<{ preferences: boolean; watchlist: boolean } | null>(null)
 
-	if (!apptData.hasCurrentBooking || !adopter) {
-		return
-	}
+	useEffect(() => {
+		if (!adopterID) return
+		Promise.all([new AdoptersAPI().GetAdopterPreferences(adopterID), new DogsAPI().GetWatchlistForAdopter(adopterID)])
+			.then(([prefsResp, watchlistResp]) =>
+				setMissing({
+					preferences: !!prefsResp?.pref && !hasPreferences(prefsResp.pref),
+					watchlist: Array.isArray(watchlistResp?.watchlist) && watchlistResp.watchlist.length === 0,
+				})
+			)
+			.catch(() => setMissing(null))
+	}, [adopterID])
 
-	const prefs = adopter.preferences
-	const hasPreferences =
-		prefs.activityLevel != null ||
-		prefs.housingType != null ||
-		prefs.housingOwnership != null ||
-		prefs.hasFence ||
-		prefs.hasCats ||
-		prefs.hasDogs ||
-		prefs.hasOtherPets ||
-		!!prefs.minWeightPreference ||
-		!!prefs.maxWeightPreference ||
-		(prefs.genderPreference != null && prefs.genderPreference != GenderPreference.NO_PREFERENCE) ||
-		(prefs.agePreference != null && prefs.agePreference != AgePreference.NO_PREFERENCE)
-	const hasWatchlist = adopter.watchlist.length > 0
-
-	if (hasPreferences && hasWatchlist) {
+	if (!missing || (!missing.preferences && !missing.watchlist)) {
 		return
 	}
 
 	return (
 		<div className="flex flex-row flex-wrap justify-center gap-x-6 gap-y-1 border-b py-2 text-lg last:border-b-0">
-			{!hasPreferences && <SetupLink href="/preferences/" label="Add My Preferences" />}
-			{!hasWatchlist && <SetupLink href="/watchlist/" label="Add My Watchlist" />}
+			{missing.preferences && <SetupLink href="/preferences/" label="Add My Preferences" />}
+			{missing.watchlist && <SetupLink href="/watchlist/" label="Add My Watchlist" />}
 		</div>
+	)
+}
+
+// Whether anything the About section shows has been filled in
+export function hasPreferences(prefs: Partial<AdopterPreferences>) {
+	return (
+		prefs.activityLevel != null ||
+		prefs.housingType != null ||
+		prefs.housingOwnership != null ||
+		!!prefs.hasFence ||
+		!!prefs.hasCats ||
+		!!prefs.hasDogs ||
+		!!prefs.hasOtherPets ||
+		!!prefs.minWeightPreference ||
+		!!prefs.maxWeightPreference ||
+		(prefs.genderPreference != null && prefs.genderPreference != GenderPreference.NO_PREFERENCE) ||
+		(prefs.agePreference != null && prefs.agePreference != AgePreference.NO_PREFERENCE)
 	)
 }
 
