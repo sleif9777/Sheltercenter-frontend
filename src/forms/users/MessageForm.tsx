@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { faDollarSign, faEnvelopeCircleCheck, faExclamationCircle, IconDefinition } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { SetStateAction, useCallback, useEffect, useMemo, useState } from "react"
+import { SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import ReactQuill from "react-quill"
 
 import { AdoptersAPI } from "../../api/adopters/AdoptersAPI"
 import { ReportBugRequest, SendMessageRequest } from "../../api/adopters/Requests"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
+import { ChatbotAPI } from "../../api/chatbot/ChatbotAPI"
+import { MAX_QUESTION_LENGTH } from "../../api/chatbot/Requests"
+import { AskResponse, ChatbotStatusResponse } from "../../api/chatbot/Responses"
 import { PendingAdoptionsAPI } from "../../api/pendingAdoptions/PendingAdoptionsAPI"
-import { deltaToPlainText, extractWildcardsFromDelta, replaceWildcardsInDelta } from "../../utils/QuillUtils"
+import { deltaToPlainText, extractWildcardsFromDelta, messageToPlainText, replaceWildcardsInDelta } from "../../utils/QuillUtils"
 import { StringInputProps } from "../../core/components/formInputs/InputHandlers"
 import RadioInput from "../../core/components/formInputs/RadioInput"
 import { RichTextInput } from "../../core/components/formInputs/RichTextInput"
@@ -22,6 +25,7 @@ import { ModalState } from "../../core/components/modal/Modal"
 import { BookingMessageTemplate } from "../../enums/BookingEnums"
 import { useSessionState } from "../../core/session/SessionState"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
+import { ChatbotAnswer } from "../chatbot/ChatbotAnswer"
 import { FormProvider } from "../FormProvider"
 import { ErrorMap } from "../FormState"
 import { MessageAdopterFormFieldUpdater, useMessageFormState } from "./MessageFormState"
@@ -68,6 +72,67 @@ export function MessageForm({
 		schedule = useScheduleState()
 	const { reset, setField, errors, ...fields } = formState
 	const [sent, setSent] = useState(false)
+
+	// --- chatbot state ---
+	const [chatbotStatus, setChatbotStatus] = useState<ChatbotStatusResponse | null>(null)
+	const [botAnswer, setBotAnswer] = useState<{ answer: string; interactionID: number } | null>(null)
+	// Resolves the pending submit once the adopter is done with the chatbot's answer
+	const finishBotAnswer = useRef<(() => void) | null>(null)
+	const usesChatbot = isMessageToAdoptions && !isIssueReport && !adoptionID
+
+	useEffect(() => {
+		if (!usesChatbot) return
+		new ChatbotAPI()
+			.GetStatus(adopterID)
+			.then((resp) => setChatbotStatus(resp ?? null))
+			.catch(() => setChatbotStatus(null))
+	}, [adopterID, usesChatbot])
+
+	// Tries the chatbot on a message written without a template. Returns false when the message should go to
+	// staff the usual way: chatbot off, over the daily cap or length limit, or the request failed.
+	const handledByChatbot = useCallback(
+		async (question: string) => {
+			const remaining = chatbotStatus?.questionsRemaining
+			if (!chatbotStatus?.enabled || remaining === 0 || !question || question.length > MAX_QUESTION_LENGTH) {
+				return false
+			}
+
+			const resp = await new ChatbotAPI().Ask({ adopterID, question })
+			if (resp?.status !== 200) {
+				return false
+			}
+
+			const data: AskResponse = resp.data
+			setChatbotStatus({ ...chatbotStatus, questionsRemaining: data.questionsRemaining })
+
+			if (data.answered) {
+				await new Promise<void>((resolve) => {
+					finishBotAnswer.current = resolve
+					setBotAnswer({ answer: data.answer, interactionID: data.interactionID })
+				})
+				return true
+			}
+
+			// The chatbot couldn't answer, so it already sent the message to staff
+			setSent(true)
+			await new Promise<void>((resolve) => setTimeout(resolve, 4000))
+			return true
+		},
+		[adopterID, chatbotStatus]
+	)
+
+	const sendBotAnswerToStaff = useCallback(async () => {
+		if (!botAnswer) return
+		const resp = await new ChatbotAPI().SendToStaff(botAnswer.interactionID)
+		if (resp?.status !== 204) {
+			showToast({ level: MessageLevel.Error, message: "Failed to send!" })
+			return
+		}
+		setBotAnswer(null)
+		setSent(true)
+		await new Promise<void>((resolve) => setTimeout(resolve, 4000))
+		finishBotAnswer.current?.()
+	}, [botAnswer])
 
 	// --- wildcard state ---
 	const [wildcardValues, setWildcardValues] = useState<Record<string, string>>({})
@@ -119,6 +184,10 @@ export function MessageForm({
 				return
 			}
 
+			if (usesChatbot && updatedReq.templateFlag == null && (await handledByChatbot(messageToPlainText(updatedReq.message)))) {
+				return
+			}
+
 			const resp = isMessageToAdoptions ? await new AdoptersAPI().MessageAdoptions(updatedReq) : await new AdoptersAPI().MessageAdopter(updatedReq)
 
 			if (resp.status == 204) {
@@ -132,7 +201,7 @@ export function MessageForm({
 				showToast({ level: MessageLevel.Error, message: "Failed to send!" })
 			}
 		},
-		[adopterID, adoptionID, adoptionSubject, apptID, fields, isIssueReport, isMessageToAdoptions, onSuccess, schedule]
+		[adopterID, adoptionID, adoptionSubject, apptID, fields, handledByChatbot, isIssueReport, isMessageToAdoptions, onSuccess, schedule, usesChatbot]
 	)
 
 	const handleManualEdit = useCallback(() => {
@@ -162,6 +231,7 @@ export function MessageForm({
 		<FormProvider
 			formState={formState}
 			hideCancel
+			hideFooter={!!botAnswer}
 			modalState={modalState}
 			submitButtonProps={{
 				icon: faEnvelopeCircleCheck,
@@ -171,6 +241,8 @@ export function MessageForm({
 		>
 			{sent ? (
 				<Message level={MessageLevel.Success} message="Your message was sent! This window will close shortly." />
+			) : botAnswer ? (
+				<ChatbotAnswer answer={botAnswer.answer} onAccept={() => finishBotAnswer.current?.()} onSendToStaff={sendBotAnswerToStaff} />
 			) : (
 				<Fieldset
 					errors={errors}

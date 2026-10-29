@@ -23,6 +23,7 @@ export function FormProvider<T extends object>({
 	errorTooltip,
 	formState,
 	hideCancel,
+	hideFooter,
 	modalState,
 	onSubmit,
 	onCancel,
@@ -35,6 +36,8 @@ export function FormProvider<T extends object>({
 	debug?: boolean
 	errorTooltip?: string
 	hideCancel?: boolean
+	// Hides the submit and cancel buttons, e.g. while the form body asks the user something else
+	hideFooter?: boolean
 	formState: FormState<T> & T
 	modalState?: ModalState
 	onSubmit: FormSubmitHandler<T>
@@ -102,32 +105,34 @@ export function FormProvider<T extends object>({
 			</div>
 
 			{/* Sticky footer */}
-			<div className={`mt-3 flex shrink-0 flex-row justify-end gap-x-3 border-t ${border} py-3 text-black`}>
-				{!hideCancel && (
-					<TooltipProvider tooltip={cancelButtonProps?.tooltip ?? "Close without saving"}>
+			{!hideFooter && (
+				<div className={`mt-3 flex shrink-0 flex-row justify-end gap-x-3 border-t ${border} py-3 text-black`}>
+					{!hideCancel && (
+						<TooltipProvider tooltip={cancelButtonProps?.tooltip ?? "Close without saving"}>
+							<SubmissionButton
+								addlProps={{
+									type: "button",
+								}}
+								colorOverride={colorOverride}
+								icon={cancelButtonProps?.icon ?? faXmark}
+								label={cancelButtonProps?.label ?? "Cancel"}
+								onClick={handleCancel}
+							/>
+						</TooltipProvider>
+					)}
+					<TooltipProvider tooltip={allErrors.length > 0 ? (errorTooltip ?? "Fix errors to submit") : ""}>
 						<SubmissionButton
 							addlProps={{
-								type: "button",
+								type: "submit",
 							}}
 							colorOverride={colorOverride}
-							icon={cancelButtonProps?.icon ?? faXmark}
-							label={cancelButtonProps?.label ?? "Cancel"}
-							onClick={handleCancel}
+							disabled={!isValid || isSubmitting}
+							icon={submitButtonProps?.icon ?? faCheck}
+							label={isSubmitting ? "Sending..." : (submitButtonProps?.label ?? "Submit")}
 						/>
 					</TooltipProvider>
-				)}
-				<TooltipProvider tooltip={allErrors.length > 0 ? (errorTooltip ?? "Fix errors to submit") : ""}>
-					<SubmissionButton
-						addlProps={{
-							type: "submit",
-						}}
-						colorOverride={colorOverride}
-						disabled={!isValid || isSubmitting}
-						icon={submitButtonProps?.icon ?? faCheck}
-						label={isSubmitting ? "Sending..." : (submitButtonProps?.label ?? "Submit")}
-					/>
-				</TooltipProvider>
-			</div>
+				</div>
+			)}
 		</form>
 	)
 }

@@ -20,7 +20,6 @@ import { Modal, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
 import { syncAdopterSession } from "../../core/session/syncAdopterSession"
 import { PendingAdoptionStatus } from "../../enums/PendingAdoptionEnums"
-import { AskAdoptions } from "../../forms/chatbot/AskAdoptions"
 import { MessageForm, QuickText } from "../../forms/users/MessageForm"
 import FullWidthPage from "../../layouts/FullWidthPage/FullWidthPage"
 import PlaceholderText from "../../layouts/PlaceholderText/PlaceholderText"
@@ -336,8 +335,7 @@ function MessageAdoptionsButton({
 			})
 		: []
 
-	const adopterID = session.user?.adopterID
-	if (!adopterID) {
+	if (!session.user?.adopterID) {
 		return
 	}
 
@@ -346,20 +344,13 @@ function MessageAdoptionsButton({
 			<LargeButton label="Message Adoptions" onClick={modalState.open} />
 			<p className="text-sm text-gray-500">Have a question for us? Our team typically responds within 24 hours during operating hours.</p>
 			<Modal modalState={modalState} modalTitle={"Message Adoptions"}>
-				<AskAdoptions
-					adopterID={adopterID}
-					messageForm={(initialValue) => (
-						<MessageForm
-							adopterID={adopterID}
-							hideSubject
-							initialValue={initialValue}
-							isMessageToAdoptions
-							modalState={modalState}
-							quickTextOptions={includeQTs ? quickTexts : undefined}
-							readyToRollInstant={readyToRollInstant ?? undefined}
-						/>
-					)}
-					onDone={modalState.close}
+				<MessageForm
+					adopterID={session.user?.adopterID}
+					hideSubject
+					isMessageToAdoptions
+					modalState={modalState}
+					quickTextOptions={includeQTs ? quickTexts : undefined}
+					readyToRollInstant={readyToRollInstant ?? undefined}
 				/>
 			</Modal>
 		</>

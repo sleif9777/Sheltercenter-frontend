@@ -85,6 +85,17 @@ export function deltaToPlainText(content: ReactQuill.Value | undefined): string 
 }
 
 /**
+ * Converts editor content, HTML or a Quill delta, to plain text with one line per paragraph
+ */
+export function messageToPlainText(content: ReactQuill.Value | undefined): string {
+    if (typeof content !== "string") return deltaToPlainText(content).trim()
+
+    const withBreaks = content.replace(/<br\s*\/?>/gi, "\n").replace(/<\/(p|li|h\d)>/gi, "\n")
+    const text = new DOMParser().parseFromString(withBreaks, "text/html").body.textContent ?? ""
+    return text.replace(/\n{3,}/g, "\n\n").trim()
+}
+
+/**
  * Converts plain text back to a simple Quill delta
  */
 export function plainTextToDelta(text: string): ReactQuill.Value {
