@@ -300,6 +300,50 @@ function WatchlistSection({ apptData }: { apptData: IAppointment }) {
 	return <CardTableSection items={watchlistTable} showBorder title="Watchlist" />
 }
 
+// On the adopter's own card, points them to whatever they haven't filled in yet, which would otherwise
+// leave the card nearly empty
+export function AdopterSetupSection({ apptData }: { apptData: IAppointment }) {
+	const { adopter } = unpackApptData(apptData)
+
+	if (!apptData.hasCurrentBooking || !adopter) {
+		return
+	}
+
+	const prefs = adopter.preferences
+	const hasPreferences =
+		prefs.activityLevel != null ||
+		prefs.housingType != null ||
+		prefs.housingOwnership != null ||
+		prefs.hasFence ||
+		prefs.hasCats ||
+		prefs.hasDogs ||
+		prefs.hasOtherPets ||
+		!!prefs.minWeightPreference ||
+		!!prefs.maxWeightPreference ||
+		(prefs.genderPreference != null && prefs.genderPreference != GenderPreference.NO_PREFERENCE) ||
+		(prefs.agePreference != null && prefs.agePreference != AgePreference.NO_PREFERENCE)
+	const hasWatchlist = adopter.watchlist.length > 0
+
+	if (hasPreferences && hasWatchlist) {
+		return
+	}
+
+	return (
+		<div className="flex flex-row flex-wrap justify-center gap-x-6 gap-y-1 border-b py-2 text-lg last:border-b-0">
+			{!hasPreferences && <SetupLink href="/preferences/" label="Add My Preferences" />}
+			{!hasWatchlist && <SetupLink href="/watchlist/" label="Add My Watchlist" />}
+		</div>
+	)
+}
+
+function SetupLink({ href, label }: { href: string; label: string }) {
+	return (
+		<a className="font-semibold text-pink-700 underline hover:text-pink-900" href={href}>
+			{label}
+		</a>
+	)
+}
+
 export function SurrenderInfoSection({ apptData }: { apptData: IAppointment }) {
 	if (apptData.type !== AppointmentType.SURRENDER || !apptData.notes) {
 		return

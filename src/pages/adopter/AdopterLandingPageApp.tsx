@@ -119,7 +119,7 @@ export function AdopterLandingPageApp() {
 										<UpdatePreferencesButton />
 										<ReportBugButton />
 									</div>
-									<div className="m-auto hidden w-sm flex-col gap-y-1 md:flex">
+									<div className="mx-auto hidden w-sm flex-col gap-y-1 self-start md:flex">
 										{currentAppt.ID && <AppointmentCard apptID={currentAppt.ID} context={AppointmentCardContext.CURRENT_APPOINTMENT} />}
 									</div>
 								</>
