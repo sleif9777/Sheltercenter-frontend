@@ -11,6 +11,13 @@ export interface IChangeLogEntry {
 // Add new entries at the top. Write them for shelter staff, not developers.
 export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 	{
+		date: "2026-10-28",
+		details:
+			'The "Hope to see you again soon" email now reminds adopters that they don\'t need to reapply, and shows the date their approval lasts until. This is left out if their approval has already expired.',
+		title: "No-decision email explains adopters don't need to reapply",
+		type: ChangeLogEntryType.IMPROVEMENT,
+	},
+	{
 		date: "2026-10-27",
 		details:
 			'Admins and superusers can add short notes about a dog (like "Offsite" or "Trial") from the new Notes tab on the dashboard, for dogs in the system or typed in by name. Notes can be removed by hand or automatically after a chosen day. The tab only appears on the dashboard while there is at least one note.',
