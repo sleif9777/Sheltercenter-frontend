@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { AxiosError } from "axios"
 import { faDollarSign, faEnvelopeCircleCheck, faExclamationCircle, IconDefinition } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -127,6 +128,10 @@ export function MessageForm({
 		if (!botAnswer) return null
 		const resp = await new ChatbotAPI().AcceptOffer(botAnswer.interactionID)
 		if (resp?.status !== 200) {
+			if (!isConflict(resp)) {
+				showToast({ level: MessageLevel.Error, message: TRY_AGAIN })
+				return null
+			}
 			showToast({ level: MessageLevel.Error, message: "Sorry, that time is no longer available." })
 			setBotAnswer({ ...botAnswer, offer: null })
 			return null
@@ -139,6 +144,10 @@ export function MessageForm({
 		if (!botAnswer) return false
 		const resp = await new ChatbotAPI().AcceptCancellation(botAnswer.interactionID)
 		if (resp?.status !== 200) {
+			if (!isConflict(resp)) {
+				showToast({ level: MessageLevel.Error, message: TRY_AGAIN })
+				return false
+			}
 			showToast({ level: MessageLevel.Error, message: "Sorry, that appointment can't be canceled here. Please use Cancel My Appointment on your home page." })
 			setBotAnswer({ ...botAnswer, offerCancel: null })
 			return false
@@ -327,6 +336,14 @@ export function MessageForm({
 			)}
 		</FormProvider>
 	)
+}
+
+const TRY_AGAIN = "Sorry, something went wrong. Please try again."
+
+// 409 means the offer can't happen anymore (the time was taken, or the appointment already changed);
+// anything else may work on a retry, so the offer stays
+function isConflict(resp: unknown) {
+	return (resp as AxiosError | undefined)?.response?.status === 409
 }
 
 function pickBotAnswer(data: AskResponse) {

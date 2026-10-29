@@ -131,6 +131,26 @@ describe("MessageForm chatbot", () => {
 		expect(screen.getByText("4:30 PM is open.")).toBeInTheDocument()
 	})
 
+	it("keeps the offer after a server error so the adopter can try again", async () => {
+		chatbotStatus(true)
+		vi
+			.spyOn(axios, "post")
+			.mockResolvedValueOnce({
+				data: { answer: "4:30 PM is open.", interactionID: 9, offer: { label: "4:30 PM" }, questionsRemaining: null, sentToStaff: false },
+				status: 200,
+			})
+			.mockRejectedValueOnce({ response: { data: {}, status: 500 } })
+			.mockResolvedValueOnce({ data: { label: "4:30 PM" }, status: 200 })
+		renderForm()
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("Can I switch back to 4:30?")
+		await userEvent.click(await screen.findByRole("button", { name: "Yes, reschedule my appointment" }))
+		await userEvent.click(await screen.findByRole("button", { name: "Yes, reschedule my appointment" }))
+
+		expect(await screen.findByText(/All set! Your appointment is now/)).toBeInTheDocument()
+	})
+
 	it("cancels the appointment when the adopter confirms", async () => {
 		chatbotStatus(true)
 		const post = vi
