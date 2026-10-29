@@ -23,4 +23,8 @@ export class ChatbotAPI extends APIBase {
 	async AcceptOffer(interactionID: number) {
 		return this.buildAndPost<InteractionIDRequest>("AcceptOffer", { interactionID })
 	}
+
+	async AcceptCancellation(interactionID: number) {
+		return this.buildAndPost<InteractionIDRequest>("AcceptCancellation", { interactionID })
+	}
 }

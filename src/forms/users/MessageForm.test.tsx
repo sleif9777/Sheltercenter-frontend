@@ -131,6 +131,61 @@ describe("MessageForm chatbot", () => {
 		expect(screen.getByText("4:30 PM is open.")).toBeInTheDocument()
 	})
 
+	it("cancels the appointment after the adopter confirms", async () => {
+		chatbotStatus(true)
+		const post = vi
+			.spyOn(axios, "post")
+			.mockResolvedValueOnce({
+				data: {
+					answer: "You can cancel with the button below.",
+					interactionID: 9,
+					offer: null,
+					offerCancel: { label: "Saturday, October 31 at 1:00 PM" },
+					questionsRemaining: null,
+					sentToStaff: false,
+				},
+				status: 200,
+			})
+			.mockResolvedValueOnce({ data: { label: "Saturday, October 31 at 1:00 PM" }, status: 200 })
+		renderForm()
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("Please cancel my appointment")
+		await userEvent.click(await screen.findByRole("button", { name: "Cancel my appointment" }))
+		expect(screen.getByText(/This can't be undone/)).toBeInTheDocument()
+		expect(post).toHaveBeenCalledTimes(1)
+		await userEvent.click(screen.getByRole("button", { name: "Yes, cancel it" }))
+
+		expect(post.mock.calls[1][0]).toBe("http://api.test/Chatbot/AcceptCancellation/")
+		expect(post.mock.calls[1][1]).toEqual({ interactionID: 9 })
+		expect(await screen.findByText(/is canceled/)).toBeInTheDocument()
+	})
+
+	it("keeps the appointment if the adopter changes their mind", async () => {
+		chatbotStatus(true)
+		const post = vi.spyOn(axios, "post").mockResolvedValueOnce({
+			data: {
+				answer: "You can cancel below.",
+				interactionID: 9,
+				offer: null,
+				offerCancel: { label: "Oct 31" },
+				questionsRemaining: null,
+				sentToStaff: false,
+			},
+			status: 200,
+		})
+		renderForm()
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("Please cancel my appointment")
+		await userEvent.click(await screen.findByRole("button", { name: "Cancel my appointment" }))
+		await userEvent.click(screen.getByRole("button", { name: "Keep it" }))
+
+		expect(screen.queryByText(/This can't be undone/)).not.toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Cancel my appointment" })).toBeInTheDocument()
+		expect(post).toHaveBeenCalledTimes(1)
+	})
+
 	it("sends the message to staff when the adopter still needs help", async () => {
 		chatbotStatus(true)
 		const post = vi

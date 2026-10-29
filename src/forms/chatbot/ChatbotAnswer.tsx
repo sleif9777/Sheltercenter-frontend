@@ -4,20 +4,27 @@ import { ReactNode, useState } from "react"
  * Shown in place of the Message Adoptions form when the chatbot answered the adopter's message from the
  * shelter's policies. After a full answer the adopter either accepts it or sends their message on to staff.
  * After a partial answer the message has already gone to staff, so the adopter just reads it and closes.
- * A full answer can come with an open time; the appointment only moves if the adopter presses its button.
+ * A full answer can offer an open time or a cancellation; nothing changes unless the adopter presses its
+ * button, and a cancellation asks them to confirm first.
  */
 export function ChatbotAnswer({
 	answer,
 	offer,
+	offerCancel,
 	sentToStaff,
 	onAccept,
+	onAcceptCancellation,
 	onAcceptOffer,
 	onSendToStaff,
 }: {
 	answer: string
 	offer?: string
+	// The appointment the chatbot offered to cancel
+	offerCancel?: string
 	sentToStaff: boolean
 	onAccept: () => void
+	// Resolves to true once the appointment is canceled
+	onAcceptCancellation?: () => Promise<boolean>
 	// Resolves to the appointment's new time, or null if the time is no longer open
 	onAcceptOffer?: () => Promise<string | null>
 	onSendToStaff: () => Promise<void>
@@ -25,6 +32,27 @@ export function ChatbotAnswer({
 	const [sending, setSending] = useState(false)
 	const [moving, setMoving] = useState(false)
 	const [movedTo, setMovedTo] = useState<string | null>(null)
+	const [confirmingCancel, setConfirmingCancel] = useState(false)
+	const [canceling, setCanceling] = useState(false)
+	const [canceled, setCanceled] = useState(false)
+
+	const acceptCancellation = async () => {
+		setCanceling(true)
+		try {
+			setCanceled((await onAcceptCancellation?.()) ?? false)
+		} finally {
+			setCanceling(false)
+			setConfirmingCancel(false)
+		}
+	}
+
+	if (canceled) {
+		return (
+			<Done onClose={onAccept}>
+				Your appointment on <span className="font-semibold">{offerCancel}</span> is canceled. We&apos;ve emailed you a confirmation.
+			</Done>
+		)
+	}
 
 	const acceptOffer = async () => {
 		setMoving(true)
@@ -37,14 +65,9 @@ export function ChatbotAnswer({
 
 	if (movedTo) {
 		return (
-			<div className="flex flex-col gap-y-3 text-left">
-				<div className="rounded border-2 border-green-600 bg-green-50 p-3 text-lg">
-					All set! Your appointment is now <span className="font-semibold">{movedTo}</span>. We&apos;ve emailed you a confirmation.
-				</div>
-				<div className="flex flex-row flex-wrap justify-center gap-3">
-					<AnswerButton label="Close" onClick={onAccept} />
-				</div>
-			</div>
+			<Done onClose={onAccept}>
+				All set! Your appointment is now <span className="font-semibold">{movedTo}</span>. We&apos;ve emailed you a confirmation.
+			</Done>
 		)
 	}
 
@@ -74,7 +97,21 @@ export function ChatbotAnswer({
 			) : (
 				<>
 					<div className="text-sm text-gray-500">This is an automated answer. If it doesn&apos;t help, we&apos;ll send your message to our team.</div>
+					{confirmingCancel && (
+						<div className="flex flex-col gap-y-2 rounded border-2 border-red-600 bg-red-50 p-3 text-lg">
+							<div>
+								Cancel your appointment on <span className="font-semibold">{offerCancel}</span>? This can&apos;t be undone.
+							</div>
+							<div className="flex flex-row flex-wrap justify-center gap-3">
+								<AnswerButton disabled={canceling} label={canceling ? "Canceling..." : "Yes, cancel it"} primary onClick={acceptCancellation} />
+								<AnswerButton label="Keep it" onClick={() => setConfirmingCancel(false)} />
+							</div>
+						</div>
+					)}
 					<div className="flex flex-row flex-wrap justify-center gap-3">
+						{offerCancel && onAcceptCancellation && !confirmingCancel && (
+							<AnswerButton label="Cancel my appointment" primary onClick={() => setConfirmingCancel(true)} />
+						)}
 						{offer && onAcceptOffer && (
 							<AnswerButton disabled={moving} label={moving ? "Moving..." : `Move my appointment to ${offer}`} primary onClick={acceptOffer} />
 						)}
@@ -83,6 +120,17 @@ export function ChatbotAnswer({
 					</div>
 				</>
 			)}
+		</div>
+	)
+}
+
+function Done({ children, onClose }: { children: ReactNode; onClose: () => void }) {
+	return (
+		<div className="flex flex-col gap-y-3 text-left">
+			<div className="rounded border-2 border-green-600 bg-green-50 p-3 text-lg">{children}</div>
+			<div className="flex flex-row flex-wrap justify-center gap-3">
+				<AnswerButton label="Close" onClick={onClose} />
+			</div>
 		</div>
 	)
 }

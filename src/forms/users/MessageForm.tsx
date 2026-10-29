@@ -76,7 +76,7 @@ export function MessageForm({
 
 	// --- chatbot state ---
 	const [chatbotStatus, setChatbotStatus] = useState<ChatbotStatusResponse | null>(null)
-	const [botAnswer, setBotAnswer] = useState<Pick<AskResponse, "answer" | "interactionID" | "offer" | "sentToStaff"> | null>(null)
+	const [botAnswer, setBotAnswer] = useState<Pick<AskResponse, "answer" | "interactionID" | "offer" | "offerCancel" | "sentToStaff"> | null>(null)
 	// Resolves the pending submit once the adopter is done with the chatbot's answer
 	const finishBotAnswer = useRef<(() => void) | null>(null)
 	const usesChatbot = isMessageToAdoptions && !isIssueReport && !adoptionID
@@ -109,7 +109,7 @@ export function MessageForm({
 			if (data.answer) {
 				await new Promise<void>((resolve) => {
 					finishBotAnswer.current = resolve
-					setBotAnswer({ answer: data.answer, interactionID: data.interactionID, offer: data.offer, sentToStaff: data.sentToStaff })
+					setBotAnswer({ answer: data.answer, interactionID: data.interactionID, offer: data.offer, offerCancel: data.offerCancel, sentToStaff: data.sentToStaff })
 				})
 				return true
 			}
@@ -133,6 +133,18 @@ export function MessageForm({
 		}
 		await syncAdopterSession(adopterID)
 		return (resp.data as AcceptOfferResponse).label
+	}, [adopterID, botAnswer])
+
+	const acceptBotCancellation = useCallback(async () => {
+		if (!botAnswer) return false
+		const resp = await new ChatbotAPI().AcceptCancellation(botAnswer.interactionID)
+		if (resp?.status !== 200) {
+			showToast({ level: MessageLevel.Error, message: "Sorry, that appointment can't be canceled here. Please use Cancel My Appointment on your home page." })
+			setBotAnswer({ ...botAnswer, offerCancel: null })
+			return false
+		}
+		await syncAdopterSession(adopterID)
+		return true
 	}, [adopterID, botAnswer])
 
 	const sendBotAnswerToStaff = useCallback(async () => {
@@ -260,8 +272,10 @@ export function MessageForm({
 				<ChatbotAnswer
 					answer={botAnswer.answer}
 					offer={botAnswer.offer?.label}
+					offerCancel={botAnswer.offerCancel?.label}
 					sentToStaff={botAnswer.sentToStaff}
 					onAccept={() => finishBotAnswer.current?.()}
+					onAcceptCancellation={acceptBotCancellation}
 					onAcceptOffer={acceptBotOffer}
 					onSendToStaff={sendBotAnswerToStaff}
 				/>

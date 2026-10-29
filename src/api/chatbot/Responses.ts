@@ -12,6 +12,8 @@ export type AskResponse = {
 	sentToStaff: boolean
 	// An open time the adopter can move their appointment to with one click
 	offer: { label: string } | null
+	// The adopter's current appointment, when the chatbot offered to cancel it
+	offerCancel: { label: string } | null
 	// null when there's no daily cap
 	questionsRemaining: number | null
 }
