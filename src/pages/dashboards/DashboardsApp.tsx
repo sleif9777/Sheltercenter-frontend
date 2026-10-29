@@ -464,8 +464,12 @@ function DashboardDogCard({
 			{showsWeekday(dog, hashKey, mode) && (
 				<span className="mr-1 ml-auto shrink-0 text-sm font-semibold uppercase">{DateTime.FromISODate(dog.unavailableDate).GetWeekdayShortStr()}</span>
 			)}
+			{/* Free to shrink, so a narrow column wraps it ("SAT" over "3:15") instead of overflowing; the row's
+			    items-center keeps it and the name vertically centered either way. */}
 			{showsPaperworkAppointment(dog, hashKey, mode) && (
-				<span className="mr-1 ml-auto shrink-0 text-sm font-semibold uppercase">{new DateTime(dog.paperworkAppointmentInst!).GetWeekdayShortTime()}</span>
+				<span className="mr-1 ml-auto text-right text-sm leading-tight font-semibold uppercase">
+					{new DateTime(dog.paperworkAppointmentInst!).GetWeekdayShortTime()}
+				</span>
 			)}
 		</DashboardCard>
 	)

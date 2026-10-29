@@ -15,7 +15,7 @@ export type DashboardNoteFormData = {
 
 export type DashboardNoteFormFieldUpdater = FormFieldUpdateCallback<DashboardNoteFormData>
 
-export const NOTE_QUICK_OPTIONS = ["Offsite", "Trial"]
+export const NOTE_QUICK_OPTIONS = ["Medical Foster", "Offsite", "Trial"]
 
 const initialState: DashboardNoteFormData = {
 	dogID: 0,

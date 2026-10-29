@@ -203,3 +203,29 @@ describe("DashboardsApp notes", () => {
 		expect(refresh).toHaveBeenCalled()
 	})
 })
+
+describe("DashboardsApp Ready to Roll", () => {
+	it("lets the pickup time wrap, centered beside the name", () => {
+		useDashboardsState.setState({
+			dogHash: {
+				chosen: {
+					needsSN: [],
+					needsWC: [],
+					readyToRoll: [{ ID: 1, name: "Biscuit", paperworkAppointmentInst: "2026-10-31T19:15:00Z", photoURL: "", unavailableDate: "2026-10-20" }],
+				},
+				fta: [],
+				newlyInHome: [],
+			},
+			mode: DashboardMode.CHOSEN,
+			notes: [],
+			refresh: () => {},
+		})
+		renderAs(SecurityLevel.DASHBOARD)
+
+		const pickup = screen.getByText("Sat 3:15")
+		expect(pickup).not.toHaveClass("shrink-0")
+		expect(pickup).toHaveClass("text-right")
+		expect(pickup.parentElement).toHaveClass("items-center")
+		expect(screen.getByText("Biscuit").parentElement).toBe(pickup.parentElement)
+	})
+})
