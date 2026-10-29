@@ -37,7 +37,7 @@ export function AskAdoptions({
 }) {
 	const [step, setStep] = useState<Step>({ kind: "loading" })
 	const [question, setQuestion] = useState("")
-	const [questionsRemaining, setQuestionsRemaining] = useState(0)
+	const [questionsRemaining, setQuestionsRemaining] = useState<number | null>(null)
 
 	useEffect(() => {
 		new ChatbotAPI()
@@ -45,7 +45,7 @@ export function AskAdoptions({
 			.then((resp) => {
 				if (!resp?.enabled) {
 					setStep({ kind: "form" })
-				} else if (resp.questionsRemaining < 1) {
+				} else if (resp.questionsRemaining !== null && resp.questionsRemaining < 1) {
 					setStep({ kind: "form", notice: LIMIT_NOTICE })
 				} else {
 					setQuestionsRemaining(resp.questionsRemaining)
@@ -121,9 +121,11 @@ export function AskAdoptions({
 						value={question}
 						onChange={setQuestion}
 					/>
-					<p className="text-sm text-gray-500">
-						You can ask {questionsRemaining} more {questionsRemaining === 1 ? "question" : "questions"} today.
-					</p>
+					{questionsRemaining !== null && (
+						<p className="text-sm text-gray-500">
+							You can ask {questionsRemaining} more {questionsRemaining === 1 ? "question" : "questions"} today.
+						</p>
+					)}
 					<LargeButton label="Ask" onClick={ask} />
 					<TextButton label="Skip this and write to our team" onClick={() => setStep({ kind: "form", question: question.trim() || undefined })} />
 				</div>
@@ -144,7 +146,7 @@ export function AskAdoptions({
 					</p>
 					<LargeButton label="That answers my question" onClick={onDone} />
 					<LargeButton label="I still need help" onClick={() => sendToStaff(step.interactionID)} />
-					{questionsRemaining > 0 && <TextButton label="Ask another question" onClick={askAnother} />}
+					{(questionsRemaining === null || questionsRemaining > 0) && <TextButton label="Ask another question" onClick={askAnother} />}
 				</div>
 			)
 

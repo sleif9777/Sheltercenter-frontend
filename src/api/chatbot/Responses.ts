@@ -1,6 +1,7 @@
 export type ChatbotStatusResponse = {
 	enabled: boolean
-	questionsRemaining: number
+	// null when there's no daily cap
+	questionsRemaining: number | null
 }
 
 export type AskResponse = {
@@ -8,5 +9,6 @@ export type AskResponse = {
 	// false means the question was sent to staff instead
 	answered: boolean
 	answer: string
-	questionsRemaining: number
+	// null when there's no daily cap
+	questionsRemaining: number | null
 }

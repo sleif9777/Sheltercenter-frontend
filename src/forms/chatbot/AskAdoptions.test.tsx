@@ -8,7 +8,7 @@ import { AskAdoptions } from "./AskAdoptions"
 const messageForm = vi.fn((initialValue?: string) => <div data-testid="message-form">{initialValue}</div>)
 const onDone = vi.fn()
 
-function status(enabled: boolean, questionsRemaining = 5) {
+function status(enabled: boolean, questionsRemaining: number | null = 5) {
 	vi.spyOn(axios, "get").mockResolvedValue({ data: { enabled, questionsRemaining }, status: 200 })
 }
 
@@ -78,6 +78,19 @@ describe("AskAdoptions", () => {
 
 		expect(await screen.findByText(/reached today's limit/)).toBeInTheDocument()
 		expect(messageForm).toHaveBeenLastCalledWith("<p>Hi &lt;there&gt;</p>")
+	})
+
+	it("hides the question count when there's no daily cap", async () => {
+		status(true, null)
+		vi.spyOn(axios, "post").mockResolvedValue({ data: { answer: "Yes.", answered: true, interactionID: 9, questionsRemaining: null }, status: 200 })
+		renderAsk()
+
+		await askQuestion("Question?")
+
+		expect(await screen.findByText("Yes.")).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Ask another question" })).toBeInTheDocument()
+		await userEvent.click(screen.getByRole("button", { name: "Ask another question" }))
+		expect(screen.queryByText(/more questions? today/)).not.toBeInTheDocument()
 	})
 
 	it("goes straight to the form when no questions are left today", async () => {
