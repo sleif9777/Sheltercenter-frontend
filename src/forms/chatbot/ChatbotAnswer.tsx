@@ -2,9 +2,20 @@ import { ReactNode, useState } from "react"
 
 /**
  * Shown in place of the Message Adoptions form when the chatbot answered the adopter's message from the
- * shelter's policies. The adopter either accepts the answer or sends their message on to staff.
+ * shelter's policies. After a full answer the adopter either accepts it or sends their message on to staff.
+ * After a partial answer the message has already gone to staff, so the adopter just reads it and closes.
  */
-export function ChatbotAnswer({ answer, onAccept, onSendToStaff }: { answer: string; onAccept: () => void; onSendToStaff: () => Promise<void> }) {
+export function ChatbotAnswer({
+	answer,
+	sentToStaff,
+	onAccept,
+	onSendToStaff,
+}: {
+	answer: string
+	sentToStaff: boolean
+	onAccept: () => void
+	onSendToStaff: () => Promise<void>
+}) {
 	const [sending, setSending] = useState(false)
 
 	const sendToStaff = async () => {
@@ -18,13 +29,27 @@ export function ChatbotAnswer({ answer, onAccept, onSendToStaff }: { answer: str
 
 	return (
 		<div className="flex flex-col gap-y-3 text-left">
-			<div className="text-lg">Here&apos;s an answer from our adoption policies:</div>
+			<div className="text-lg">{sentToStaff ? "Here's what our adoption policies say:" : "Here's an answer from our adoption policies:"}</div>
 			<div className="rounded border-2 border-pink-700 bg-pink-50 p-3 text-lg whitespace-pre-line">{withLinks(answer)}</div>
-			<div className="text-sm text-gray-500">This is an automated answer. If it doesn&apos;t help, we&apos;ll send your message to our team.</div>
-			<div className="flex flex-row flex-wrap justify-center gap-3">
-				<AnswerButton label="That answers my question" onClick={onAccept} />
-				<AnswerButton disabled={sending} label={sending ? "Sending..." : "Send my message to the team"} onClick={sendToStaff} />
-			</div>
+			{sentToStaff ? (
+				<>
+					<div className="text-lg">
+						We&apos;ve also sent your message to our team, and they&apos;ll follow up on the rest. Our team typically responds within 24 hours during
+						operating hours.
+					</div>
+					<div className="flex flex-row flex-wrap justify-center gap-3">
+						<AnswerButton label="Close" onClick={onAccept} />
+					</div>
+				</>
+			) : (
+				<>
+					<div className="text-sm text-gray-500">This is an automated answer. If it doesn&apos;t help, we&apos;ll send your message to our team.</div>
+					<div className="flex flex-row flex-wrap justify-center gap-3">
+						<AnswerButton label="That answers my question" onClick={onAccept} />
+						<AnswerButton disabled={sending} label={sending ? "Sending..." : "Send my message to the team"} onClick={sendToStaff} />
+					</div>
+				</>
+			)}
 		</div>
 	)
 }

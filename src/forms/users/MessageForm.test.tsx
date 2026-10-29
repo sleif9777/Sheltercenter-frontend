@@ -51,7 +51,7 @@ describe("MessageForm chatbot", () => {
 		chatbotStatus(true)
 		const post = vi
 			.spyOn(axios, "post")
-			.mockResolvedValue({ data: { answer: "We don't hold dogs.", answered: true, interactionID: 9, questionsRemaining: null }, status: 200 })
+			.mockResolvedValue({ data: { answer: "We don't hold dogs.", interactionID: 9, sentToStaff: false, questionsRemaining: null }, status: 200 })
 		renderForm()
 		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
 
@@ -67,11 +67,28 @@ describe("MessageForm chatbot", () => {
 		await vi.waitFor(() => expect(modalState.close).toHaveBeenCalled())
 	})
 
+	it("shows a partial answer and says the message went to the team", async () => {
+		chatbotStatus(true)
+		const post = vi
+			.spyOn(axios, "post")
+			.mockResolvedValue({ data: { answer: "Micah can come and sign.", interactionID: 9, questionsRemaining: null, sentToStaff: true }, status: 200 })
+		renderForm()
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("Can Micah come on Wednesday?")
+
+		expect(await screen.findByText("Micah can come and sign.")).toBeInTheDocument()
+		expect(screen.getByText(/We've also sent your message to our team/)).toBeInTheDocument()
+		await userEvent.click(screen.getByRole("button", { name: "Close" }))
+		await vi.waitFor(() => expect(modalState.close).toHaveBeenCalled())
+		expect(post).toHaveBeenCalledTimes(1)
+	})
+
 	it("sends the message to staff when the adopter still needs help", async () => {
 		chatbotStatus(true)
 		const post = vi
 			.spyOn(axios, "post")
-			.mockResolvedValueOnce({ data: { answer: "We don't hold dogs.", answered: true, interactionID: 9, questionsRemaining: null }, status: 200 })
+			.mockResolvedValueOnce({ data: { answer: "We don't hold dogs.", interactionID: 9, sentToStaff: false, questionsRemaining: null }, status: 200 })
 			.mockResolvedValueOnce({ data: {}, status: 204 })
 		renderForm()
 		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
@@ -88,7 +105,7 @@ describe("MessageForm chatbot", () => {
 		chatbotStatus(true)
 		const post = vi
 			.spyOn(axios, "post")
-			.mockResolvedValue({ data: { answer: "", answered: false, interactionID: 9, questionsRemaining: null }, status: 200 })
+			.mockResolvedValue({ data: { answer: "", interactionID: 9, sentToStaff: true, questionsRemaining: null }, status: 200 })
 		renderForm()
 		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
 
@@ -131,7 +148,7 @@ describe("MessageForm chatbot", () => {
 		useMessageFormState.getState().setField("templateFlag", 1)
 		const post = vi
 			.spyOn(axios, "post")
-			.mockResolvedValue({ data: { answer: "", answered: false, interactionID: 9, questionsRemaining: null }, status: 200 })
+			.mockResolvedValue({ data: { answer: "", interactionID: 9, sentToStaff: true, questionsRemaining: null }, status: 200 })
 		renderForm()
 		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
 
@@ -145,7 +162,7 @@ describe("MessageForm chatbot", () => {
 		chatbotStatus(true)
 		const post = vi
 			.spyOn(axios, "post")
-			.mockResolvedValue({ data: { answer: "", answered: false, interactionID: 9, questionsRemaining: null }, status: 200 })
+			.mockResolvedValue({ data: { answer: "", interactionID: 9, sentToStaff: true, questionsRemaining: null }, status: 200 })
 		renderForm([{ label: "Blank Template", templateContent: plainTextToDelta(""), value: 0 }])
 		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
 

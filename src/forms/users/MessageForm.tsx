@@ -75,7 +75,7 @@ export function MessageForm({
 
 	// --- chatbot state ---
 	const [chatbotStatus, setChatbotStatus] = useState<ChatbotStatusResponse | null>(null)
-	const [botAnswer, setBotAnswer] = useState<{ answer: string; interactionID: number } | null>(null)
+	const [botAnswer, setBotAnswer] = useState<{ answer: string; interactionID: number; sentToStaff: boolean } | null>(null)
 	// Resolves the pending submit once the adopter is done with the chatbot's answer
 	const finishBotAnswer = useRef<(() => void) | null>(null)
 	const usesChatbot = isMessageToAdoptions && !isIssueReport && !adoptionID
@@ -105,15 +105,15 @@ export function MessageForm({
 			const data: AskResponse = resp.data
 			setChatbotStatus({ ...chatbotStatus, questionsRemaining: data.questionsRemaining })
 
-			if (data.answered) {
+			if (data.answer) {
 				await new Promise<void>((resolve) => {
 					finishBotAnswer.current = resolve
-					setBotAnswer({ answer: data.answer, interactionID: data.interactionID })
+					setBotAnswer({ answer: data.answer, interactionID: data.interactionID, sentToStaff: data.sentToStaff })
 				})
 				return true
 			}
 
-			// The chatbot couldn't answer, so it already sent the message to staff
+			// The chatbot couldn't answer any of it, so it already sent the message to staff
 			setSent(true)
 			await new Promise<void>((resolve) => setTimeout(resolve, 4000))
 			return true
@@ -243,7 +243,12 @@ export function MessageForm({
 			{sent ? (
 				<Message level={MessageLevel.Success} message="Your message was sent! This window will close shortly." />
 			) : botAnswer ? (
-				<ChatbotAnswer answer={botAnswer.answer} onAccept={() => finishBotAnswer.current?.()} onSendToStaff={sendBotAnswerToStaff} />
+				<ChatbotAnswer
+					answer={botAnswer.answer}
+					sentToStaff={botAnswer.sentToStaff}
+					onAccept={() => finishBotAnswer.current?.()}
+					onSendToStaff={sendBotAnswerToStaff}
+				/>
 			) : (
 				<Fieldset
 					errors={errors}
