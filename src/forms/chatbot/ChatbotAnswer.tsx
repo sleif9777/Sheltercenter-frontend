@@ -1,23 +1,31 @@
 import { ReactNode, useState } from "react"
 
+import { MAX_QUESTION_LENGTH } from "../../api/chatbot/Requests"
+import { TextInput } from "../../core/components/formInputs/TextInput"
+
 /**
  * Shown in place of the Message Adoptions form when the chatbot answered the adopter's message from the
- * shelter's policies. After a full answer the adopter either accepts it or sends their message on to staff.
- * After a partial answer the message has already gone to staff, so the adopter just reads it and closes.
- * A full answer can offer an open time or a cancellation; nothing changes unless the adopter presses its
- * button, and a cancellation asks them to confirm first.
+ * shelter's policies:
+ * - an offer to move or cancel their appointment: they confirm it or say never mind;
+ * - a follow-up question: they reply in place, and the chatbot answers again;
+ * - a partial answer: the message has already gone to staff, so they just read it and close;
+ * - a full answer: they accept it or send their message on to staff.
  */
 export function ChatbotAnswer({
 	answer,
+	awaitingReply,
 	offer,
 	offerCancel,
 	sentToStaff,
 	onAccept,
 	onAcceptCancellation,
 	onAcceptOffer,
+	onReply,
 	onSendToStaff,
 }: {
 	answer: string
+	awaitingReply?: boolean
+	// The open time the chatbot offered to move the appointment to
 	offer?: string
 	// The appointment the chatbot offered to cancel
 	offerCancel?: string
@@ -27,112 +35,143 @@ export function ChatbotAnswer({
 	onAcceptCancellation?: () => Promise<boolean>
 	// Resolves to the appointment's new time, or null if the time is no longer open
 	onAcceptOffer?: () => Promise<string | null>
+	onReply?: (reply: string) => Promise<void>
 	onSendToStaff: () => Promise<void>
 }) {
-	const [sending, setSending] = useState(false)
-	const [moving, setMoving] = useState(false)
-	const [movedTo, setMovedTo] = useState<string | null>(null)
-	const [confirmingCancel, setConfirmingCancel] = useState(false)
-	const [canceling, setCanceling] = useState(false)
-	const [canceled, setCanceled] = useState(false)
+	const [busy, setBusy] = useState<"moving" | "canceling" | "replying" | "sending" | null>(null)
+	const [done, setDone] = useState<ReactNode>(null)
+	const [reply, setReply] = useState("")
 
-	const acceptCancellation = async () => {
-		setCanceling(true)
+	const run = async (kind: NonNullable<typeof busy>, action: () => Promise<void>) => {
+		setBusy(kind)
 		try {
-			setCanceled((await onAcceptCancellation?.()) ?? false)
+			await action()
 		} finally {
-			setCanceling(false)
-			setConfirmingCancel(false)
+			setBusy(null)
 		}
 	}
 
-	if (canceled) {
+	const acceptOffer = () =>
+		run("moving", async () => {
+			const movedTo = await onAcceptOffer?.()
+			if (movedTo) {
+				setDone(
+					<>
+						All set! Your appointment is now <span className="font-semibold">{movedTo}</span>. We&apos;ve emailed you a confirmation.
+					</>
+				)
+			}
+		})
+
+	const acceptCancellation = () =>
+		run("canceling", async () => {
+			if (await onAcceptCancellation?.()) {
+				setDone(
+					<>
+						Your appointment on <span className="font-semibold">{offerCancel}</span> is canceled. We&apos;ve emailed you a confirmation.
+					</>
+				)
+			}
+		})
+
+	if (done) {
 		return (
-			<Done onClose={onAccept}>
-				Your appointment on <span className="font-semibold">{offerCancel}</span> is canceled. We&apos;ve emailed you a confirmation.
-			</Done>
+			<div className="flex flex-col gap-y-3 text-left">
+				<div className="rounded border-2 border-green-600 bg-green-50 p-3 text-lg">{done}</div>
+				<Buttons>
+					<AnswerButton label="Close" onClick={onAccept} />
+				</Buttons>
+			</div>
 		)
 	}
 
-	const acceptOffer = async () => {
-		setMoving(true)
-		try {
-			setMovedTo((await onAcceptOffer?.()) ?? null)
-		} finally {
-			setMoving(false)
-		}
-	}
+	const answerBox = <div className="rounded border-2 border-pink-700 bg-pink-50 p-3 text-lg whitespace-pre-line">{withLinks(answer)}</div>
+	const hasOffer = !sentToStaff && ((offer && onAcceptOffer) || (offerCancel && onAcceptCancellation))
 
-	if (movedTo) {
+	if (hasOffer) {
 		return (
-			<Done onClose={onAccept}>
-				All set! Your appointment is now <span className="font-semibold">{movedTo}</span>. We&apos;ve emailed you a confirmation.
-			</Done>
+			<div className="flex flex-col gap-y-3 text-left">
+				{answerBox}
+				<Buttons>
+					{offer && onAcceptOffer && (
+						<AnswerButton
+							disabled={!!busy}
+							label={busy === "moving" ? "Rescheduling..." : "Yes, reschedule my appointment"}
+							primary
+							onClick={acceptOffer}
+						/>
+					)}
+					{offerCancel && onAcceptCancellation && (
+						<AnswerButton
+							disabled={!!busy}
+							label={busy === "canceling" ? "Canceling..." : "Yes, cancel my appointment"}
+							primary
+							onClick={acceptCancellation}
+						/>
+					)}
+					<AnswerButton disabled={!!busy} label="Never Mind" onClick={onAccept} />
+				</Buttons>
+			</div>
 		)
 	}
 
-	const sendToStaff = async () => {
-		setSending(true)
-		try {
-			await onSendToStaff()
-		} finally {
-			setSending(false)
-		}
+	if (awaitingReply && onReply && !sentToStaff) {
+		return (
+			<div className="flex flex-col gap-y-3 text-left">
+				{answerBox}
+				<TextInput
+					addlProps={{ disabled: !!busy, minRows: 2, multiline: true, slotProps: { htmlInput: { maxLength: MAX_QUESTION_LENGTH } } }}
+					errors={[]}
+					fieldLabel="Your reply"
+					value={reply}
+					onChange={setReply}
+				/>
+				<Buttons>
+					<AnswerButton
+						disabled={!!busy || !reply.trim()}
+						label={busy === "replying" ? "Sending..." : "Send reply"}
+						primary
+						onClick={() => run("replying", () => onReply(reply.trim()))}
+					/>
+					<AnswerButton disabled={!!busy} label="Send my message to the team" onClick={() => run("sending", onSendToStaff)} />
+				</Buttons>
+			</div>
+		)
 	}
 
 	return (
 		<div className="flex flex-col gap-y-3 text-left">
 			<div className="text-lg">{sentToStaff ? "Here's what our adoption policies say:" : "Here's an answer from our adoption policies:"}</div>
-			<div className="rounded border-2 border-pink-700 bg-pink-50 p-3 text-lg whitespace-pre-line">{withLinks(answer)}</div>
+			{answerBox}
 			{sentToStaff ? (
 				<>
 					<div className="text-lg">
 						We&apos;ve also sent your message to our team, and they&apos;ll follow up on the rest. Our team typically responds within 24 hours during
 						operating hours.
 					</div>
-					<div className="flex flex-row flex-wrap justify-center gap-3">
+					<Buttons>
 						<AnswerButton label="Close" onClick={onAccept} />
-					</div>
+					</Buttons>
 				</>
 			) : (
 				<>
 					<div className="text-sm text-gray-500">This is an automated answer. If it doesn&apos;t help, we&apos;ll send your message to our team.</div>
-					{confirmingCancel && (
-						<div className="flex flex-col gap-y-2 rounded border-2 border-red-600 bg-red-50 p-3 text-lg">
-							<div>
-								Cancel your appointment on <span className="font-semibold">{offerCancel}</span>? This can&apos;t be undone.
-							</div>
-							<div className="flex flex-row flex-wrap justify-center gap-3">
-								<AnswerButton disabled={canceling} label={canceling ? "Canceling..." : "Yes, cancel it"} primary onClick={acceptCancellation} />
-								<AnswerButton label="Keep it" onClick={() => setConfirmingCancel(false)} />
-							</div>
-						</div>
-					)}
-					<div className="flex flex-row flex-wrap justify-center gap-3">
-						{offerCancel && onAcceptCancellation && !confirmingCancel && (
-							<AnswerButton label="Cancel my appointment" primary onClick={() => setConfirmingCancel(true)} />
-						)}
-						{offer && onAcceptOffer && (
-							<AnswerButton disabled={moving} label={moving ? "Moving..." : `Move my appointment to ${offer}`} primary onClick={acceptOffer} />
-						)}
+					<Buttons>
 						<AnswerButton label="That answers my question" onClick={onAccept} />
-						<AnswerButton disabled={sending} label={sending ? "Sending..." : "Send my message to the team"} onClick={sendToStaff} />
-					</div>
+						<AnswerButton
+							disabled={!!busy}
+							label={busy === "sending" ? "Sending..." : "Send my message to the team"}
+							onClick={() => run("sending", onSendToStaff)}
+						/>
+					</Buttons>
 				</>
 			)}
 		</div>
 	)
 }
 
-function Done({ children, onClose }: { children: ReactNode; onClose: () => void }) {
-	return (
-		<div className="flex flex-col gap-y-3 text-left">
-			<div className="rounded border-2 border-green-600 bg-green-50 p-3 text-lg">{children}</div>
-			<div className="flex flex-row flex-wrap justify-center gap-3">
-				<AnswerButton label="Close" onClick={onClose} />
-			</div>
-		</div>
-	)
+function Buttons({ children }: { children: ReactNode }) {
+	return <div className="flex flex-row flex-wrap justify-center gap-3">{children}</div>
 }
 
 function AnswerButton({ disabled, label, primary, onClick }: { disabled?: boolean; label: string; primary?: boolean; onClick: () => void }) {

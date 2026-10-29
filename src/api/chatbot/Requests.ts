@@ -4,6 +4,8 @@ export type AskRequest = {
 	question: string
 	// The message as written in the editor, so the email to staff keeps its formatting
 	message?: string
+	// The chatbot answer this replies to, when the adopter answers its follow-up question
+	previousInteractionID?: number
 }
 
 export type InteractionIDRequest = {

@@ -76,7 +76,7 @@ export function MessageForm({
 
 	// --- chatbot state ---
 	const [chatbotStatus, setChatbotStatus] = useState<ChatbotStatusResponse | null>(null)
-	const [botAnswer, setBotAnswer] = useState<Pick<AskResponse, "answer" | "interactionID" | "offer" | "offerCancel" | "sentToStaff"> | null>(null)
+	const [botAnswer, setBotAnswer] = useState<Pick<AskResponse, "answer" | "awaitingReply" | "interactionID" | "offer" | "offerCancel" | "sentToStaff"> | null>(null)
 	// Resolves the pending submit once the adopter is done with the chatbot's answer
 	const finishBotAnswer = useRef<(() => void) | null>(null)
 	const usesChatbot = isMessageToAdoptions && !isIssueReport && !adoptionID
@@ -109,7 +109,7 @@ export function MessageForm({
 			if (data.answer) {
 				await new Promise<void>((resolve) => {
 					finishBotAnswer.current = resolve
-					setBotAnswer({ answer: data.answer, interactionID: data.interactionID, offer: data.offer, offerCancel: data.offerCancel, sentToStaff: data.sentToStaff })
+					setBotAnswer(pickBotAnswer(data))
 				})
 				return true
 			}
@@ -146,6 +146,31 @@ export function MessageForm({
 		await syncAdopterSession(adopterID)
 		return true
 	}, [adopterID, botAnswer])
+
+	// The adopter answered the chatbot's follow-up question; its next answer replaces this one
+	const replyToBot = useCallback(
+		async (reply: string) => {
+			if (!botAnswer) return
+			const resp = await new ChatbotAPI().Ask({ adopterID, previousInteractionID: botAnswer.interactionID, question: reply })
+			if (resp?.status !== 200) {
+				showToast({ level: MessageLevel.Error, message: "Sorry, something went wrong. Please try again." })
+				return
+			}
+
+			const data: AskResponse = resp.data
+			if (data.answer) {
+				setBotAnswer(pickBotAnswer(data))
+				return
+			}
+
+			// The chatbot couldn't answer, so it already sent the conversation to staff
+			setBotAnswer(null)
+			setSent(true)
+			await new Promise<void>((resolve) => setTimeout(resolve, 4000))
+			finishBotAnswer.current?.()
+		},
+		[adopterID, botAnswer]
+	)
 
 	const sendBotAnswerToStaff = useCallback(async () => {
 		if (!botAnswer) return
@@ -271,12 +296,15 @@ export function MessageForm({
 			) : botAnswer ? (
 				<ChatbotAnswer
 					answer={botAnswer.answer}
+					awaitingReply={botAnswer.awaitingReply}
+					key={botAnswer.interactionID}
 					offer={botAnswer.offer?.label}
 					offerCancel={botAnswer.offerCancel?.label}
 					sentToStaff={botAnswer.sentToStaff}
 					onAccept={() => finishBotAnswer.current?.()}
 					onAcceptCancellation={acceptBotCancellation}
 					onAcceptOffer={acceptBotOffer}
+					onReply={replyToBot}
 					onSendToStaff={sendBotAnswerToStaff}
 				/>
 			) : (
@@ -299,6 +327,11 @@ export function MessageForm({
 			)}
 		</FormProvider>
 	)
+}
+
+function pickBotAnswer(data: AskResponse) {
+	const { answer, awaitingReply, interactionID, offer, offerCancel, sentToStaff } = data
+	return { answer, awaitingReply, interactionID, offer, offerCancel, sentToStaff }
 }
 
 function Fieldset({

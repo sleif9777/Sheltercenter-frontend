@@ -14,6 +14,8 @@ export type AskResponse = {
 	offer: { label: string } | null
 	// The adopter's current appointment, when the chatbot offered to cancel it
 	offerCancel: { label: string } | null
+	// The answer asks for one more detail, which the adopter can reply with in place
+	awaitingReply: boolean
 	// null when there's no daily cap
 	questionsRemaining: number | null
 }

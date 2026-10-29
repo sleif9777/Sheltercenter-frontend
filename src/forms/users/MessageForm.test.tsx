@@ -103,7 +103,7 @@ describe("MessageForm chatbot", () => {
 		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
 
 		await send("Can I switch back to 4:30?")
-		await userEvent.click(await screen.findByRole("button", { name: "Move my appointment to Wednesday, October 28 at 4:30 PM" }))
+		await userEvent.click(await screen.findByRole("button", { name: "Yes, reschedule my appointment" }))
 
 		expect(post.mock.calls[1][0]).toBe("http://api.test/Chatbot/AcceptOffer/")
 		expect(post.mock.calls[1][1]).toEqual({ interactionID: 9 })
@@ -125,13 +125,13 @@ describe("MessageForm chatbot", () => {
 		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
 
 		await send("Can I switch back to 4:30?")
-		await userEvent.click(await screen.findByRole("button", { name: "Move my appointment to 4:30 PM" }))
+		await userEvent.click(await screen.findByRole("button", { name: "Yes, reschedule my appointment" }))
 
-		await vi.waitFor(() => expect(screen.queryByRole("button", { name: "Move my appointment to 4:30 PM" })).not.toBeInTheDocument())
+		await vi.waitFor(() => expect(screen.queryByRole("button", { name: "Yes, reschedule my appointment" })).not.toBeInTheDocument())
 		expect(screen.getByText("4:30 PM is open.")).toBeInTheDocument()
 	})
 
-	it("cancels the appointment after the adopter confirms", async () => {
+	it("cancels the appointment when the adopter confirms", async () => {
 		chatbotStatus(true)
 		const post = vi
 			.spyOn(axios, "post")
@@ -151,17 +151,16 @@ describe("MessageForm chatbot", () => {
 		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
 
 		await send("Please cancel my appointment")
-		await userEvent.click(await screen.findByRole("button", { name: "Cancel my appointment" }))
-		expect(screen.getByText(/This can't be undone/)).toBeInTheDocument()
-		expect(post).toHaveBeenCalledTimes(1)
-		await userEvent.click(screen.getByRole("button", { name: "Yes, cancel it" }))
+		expect(await screen.findByRole("button", { name: "Never Mind" })).toBeInTheDocument()
+		expect(screen.queryByRole("button", { name: "That answers my question" })).not.toBeInTheDocument()
+		await userEvent.click(screen.getByRole("button", { name: "Yes, cancel my appointment" }))
 
 		expect(post.mock.calls[1][0]).toBe("http://api.test/Chatbot/AcceptCancellation/")
 		expect(post.mock.calls[1][1]).toEqual({ interactionID: 9 })
 		expect(await screen.findByText(/is canceled/)).toBeInTheDocument()
 	})
 
-	it("keeps the appointment if the adopter changes their mind", async () => {
+	it("closes without changes when the adopter says never mind", async () => {
 		chatbotStatus(true)
 		const post = vi.spyOn(axios, "post").mockResolvedValueOnce({
 			data: {
@@ -178,12 +177,42 @@ describe("MessageForm chatbot", () => {
 		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
 
 		await send("Please cancel my appointment")
-		await userEvent.click(await screen.findByRole("button", { name: "Cancel my appointment" }))
-		await userEvent.click(screen.getByRole("button", { name: "Keep it" }))
+		await userEvent.click(await screen.findByRole("button", { name: "Never Mind" }))
 
-		expect(screen.queryByText(/This can't be undone/)).not.toBeInTheDocument()
-		expect(screen.getByRole("button", { name: "Cancel my appointment" })).toBeInTheDocument()
+		await vi.waitFor(() => expect(modalState.close).toHaveBeenCalled())
 		expect(post).toHaveBeenCalledTimes(1)
+	})
+
+	it("lets the adopter reply to a follow-up question in place", async () => {
+		chatbotStatus(true)
+		const post = vi
+			.spyOn(axios, "post")
+			.mockResolvedValueOnce({
+				data: { answer: "Which day would you like?", awaitingReply: true, interactionID: 9, offer: null, offerCancel: null, sentToStaff: false },
+				status: 200,
+			})
+			.mockResolvedValueOnce({
+				data: {
+					answer: "Friday at 3 PM is open.",
+					awaitingReply: false,
+					interactionID: 10,
+					offer: { label: "Friday, November 6 at 3:00 PM" },
+					offerCancel: null,
+					sentToStaff: false,
+				},
+				status: 200,
+			})
+		renderForm()
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("I want to reschedule for 3pm")
+		await userEvent.type(await screen.findByRole("textbox", { name: "Your reply" }), "Friday")
+		await userEvent.click(screen.getByRole("button", { name: "Send reply" }))
+
+		expect(post.mock.calls[1][0]).toBe("http://api.test/Chatbot/Ask/")
+		expect(post.mock.calls[1][1]).toEqual({ adopterID: 4, previousInteractionID: 9, question: "Friday" })
+		expect(await screen.findByText("Friday at 3 PM is open.")).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Yes, reschedule my appointment" })).toBeInTheDocument()
 	})
 
 	it("sends the message to staff when the adopter still needs help", async () => {
