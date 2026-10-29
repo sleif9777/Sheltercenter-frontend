@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { MemoryRouter } from "react-router-dom"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
+import { DateTime } from "../../utils/DateTime"
 import ChangeLogApp from "./ChangeLogApp"
 import { CHANGE_LOG_ENTRIES } from "./ChangeLogEntries"
 
@@ -20,14 +21,16 @@ describe("ChangeLogApp", () => {
 	})
 
 	it("lists every entry under its date, newest date first", () => {
+		// Newest entry's date, so adding entries on a new day doesn't break this test
+		const newestDate = CHANGE_LOG_ENTRIES.map((e) => e.date).sort()[CHANGE_LOG_ENTRIES.length - 1]
 		vi.useFakeTimers({ toFake: ["Date"] })
-		vi.setSystemTime(new Date("2026-10-27T16:00:00Z"))
+		vi.setSystemTime(new Date(`${newestDate}T16:00:00Z`))
 		renderPage()
 		for (const entry of CHANGE_LOG_ENTRIES) {
 			expect(screen.getByText(entry.title)).toBeVisible()
 		}
 		const headings = screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent)
-		expect(headings[0]).toBe("Oct 27, 2026")
+		expect(headings[0]).toBe(DateTime.FromISODate(newestDate).GetFullDate())
 		expect(headings[headings.length - 1]).toBe("Oct 1, 2026")
 		expect(screen.queryByText("Older Changes")).not.toBeInTheDocument()
 	})
