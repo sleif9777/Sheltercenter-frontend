@@ -8,10 +8,11 @@ import { plainTextToDelta } from "../../utils/QuillUtils"
 import { useMessageFormState } from "./MessageFormState"
 import { MessageForm, QuickText } from "./MessageForm"
 
-// Quill doesn't run in jsdom, so type into a plain textarea instead
+// Quill doesn't run in jsdom, so type into a plain textarea instead. Templates are Quill deltas, which this
+// stand-in can't display, so it shows them empty, like the Blank Template.
 vi.mock("../../core/components/formInputs/RichTextInput", () => ({
-	RichTextInput: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
-		<textarea aria-label="Message" value={value} onChange={(e) => onChange(e.target.value)} />
+	RichTextInput: ({ value, onChange }: { value: unknown; onChange: (v: string) => void }) => (
+		<textarea aria-label="Message" value={typeof value === "string" ? value : ""} onChange={(e) => onChange(e.target.value)} />
 	),
 }))
 
@@ -138,6 +139,22 @@ describe("MessageForm chatbot", () => {
 
 		expect(await screen.findByText(/Your message was sent!/)).toBeInTheDocument()
 		expect(post.mock.calls[0][0]).toBe("http://api.test/Chatbot/Ask/")
+	})
+
+	it("asks the chatbot when the Blank Template is chosen", async () => {
+		chatbotStatus(true)
+		const post = vi
+			.spyOn(axios, "post")
+			.mockResolvedValue({ data: { answer: "", answered: false, interactionID: 9, questionsRemaining: null }, status: 200 })
+		renderForm([{ label: "Blank Template", templateContent: plainTextToDelta(""), value: 0 }])
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await userEvent.click(screen.getByRole("checkbox", { name: "Blank Template" }))
+		await send("Can I bring my kids?")
+
+		expect(await screen.findByText(/Your message was sent!/)).toBeInTheDocument()
+		expect(post.mock.calls[0][0]).toBe("http://api.test/Chatbot/Ask/")
+		expect(post.mock.calls[0][1]).toEqual({ adopterID: 4, question: "Can I bring my kids?" })
 	})
 
 	it("skips the chatbot when a template is chosen", async () => {

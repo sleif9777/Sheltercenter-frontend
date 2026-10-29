@@ -88,7 +88,7 @@ export function MessageForm({
 			.catch(() => setChatbotStatus(null))
 	}, [adopterID, usesChatbot])
 
-	// Tries the chatbot on a message written without a template. Returns false when the message should go to
+	// Tries the chatbot on a message the adopter wrote themselves. Returns false when the message should go to
 	// staff the usual way: chatbot off, over the daily cap or length limit, or the request failed.
 	const handledByChatbot = useCallback(
 		async (question: string) => {
@@ -184,7 +184,8 @@ export function MessageForm({
 				return
 			}
 
-			if (usesChatbot && updatedReq.templateFlag == null && (await handledByChatbot(messageToPlainText(updatedReq.message)))) {
+			// No template, or the Blank Template (0), means the adopter wrote the message themselves
+			if (usesChatbot && !updatedReq.templateFlag && (await handledByChatbot(messageToPlainText(updatedReq.message)))) {
 				return
 			}
 
