@@ -9,7 +9,7 @@ import { ReportBugRequest, SendMessageRequest } from "../../api/adopters/Request
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { ChatbotAPI } from "../../api/chatbot/ChatbotAPI"
 import { MAX_QUESTION_LENGTH } from "../../api/chatbot/Requests"
-import { AskResponse, ChatbotStatusResponse } from "../../api/chatbot/Responses"
+import { AcceptOfferResponse, AskResponse, ChatbotStatusResponse } from "../../api/chatbot/Responses"
 import { PendingAdoptionsAPI } from "../../api/pendingAdoptions/PendingAdoptionsAPI"
 import { deltaToPlainText, extractWildcardsFromDelta, messageToPlainText, replaceWildcardsInDelta } from "../../utils/QuillUtils"
 import { StringInputProps } from "../../core/components/formInputs/InputHandlers"
@@ -24,6 +24,7 @@ import { showToast } from "../../core/components/messages/ToastProvider"
 import { ModalState } from "../../core/components/modal/Modal"
 import { BookingMessageTemplate } from "../../enums/BookingEnums"
 import { useSessionState } from "../../core/session/SessionState"
+import { syncAdopterSession } from "../../core/session/syncAdopterSession"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
 import { ChatbotAnswer } from "../chatbot/ChatbotAnswer"
 import { FormProvider } from "../FormProvider"
@@ -75,7 +76,7 @@ export function MessageForm({
 
 	// --- chatbot state ---
 	const [chatbotStatus, setChatbotStatus] = useState<ChatbotStatusResponse | null>(null)
-	const [botAnswer, setBotAnswer] = useState<{ answer: string; interactionID: number; sentToStaff: boolean } | null>(null)
+	const [botAnswer, setBotAnswer] = useState<Pick<AskResponse, "answer" | "interactionID" | "offer" | "sentToStaff"> | null>(null)
 	// Resolves the pending submit once the adopter is done with the chatbot's answer
 	const finishBotAnswer = useRef<(() => void) | null>(null)
 	const usesChatbot = isMessageToAdoptions && !isIssueReport && !adoptionID
@@ -91,13 +92,13 @@ export function MessageForm({
 	// Tries the chatbot on a message the adopter wrote themselves. Returns false when the message should go to
 	// staff the usual way: chatbot off, over the daily cap or length limit, or the request failed.
 	const handledByChatbot = useCallback(
-		async (question: string) => {
+		async (question: string, message?: string) => {
 			const remaining = chatbotStatus?.questionsRemaining
 			if (!chatbotStatus?.enabled || remaining === 0 || !question || question.length > MAX_QUESTION_LENGTH) {
 				return false
 			}
 
-			const resp = await new ChatbotAPI().Ask({ adopterID, question })
+			const resp = await new ChatbotAPI().Ask({ adopterID, message, question })
 			if (resp?.status !== 200) {
 				return false
 			}
@@ -108,7 +109,7 @@ export function MessageForm({
 			if (data.answer) {
 				await new Promise<void>((resolve) => {
 					finishBotAnswer.current = resolve
-					setBotAnswer({ answer: data.answer, interactionID: data.interactionID, sentToStaff: data.sentToStaff })
+					setBotAnswer({ answer: data.answer, interactionID: data.interactionID, offer: data.offer, sentToStaff: data.sentToStaff })
 				})
 				return true
 			}
@@ -120,6 +121,19 @@ export function MessageForm({
 		},
 		[adopterID, chatbotStatus]
 	)
+
+	// Moves the adopter's appointment to the time the chatbot offered. Returns the new time, or null if it's gone.
+	const acceptBotOffer = useCallback(async () => {
+		if (!botAnswer) return null
+		const resp = await new ChatbotAPI().AcceptOffer(botAnswer.interactionID)
+		if (resp?.status !== 200) {
+			showToast({ level: MessageLevel.Error, message: "Sorry, that time is no longer available." })
+			setBotAnswer({ ...botAnswer, offer: null })
+			return null
+		}
+		await syncAdopterSession(adopterID)
+		return (resp.data as AcceptOfferResponse).label
+	}, [adopterID, botAnswer])
 
 	const sendBotAnswerToStaff = useCallback(async () => {
 		if (!botAnswer) return
@@ -185,7 +199,7 @@ export function MessageForm({
 			}
 
 			// No template, or the Blank Template (0), means the adopter wrote the message themselves
-			if (usesChatbot && !updatedReq.templateFlag && (await handledByChatbot(messageToPlainText(updatedReq.message)))) {
+			if (usesChatbot && !updatedReq.templateFlag && (await handledByChatbot(messageToPlainText(updatedReq.message), typeof updatedReq.message === "string" ? updatedReq.message : undefined))) {
 				return
 			}
 
@@ -245,8 +259,10 @@ export function MessageForm({
 			) : botAnswer ? (
 				<ChatbotAnswer
 					answer={botAnswer.answer}
+					offer={botAnswer.offer?.label}
 					sentToStaff={botAnswer.sentToStaff}
 					onAccept={() => finishBotAnswer.current?.()}
+					onAcceptOffer={acceptBotOffer}
 					onSendToStaff={sendBotAnswerToStaff}
 				/>
 			) : (

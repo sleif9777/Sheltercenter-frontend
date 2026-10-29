@@ -60,7 +60,7 @@ describe("MessageForm chatbot", () => {
 		expect(await screen.findByText("We don't hold dogs.")).toBeInTheDocument()
 		expect(post).toHaveBeenCalledTimes(1)
 		expect(post.mock.calls[0][0]).toBe("http://api.test/Chatbot/Ask/")
-		expect(post.mock.calls[0][1]).toEqual({ adopterID: 4, question: "Can you hold Biscuit?" })
+		expect(post.mock.calls[0][1]).toEqual({ adopterID: 4, message: "Can you hold Biscuit?", question: "Can you hold Biscuit?" })
 		expect(screen.queryByRole("button", { name: SUBMIT })).not.toBeInTheDocument()
 
 		await userEvent.click(screen.getByRole("button", { name: "That answers my question" }))
@@ -82,6 +82,53 @@ describe("MessageForm chatbot", () => {
 		await userEvent.click(screen.getByRole("button", { name: "Close" }))
 		await vi.waitFor(() => expect(modalState.close).toHaveBeenCalled())
 		expect(post).toHaveBeenCalledTimes(1)
+	})
+
+	it("moves the appointment when the adopter takes the offered time", async () => {
+		chatbotStatus(true)
+		const post = vi
+			.spyOn(axios, "post")
+			.mockResolvedValueOnce({
+				data: {
+					answer: "4:30 PM is open.",
+					interactionID: 9,
+					offer: { label: "Wednesday, October 28 at 4:30 PM" },
+					questionsRemaining: null,
+					sentToStaff: false,
+				},
+				status: 200,
+			})
+			.mockResolvedValueOnce({ data: { label: "Wednesday, October 28 at 4:30 PM" }, status: 200 })
+		renderForm()
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("Can I switch back to 4:30?")
+		await userEvent.click(await screen.findByRole("button", { name: "Move my appointment to Wednesday, October 28 at 4:30 PM" }))
+
+		expect(post.mock.calls[1][0]).toBe("http://api.test/Chatbot/AcceptOffer/")
+		expect(post.mock.calls[1][1]).toEqual({ interactionID: 9 })
+		expect(await screen.findByText(/All set! Your appointment is now/)).toBeInTheDocument()
+		await userEvent.click(screen.getByRole("button", { name: "Close" }))
+		await vi.waitFor(() => expect(modalState.close).toHaveBeenCalled())
+	})
+
+	it("drops the offer if the time was taken before the adopter accepted", async () => {
+		chatbotStatus(true)
+		vi
+			.spyOn(axios, "post")
+			.mockResolvedValueOnce({
+				data: { answer: "4:30 PM is open.", interactionID: 9, offer: { label: "4:30 PM" }, questionsRemaining: null, sentToStaff: false },
+				status: 200,
+			})
+			.mockRejectedValueOnce({ response: { data: {}, status: 409 } })
+		renderForm()
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("Can I switch back to 4:30?")
+		await userEvent.click(await screen.findByRole("button", { name: "Move my appointment to 4:30 PM" }))
+
+		await vi.waitFor(() => expect(screen.queryByRole("button", { name: "Move my appointment to 4:30 PM" })).not.toBeInTheDocument())
+		expect(screen.getByText("4:30 PM is open.")).toBeInTheDocument()
 	})
 
 	it("sends the message to staff when the adopter still needs help", async () => {
@@ -171,7 +218,7 @@ describe("MessageForm chatbot", () => {
 
 		expect(await screen.findByText(/Your message was sent!/)).toBeInTheDocument()
 		expect(post.mock.calls[0][0]).toBe("http://api.test/Chatbot/Ask/")
-		expect(post.mock.calls[0][1]).toEqual({ adopterID: 4, question: "Can I bring my kids?" })
+		expect(post.mock.calls[0][1]).toEqual({ adopterID: 4, message: "Can I bring my kids?", question: "Can I bring my kids?" })
 	})
 
 	it("skips the chatbot when a template is chosen", async () => {

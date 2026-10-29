@@ -10,6 +10,13 @@ export type AskResponse = {
 	answer: string
 	// The chatbot already emailed the message to staff, alone or alongside a partial answer
 	sentToStaff: boolean
+	// An open time the adopter can move their appointment to with one click
+	offer: { label: string } | null
 	// null when there's no daily cap
 	questionsRemaining: number | null
+}
+
+export type AcceptOfferResponse = {
+	// The appointment's new time, e.g. "Wednesday, October 28 at 4:30 PM"
+	label: string
 }

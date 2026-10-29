@@ -19,4 +19,8 @@ export class ChatbotAPI extends APIBase {
 	async SendToStaff(interactionID: number) {
 		return this.buildAndPost<InteractionIDRequest>("SendToStaff", { interactionID })
 	}
+
+	async AcceptOffer(interactionID: number) {
+		return this.buildAndPost<InteractionIDRequest>("AcceptOffer", { interactionID })
+	}
 }
