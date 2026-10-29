@@ -4,10 +4,12 @@ import { createFormState, FormFieldUpdateCallback } from "../FormState"
 
 export type MessageAdopterFormFieldUpdater = FormFieldUpdateCallback<SendMessageRequest>
 
+// templateFlag is listed so reset() clears a template chosen the last time the form was open
 const initialState: SendMessageRequest = {
 	adopterID: 0,
 	message: "",
 	subject: "",
+	templateFlag: undefined,
 }
 
 export const useMessageFormState = createFormState<SendMessageRequest>(initialState, {

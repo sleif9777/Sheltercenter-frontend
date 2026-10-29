@@ -125,6 +125,21 @@ describe("MessageForm chatbot", () => {
 		expect(post.mock.calls[0][0]).toBe("http://api.test/Adopters/MessageAdoptions/")
 	})
 
+	it("forgets a template chosen the last time the form was open", async () => {
+		chatbotStatus(true)
+		useMessageFormState.getState().setField("templateFlag", 1)
+		const post = vi
+			.spyOn(axios, "post")
+			.mockResolvedValue({ data: { answer: "", answered: false, interactionID: 9, questionsRemaining: null }, status: 200 })
+		renderForm()
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("Hello?")
+
+		expect(await screen.findByText(/Your message was sent!/)).toBeInTheDocument()
+		expect(post.mock.calls[0][0]).toBe("http://api.test/Chatbot/Ask/")
+	})
+
 	it("skips the chatbot when a template is chosen", async () => {
 		chatbotStatus(true)
 		const post = vi.spyOn(axios, "post").mockResolvedValue({ data: {}, status: 204 })
