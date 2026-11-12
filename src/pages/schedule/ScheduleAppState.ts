@@ -5,7 +5,6 @@ import { useSessionState } from "../../core/session/SessionState"
 import { AppointmentHash } from "../../models/AppointmentModels"
 import { AppointmentsAPI } from "../../api/appointments/AppointmentsAPI"
 import { DateTime } from "../../utils/DateTime"
-import { StringUtils } from "../../utils/StringUtils"
 
 export type ScheduleContext = {
 	apptHash?: AppointmentHash[]
@@ -90,7 +89,7 @@ export const useScheduleState = create<ScheduleState>((set, get) => {
 			const session = useSessionState.getState()
 
 			const prev = get()
-			const effectiveISO = StringUtils.isNotNull(newISODate) ? newISODate : prev.isoDate
+			const effectiveISO = newISODate || prev.isoDate
 			const nextDateUtil = new DateTime(effectiveISO)
 			session.setCalendarDate(effectiveISO)
 
