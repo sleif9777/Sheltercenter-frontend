@@ -92,6 +92,7 @@ export const useScheduleState = create<ScheduleState>((set, get) => {
 			const prev = get()
 			const effectiveISO = StringUtils.isNotNull(newISODate) ? newISODate : prev.isoDate
 			const nextDateUtil = new DateTime(effectiveISO)
+			session.setCalendarDate(effectiveISO)
 
 			// Update state FIRST
 			set({

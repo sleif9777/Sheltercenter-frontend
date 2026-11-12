@@ -11,6 +11,13 @@ export interface IChangeLogEntry {
 // Add new entries at the top. Write them for shelter staff, not developers.
 export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 	{
+		date: "2026-11-11",
+		details:
+			"Refreshing the page, or leaving the calendar and coming back, now keeps you on the date you were viewing instead of jumping back to today. The calendar starts on today again after logging in, or on a new day.",
+		title: "Calendar remembers the date you were viewing",
+		type: ChangeLogEntryType.IMPROVEMENT,
+	},
+	{
 		date: "2026-10-28",
 		details:
 			'On an adopter\'s home page, their appointment card now sits at the top of its column instead of floating in the middle. If they haven\'t filled in their preferences or watchlist yet, the card links to "Add My Preferences" and "Add My Watchlist".',

@@ -12,6 +12,13 @@ export interface DashboardPreferences {
 	hideNav: boolean
 }
 
+// Last calendar date viewed, so a page refresh doesn't snap back to today. savedOn lets a date
+// remembered on an earlier day fall back to today instead.
+export interface CalendarDateMemory {
+	isoDate: string
+	savedOn: string
+}
+
 const DEFAULT_DASHBOARD_PREFERENCES: DashboardPreferences = {
 	cycleEnabled: false,
 	hideNav: true,
@@ -31,6 +38,7 @@ export interface SessionState extends Omit<SessionContext, "securityLevel"> {
 	logOut: (userID?: number) => void
 	patchUser: (patch: Partial<IUser>) => void
 	removeCurrentAppt: () => void
+	setCalendarDate: (isoDate: string) => void
 	setCurrentAppt: (appt: IAppointment) => void
 	setDashboardPreferences: (patch: Partial<DashboardPreferences>) => void
 	setUpSession: (resp: LogInResponse) => void
@@ -41,6 +49,7 @@ export interface SessionState extends Omit<SessionContext, "securityLevel"> {
 	dashboardUser: boolean
 	greeterUser: boolean
 	sessionExpires?: string
+	calendarDate?: CalendarDateMemory
 	acknowledgements: {
 		watchlist: boolean
 		// TODO: add other user-warning acknowledgements here as needed
@@ -73,6 +82,7 @@ export const useSessionState = create<SessionState>()(
 					},
 					adminUser: state.adminUser,
 					adopterUser: state.adopterUser,
+					calendarDate: state.calendarDate,
 					dashboardPreferences: state.dashboardPreferences,
 					dashboardUser: state.dashboardUser,
 					greeterUser: state.greeterUser,
@@ -91,6 +101,7 @@ export const useSessionState = create<SessionState>()(
 					acknowledgements: state.acknowledgements,
 					adminUser: false,
 					adopterUser: false,
+					calendarDate: undefined,
 					dashboardPreferences: DEFAULT_DASHBOARD_PREFERENCES,
 					dashboardUser: false,
 					greeterUser: false,
@@ -112,6 +123,7 @@ export const useSessionState = create<SessionState>()(
 					acknowledgements: { watchlist: false },
 					adminUser: false,
 					adopterUser: false,
+					calendarDate: undefined,
 					dashboardPreferences: DEFAULT_DASHBOARD_PREFERENCES,
 					dashboardUser: false,
 					greeterUser: false,
@@ -130,6 +142,7 @@ export const useSessionState = create<SessionState>()(
 						acknowledgements: state.acknowledgements,
 						adminUser: state.adminUser,
 						adopterUser: state.adopterUser,
+						calendarDate: state.calendarDate,
 						dashboardPreferences: state.dashboardPreferences,
 						dashboardUser: state.dashboardUser,
 						greeterUser: state.greeterUser,
@@ -149,6 +162,7 @@ export const useSessionState = create<SessionState>()(
 						acknowledgements: state.acknowledgements,
 						adminUser: state.adminUser,
 						adopterUser: state.adopterUser,
+						calendarDate: state.calendarDate,
 						dashboardPreferences: state.dashboardPreferences,
 						dashboardUser: state.dashboardUser,
 						greeterUser: state.greeterUser,
@@ -163,6 +177,15 @@ export const useSessionState = create<SessionState>()(
 				})
 			},
 
+			setCalendarDate: (isoDate: string) => {
+				set(() => ({
+					calendarDate: {
+						isoDate,
+						savedOn: new DateTime().GetISODate(),
+					},
+				}))
+			},
+
 			setCurrentAppt: (appt: IAppointment) => {
 				set((state) => {
 					if (!state.user) return state
@@ -171,6 +194,7 @@ export const useSessionState = create<SessionState>()(
 						acknowledgements: state.acknowledgements,
 						adminUser: state.adminUser,
 						adopterUser: state.adopterUser,
+						calendarDate: state.calendarDate,
 						dashboardPreferences: state.dashboardPreferences,
 						dashboardUser: state.dashboardUser,
 						greeterUser: state.greeterUser,
@@ -208,6 +232,7 @@ export const useSessionState = create<SessionState>()(
 					},
 					adminUser: s === SecurityLevel.ADMIN || s === SecurityLevel.SUPERUSER,
 					adopterUser: s === SecurityLevel.ADOPTER,
+					calendarDate: undefined,
 					dashboardPreferences: DEFAULT_DASHBOARD_PREFERENCES,
 					dashboardUser: s === SecurityLevel.DASHBOARD,
 					greeterUser: s === SecurityLevel.GREETER,
@@ -243,6 +268,7 @@ export const useSessionState = create<SessionState>()(
 				acknowledgements: state.acknowledgements,
 				adminUser: state.adminUser,
 				adopterUser: state.adopterUser,
+				calendarDate: state.calendarDate,
 				dashboardPreferences: state.dashboardPreferences,
 				dashboardUser: state.dashboardUser,
 				greeterUser: state.greeterUser,

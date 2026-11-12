@@ -48,9 +48,11 @@ export function ScheduleApp() {
 	const schedule = useScheduleState()
 	const session = useSessionState()
 
-	// Render the component
+	// Resume on the last date viewed today (e.g. after a page refresh), otherwise start on today
 	useEffect(() => {
-		schedule.refresh(new DateTime().GetISODate())
+		const today = new DateTime().GetISODate(),
+			remembered = session.calendarDate
+		schedule.refresh(remembered?.savedOn == today ? remembered.isoDate : today)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
