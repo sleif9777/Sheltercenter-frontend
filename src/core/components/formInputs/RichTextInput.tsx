@@ -1,10 +1,15 @@
 import "react-quill/dist/quill.snow.css"
 
-import { useCallback, useId, useRef, useState } from "react"
+import type { DeltaStatic, TextChangeHandler } from "quill"
+import { useCallback, useEffect, useId, useRef, useState } from "react"
 import ReactQuill from "react-quill"
 
 import { RichTextInputProps } from "./InputHandlers"
 import { InputErrorLabel, InputLabel } from "./InputLabels"
+
+function countEmbeds(contents: DeltaStatic, blotName: string): number {
+	return (contents.ops ?? []).filter((op) => typeof op.insert === "object" && blotName in op.insert).length
+}
 
 export function RichTextInput({
 	addlProps,
@@ -13,14 +18,42 @@ export function RichTextInput({
 	defaultDirty = false,
 	errors,
 	fieldLabel,
+	lockedEmbeds,
 	value,
 	onChange,
 	showRecommended,
 	showRequired,
-}: RichTextInputProps) {
+}: RichTextInputProps & {
+	// Embed blot names the user can't delete; edits that would remove one are undone
+	lockedEmbeds?: string[]
+}) {
 	const elemID = useId()
 	const [dirty, setDirty] = useState<boolean>(defaultDirty)
 	const quillRef = useRef<ReactQuill | null>(null)
+
+	useEffect(() => {
+		const editor = quillRef.current?.getEditor()
+		if (!editor || !lockedEmbeds?.length) {
+			return
+		}
+
+		const handleTextChange: TextChangeHandler = (delta, oldContents, source) => {
+			const contents = editor.getContents()
+			if (source !== "user" || lockedEmbeds.every((name) => countEmbeds(contents, name) >= countEmbeds(oldContents, name))) {
+				return
+			}
+
+			// Put the text back as it was and leave the cursor where the edit started
+			const index = delta.ops?.[0]?.retain ?? 0
+			editor.setContents(oldContents, "api")
+			editor.setSelection(index, 0, "api")
+		}
+
+		editor.on("text-change", handleTextChange)
+		return () => {
+			editor.off("text-change", handleTextChange)
+		}
+	}, [lockedEmbeds])
 
 	const handleChange = useCallback(
 		(v: ReactQuill.Value) => {
