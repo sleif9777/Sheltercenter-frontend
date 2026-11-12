@@ -51,6 +51,9 @@ export type QueueEmailEntry = {
 
 export type SendQueueEmailsRequest = {
 	entries: QueueEmailEntry[]
+	// Superusers only
+	dogIDs?: number[]
+	message?: string
 }
 
 export type RescheduleAppointmentRequest = {

@@ -1,4 +1,4 @@
-import { faArrowDown, faArrowUp, faEnvelopeCircleCheck, faGripVertical, faXmark } from "@fortawesome/free-solid-svg-icons"
+import { faArrowDown, faArrowLeft, faArrowRight, faArrowUp, faEnvelopeCircleCheck, faGripVertical, faXmark } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { HttpStatusCode } from "axios"
 import { useCallback, useEffect, useMemo, useState } from "react"
@@ -9,22 +9,64 @@ import { SubmissionButton } from "../../core/components/formInputs/SubmissionBut
 import { MessageLevel } from "../../core/components/messages/Message"
 import { showToast } from "../../core/components/messages/ToastProvider"
 import { ModalState } from "../../core/components/modal/Modal"
+import { useSessionState } from "../../core/session/SessionState"
+import { SecurityLevel } from "../../enums/UserEnums"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
-import { DateTime } from "../../utils/DateTime"
-import { getEmailEntries, getQueuePositions, moveRow, QueueEditorRow, toEditorRows } from "./QueueEmailUtils"
+import { PopularDogsPicker, QueueMessageEditor, useQueueMessage } from "./QueueEmailCustomization"
+import {
+	getEmailEntries,
+	getIncludedDogIDs,
+	getQueuePositions,
+	hasQueueNumber,
+	moveRow,
+	QueueDogRow,
+	QueueEditorRow,
+	toDogRows,
+	toEmailMessage,
+	toEditorRows,
+} from "./QueueEmailUtils"
 
 export function QueueEmailForm({ modalState }: { modalState: ModalState }) {
 	const schedule = useScheduleState()
+	const session = useSessionState()
 	const [rows, setRows] = useState<QueueEditorRow[]>()
 	const [dragIndex, setDragIndex] = useState<number | null>(null)
 	const [isSending, setIsSending] = useState(false)
+	// Customizers get a second step for the message; everyone else sends from the queue step
+	const [step, setStep] = useState<1 | 2>(1)
+
+	// Customizing the message and listing popular dogs are superusers only for now
+	// TODO: add a Change Log entry when this opens up to admins
+	const canCustomize = session.user?.security === SecurityLevel.SUPERUSER
+	const [dogs, setDogs] = useState<QueueDogRow[]>([])
+	const hasDogs = dogs.some((d) => d.included)
+	const { hasDefault, isDefault, loadDefault, message, reset, setMessage, showDogsSection } = useQueueMessage(hasDogs)
+
+	// The popular dogs section comes and goes with the first checked dog
+	const updateDogs = useCallback(
+		(update: (prev: QueueDogRow[]) => QueueDogRow[]) => {
+			const next = update(dogs)
+			setDogs(next)
+			showDogsSection(next.some((d) => d.included))
+		},
+		[dogs, showDogsSection]
+	)
 
 	useEffect(() => {
-		new AppointmentsAPI().GetQueueForDate(schedule.isoDate).then((resp) => setRows(toEditorRows(resp?.queue ?? [])))
-	}, [schedule.isoDate])
+		new AppointmentsAPI().GetQueueForDate(schedule.isoDate).then((resp) => {
+			setRows(toEditorRows(resp?.queue ?? []))
+			if (resp?.defaultMessage != null) {
+				loadDefault(resp.defaultMessage)
+			}
+			setDogs(toDogRows(resp?.popularDogs ?? []))
+		})
+	}, [loadDefault, schedule.isoDate])
 
 	const positions = useMemo(() => getQueuePositions(rows ?? []), [rows])
 	const entries = useMemo(() => getEmailEntries(rows ?? []), [rows])
+	const customizing = canCustomize && hasDefault
+	const messageInvalid = customizing && !hasQueueNumber(message)
+	const onQueueStep = !customizing || step == 1
 
 	const updateRow = useCallback((apptID: number, patch: Partial<QueueEditorRow>) => {
 		setRows((prev) => prev?.map((r) => (r.apptID === apptID ? { ...r, ...patch } : r)))
@@ -35,13 +77,15 @@ export function QueueEmailForm({ modalState }: { modalState: ModalState }) {
 	}, [])
 
 	const handleSend = useCallback(async () => {
-		if (entries.length == 0 || isSending) {
+		if (entries.length == 0 || isSending || messageInvalid) {
 			return
 		}
 
 		setIsSending(true)
 		try {
-			const resp = await new AppointmentsAPI().SendQueueEmails({ entries })
+			const resp = await new AppointmentsAPI().SendQueueEmails(
+				customizing ? { dogIDs: getIncludedDogIDs(dogs), entries, message: toEmailMessage(message) } : { entries }
+			)
 			const result = resp?.data as SendQueueEmailsResponse | undefined
 
 			if (resp?.status !== HttpStatusCode.Ok || !result) {
@@ -63,29 +107,56 @@ export function QueueEmailForm({ modalState }: { modalState: ModalState }) {
 		} finally {
 			setIsSending(false)
 		}
-	}, [entries, isSending, modalState, schedule])
+	}, [customizing, dogs, entries, isSending, message, messageInvalid, modalState, schedule])
 
 	return (
 		<div className="flex min-h-0 w-full flex-1 flex-col text-left text-black">
-			<div className="min-h-0 flex-1 overflow-y-auto pr-1">
-				<p className="mb-2">
-					Adopters booked on <b>{new DateTime(schedule.isoDate).GetShortDate(true)}</b> through the 4:00 PM timeslot, in order of timeslot then booking
-					time. Drag to reorder; uncheck to remove someone from the queue. Adopters already emailed start unchecked.
+			{customizing && (
+				<p className="mb-2 text-sm font-semibold text-pink-800 uppercase">
+					Step {step} of 2 · {step == 1 ? "Queue order" : "Message"}
 				</p>
-				<QueueList dragIndex={dragIndex} move={move} positions={positions} rows={rows} setDragIndex={setDragIndex} updateRow={updateRow} />
+			)}
+			{onQueueStep && <p className="mb-2">Drag to reorder, uncheck to remove someone from the queue. Adopters already emailed start unchecked.</p>}
+			<div className="min-h-0 flex-1 overflow-y-auto pr-1">
+				{onQueueStep ? (
+					<>
+						<QueueList dragIndex={dragIndex} move={move} positions={positions} rows={rows} setDragIndex={setDragIndex} updateRow={updateRow} />
+					</>
+				) : (
+					// Fields left, message right, matching the message form
+					<div className="flex flex-col gap-3 md:flex-row">
+						<div className="w-full md:w-1/2">
+							<PopularDogsPicker dogs={dogs} setDogs={updateDogs} />
+						</div>
+						<div className="w-full md:w-1/2">
+							<QueueMessageEditor
+								isDefault={isDefault}
+								message={message}
+								popularDogNames={dogs.filter((d) => d.included).map((d) => d.name)}
+								setMessage={setMessage}
+								onReset={reset}
+							/>
+						</div>
+					</div>
+				)}
 			</div>
 			<div className="mt-3 flex shrink-0 flex-row items-center justify-end gap-x-3 border-t border-pink-800 py-3">
 				<span className="mr-auto text-sm italic">
 					{entries.length} adopter{entries.length == 1 ? "" : "s"} will be emailed
 				</span>
 				<SubmissionButton addlProps={{ type: "button" }} icon={faXmark} label="Cancel" onClick={modalState.close} />
-				<SubmissionButton
-					addlProps={{ type: "button" }}
-					disabled={entries.length == 0 || isSending}
-					icon={faEnvelopeCircleCheck}
-					label={isSending ? "Sending..." : "Send"}
-					onClick={handleSend}
-				/>
+				{customizing && step == 2 && <SubmissionButton addlProps={{ type: "button" }} icon={faArrowLeft} label="Back" onClick={() => setStep(1)} />}
+				{customizing && step == 1 ? (
+					<SubmissionButton addlProps={{ type: "button" }} disabled={entries.length == 0} icon={faArrowRight} label="Next" onClick={() => setStep(2)} />
+				) : (
+					<SubmissionButton
+						addlProps={{ type: "button" }}
+						disabled={entries.length == 0 || isSending || messageInvalid}
+						icon={faEnvelopeCircleCheck}
+						label={isSending ? "Sending..." : "Send"}
+						onClick={handleSend}
+					/>
+				)}
 			</div>
 		</div>
 	)

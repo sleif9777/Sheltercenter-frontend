@@ -1,9 +1,4 @@
-import {
-	AppointmentMissingOutcome,
-	IAppointment,
-	RecentAdoption,
-	ReportingAppointment,
-} from "../../models/AppointmentModels"
+import { AppointmentMissingOutcome, IAppointment, RecentAdoption, ReportingAppointment } from "../../models/AppointmentModels"
 import { ScheduleContext } from "../../pages/schedule/ScheduleAppState"
 
 export type ReportingPeriodStats = {
@@ -103,9 +98,18 @@ export type QueueRow = {
 	typeDisplay: string
 }
 
+export type PopularDog = {
+	dogID: number
+	name: string
+	watchers: number
+}
+
 export type QueueForDateResponse = {
 	isoDate: string
 	queue: QueueRow[]
+	// Superusers only
+	defaultMessage?: string
+	popularDogs?: PopularDog[]
 }
 
 export type SendQueueEmailsResponse = {
