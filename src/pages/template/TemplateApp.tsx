@@ -57,6 +57,7 @@ function WeekdaySelect() {
 		<SelectInput
 			fieldLabel="Weekday"
 			options={weekdayOptions}
+			sorted={false}
 			value={String(template.weekday ?? "")}
 			onChange={handleChange}
 		/>
