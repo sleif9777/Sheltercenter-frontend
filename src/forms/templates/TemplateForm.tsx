@@ -55,7 +55,8 @@ function Fieldset({
 		value: formData[field],
 	})
 
-	const timeFieldErrors = [...(errors["minute"] ?? []), ...(errors["hour"] ?? [])]
+	// Weekday rules are all about opening hours, so surface them on the time field
+	const timeFieldErrors = [...(errors["minute"] ?? []), ...(errors["hour"] ?? []), ...(errors["weekday"] ?? [])]
 
 	return (
 		<>
