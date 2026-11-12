@@ -13,6 +13,13 @@ export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 	{
 		date: "2026-11-11",
 		details:
+			'X in Queue on the calendar now has two steps: put the queue in order, then write the message. The message starts from the usual wording, already says "today", "tomorrow" or the day of the week, and signs off with your name, and you can change any of it. Each adopter\'s place in the queue stays in the message and can\'t be deleted. Check popular dogs on the left to list them in the email, A-Z, with a line about them you can reword.',
+		title: "Customize X in Queue emails and list popular dogs",
+		type: ChangeLogEntryType.IMPROVEMENT,
+	},
+	{
+		date: "2026-11-11",
+		details:
 			"Refreshing the page, or leaving the calendar and coming back, now keeps you on the date you were viewing instead of jumping back to today. The calendar starts on today again after logging in, or on a new day.",
 		title: "Calendar remembers the date you were viewing",
 		type: ChangeLogEntryType.IMPROVEMENT,

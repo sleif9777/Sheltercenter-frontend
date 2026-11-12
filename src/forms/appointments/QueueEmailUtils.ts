@@ -130,7 +130,7 @@ export type QueueDogRow = {
 	watchers?: number
 }
 
-/** Watchlist dogs start unchecked so nothing is listed unless a superuser picks it. */
+/** Watchlist dogs start unchecked so nothing is listed unless staff pick it. */
 export function toDogRows(dogs: PopularDog[]): QueueDogRow[] {
 	return dogs.map((d) => ({ ...d, included: false }))
 }

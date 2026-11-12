@@ -107,9 +107,8 @@ export type PopularDog = {
 export type QueueForDateResponse = {
 	isoDate: string
 	queue: QueueRow[]
-	// Superusers only
-	defaultMessage?: string
-	popularDogs?: PopularDog[]
+	defaultMessage: string
+	popularDogs: PopularDog[]
 }
 
 export type SendQueueEmailsResponse = {

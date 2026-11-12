@@ -51,7 +51,7 @@ export type QueueEmailEntry = {
 
 export type SendQueueEmailsRequest = {
 	entries: QueueEmailEntry[]
-	// Superusers only
+	// Optional: dogs to list as popular and a custom message
 	dogIDs?: number[]
 	message?: string
 }

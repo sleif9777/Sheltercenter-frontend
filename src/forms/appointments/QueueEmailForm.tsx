@@ -9,8 +9,6 @@ import { SubmissionButton } from "../../core/components/formInputs/SubmissionBut
 import { MessageLevel } from "../../core/components/messages/Message"
 import { showToast } from "../../core/components/messages/ToastProvider"
 import { ModalState } from "../../core/components/modal/Modal"
-import { useSessionState } from "../../core/session/SessionState"
-import { SecurityLevel } from "../../enums/UserEnums"
 import { useScheduleState } from "../../pages/schedule/ScheduleAppState"
 import { PopularDogsPicker, QueueMessageEditor, useQueueMessage } from "./QueueEmailCustomization"
 import {
@@ -28,16 +26,12 @@ import {
 
 export function QueueEmailForm({ modalState }: { modalState: ModalState }) {
 	const schedule = useScheduleState()
-	const session = useSessionState()
 	const [rows, setRows] = useState<QueueEditorRow[]>()
 	const [dragIndex, setDragIndex] = useState<number | null>(null)
 	const [isSending, setIsSending] = useState(false)
-	// Customizers get a second step for the message; everyone else sends from the queue step
+	// Queue order, then the message
 	const [step, setStep] = useState<1 | 2>(1)
 
-	// Customizing the message and listing popular dogs are superusers only for now
-	// TODO: add a Change Log entry when this opens up to admins
-	const canCustomize = session.user?.security === SecurityLevel.SUPERUSER
 	const [dogs, setDogs] = useState<QueueDogRow[]>([])
 	const hasDogs = dogs.some((d) => d.included)
 	const { hasDefault, isDefault, loadDefault, message, reset, setMessage, showDogsSection } = useQueueMessage(hasDogs)
@@ -64,7 +58,8 @@ export function QueueEmailForm({ modalState }: { modalState: ModalState }) {
 
 	const positions = useMemo(() => getQueuePositions(rows ?? []), [rows])
 	const entries = useMemo(() => getEmailEntries(rows ?? []), [rows])
-	const customizing = canCustomize && hasDefault
+	// The message step appears once the default message has loaded
+	const customizing = hasDefault
 	const messageInvalid = customizing && !hasQueueNumber(message)
 	const onQueueStep = !customizing || step == 1
 
