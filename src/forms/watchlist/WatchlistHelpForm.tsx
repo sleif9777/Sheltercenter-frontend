@@ -59,6 +59,7 @@ function NoHoldsAcknowledgementField() {
 						Adding dogs to your watchlist does NOT place them on any sort of hold. To give all dogs the most opportunities to find a forever home, Saving
 						Grace is a first-come, first-serve facility. If multiple adopters share the same appointment time, the adopter who booked earliest gets
 						priority.
+						<div className="mt-2">Also note that we aren't able to accept deposits to hold a dog ahead of your appointment.</div>
 					</div>
 				}
 			/>

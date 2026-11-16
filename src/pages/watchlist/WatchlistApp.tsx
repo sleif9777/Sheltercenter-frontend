@@ -5,6 +5,7 @@ import { usePageTitle } from "../../utils/usePageTitle"
 import { StandardCard } from "../../core/components/card/Card"
 import { CardColor } from "../../core/components/card/CardEnums"
 import RadioInput from "../../core/components/formInputs/RadioInput"
+import { Message, MessageLevel } from "../../core/components/messages/Message"
 import { Modal, ModalState, useModalState } from "../../core/components/modal/Modal"
 import { useSessionState } from "../../core/session/SessionState"
 import { WatchlistSortMethod, WatchlistSortMethodLabel } from "../../enums/DogEnums"
@@ -83,6 +84,12 @@ export function WatchlistApp() {
 					hideTitleBorder
 					whiteBg
 				>
+					{!session.adminUser && (
+						<Message
+							level={MessageLevel.Warning}
+							message="Third-party sites like Petfinder and Adopt-a-Pet may still show dogs who were adopted weeks ago. The list below is always current. We may also have new arrivals who aren't listed anywhere yet while we work on their photos and bio."
+						/>
+					)}
 					<RadioInput
 						className="mb-2"
 						columnOverride="columns-2 md:columns-4"
@@ -101,13 +108,7 @@ export function WatchlistApp() {
 					</ul>
 				</StandardCard>
 				{session.adopterUser && (
-					<StandardCard
-						className="rounded-lg py-2 lg:w-[50%]"
-						color={CardColor.PINK}
-						description="My Watchlist"
-						hideTitleBorder
-						whiteBg
-					>
+					<StandardCard className="rounded-lg py-2 lg:w-[50%]" color={CardColor.PINK} description="My Watchlist" hideTitleBorder whiteBg>
 						<h3 className="mb-2 text-left text-lg font-semibold uppercase underline">Still Available</h3>
 						<ul>
 							{watchlist.dogHash?.watching.available
@@ -145,11 +146,7 @@ function HelpModal({ modalState }: { modalState: ModalState }) {
 	return (
 		<ToolbarModal
 			modal={
-				<Modal
-					modalState={modalState}
-					modalTitle="Watchlist Help"
-					preventCloseBeforeComplete={!session.acknowledgements.watchlist}
-				>
+				<Modal modalState={modalState} modalTitle="Watchlist Help" preventCloseBeforeComplete={!session.acknowledgements.watchlist}>
 					<WatchlistHelpForm modalState={modalState} />
 				</Modal>
 			}

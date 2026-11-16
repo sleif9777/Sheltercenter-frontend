@@ -11,6 +11,13 @@ export interface IChangeLogEntry {
 // Add new entries at the top. Write them for shelter staff, not developers.
 export const CHANGE_LOG_ENTRIES: IChangeLogEntry[] = [
 	{
+		date: "2026-11-16",
+		details:
+			"The watchlist help now tells adopters we don't take deposits to hold a dog before an appointment. Adopters also see a warning above Available Dogs that Petfinder and Adopt-a-Pet may still list dogs adopted weeks ago, that this list is current, and that there may be new arrivals not listed yet while their photos and bio are in progress.",
+		title: "Watchlist explains no deposits and outdated third-party listings",
+		type: ChangeLogEntryType.IMPROVEMENT,
+	},
+	{
 		date: "2026-11-11",
 		details:
 			'X in Queue on the calendar now has two steps: put the queue in order, then write the message. The message starts from the usual wording, already says "today", "tomorrow" or the day of the week, and signs off with your name, and you can change any of it. Each adopter\'s place in the queue stays in the message and can\'t be deleted. Check popular dogs on the left to list them in the email, A-Z, with a line about them you can reword.',
