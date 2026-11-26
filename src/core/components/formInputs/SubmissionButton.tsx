@@ -16,7 +16,8 @@ export interface ButtonProps {
 	tooltip?: string
 }
 
-export type FormSubmitHandler<T> = (req: T) => void
+// Returning false keeps the form open with its fields as they are, instead of resetting and closing it
+export type FormSubmitHandler<T> = (req: T) => void | boolean | Promise<void | boolean>
 
 interface SubmissionButtonProps extends ButtonProps {
 	disabled?: boolean

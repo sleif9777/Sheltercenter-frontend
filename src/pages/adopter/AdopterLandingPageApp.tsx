@@ -49,6 +49,9 @@ export function AdopterLandingPageApp() {
 		])
 	}, [adopterID])
 
+	// The chatbot marked the adopter as bringing their own dog, so the toggle shows it without a reload
+	const markBringingDog = useCallback(() => setPrefs((current) => current && { ...current, bringingDog: true }), [])
+
 	// Staff restore calendar access and record outcomes while this tab sits open, so keep it current: re-check each
 	// minute while visible, and immediately when the tab comes back into view
 	useEffect(() => {
@@ -115,7 +118,7 @@ export function AdopterLandingPageApp() {
 										<CancelAppointmentButton />
 										<BookAppointmentButton />
 										<ManageWatchlistButton />
-										<MessageAdoptionsButton />
+										<MessageAdoptionsButton onBringingDogMarked={markBringingDog} />
 										<UpdatePreferencesButton />
 										<ReportBugButton />
 									</div>
@@ -130,7 +133,7 @@ export function AdopterLandingPageApp() {
 									<ManageWatchlistButton />
 									<BookAppointmentButton />
 									<UpdatePreferencesButton />
-									<MessageAdoptionsButton />
+									<MessageAdoptionsButton onBringingDogMarked={markBringingDog} />
 									<ReportBugButton />
 									<a
 										className="m-auto mt-3 block w-fit rounded-lg border-2 border-gray-700 bg-gray-100 px-2 py-1 text-center uppercase transition-colors hover:cursor-pointer hover:border-pink-700 hover:bg-pink-200 hover:text-pink-700 focus:ring-2 focus:ring-pink-700 focus:outline-none md:hidden"
@@ -310,10 +313,12 @@ function BookAppointmentButton() {
 
 function MessageAdoptionsButton({
 	includeQTs,
+	onBringingDogMarked,
 	pendingAdoptionStatus,
 	readyToRollInstant,
 }: {
 	includeQTs?: boolean
+	onBringingDogMarked?: () => void
 	pendingAdoptionStatus?: PendingAdoptionStatus | null
 	readyToRollInstant?: string | null
 }) {
@@ -351,6 +356,7 @@ function MessageAdoptionsButton({
 					modalState={modalState}
 					quickTextOptions={includeQTs ? quickTexts : undefined}
 					readyToRollInstant={readyToRollInstant ?? undefined}
+					onBringingDogMarked={onBringingDogMarked}
 				/>
 			</Modal>
 		</>
@@ -460,6 +466,7 @@ export function createQuickTexts(): QuickText[] {
 	return [
 		{
 			label: AdopterInquiryTemplateLabel[AdopterInquiryTemplate.VISIT_MY_DOG],
+			policySlug: "visiting-your-chosen-dog",
 			templateContent: getVisitMyDogContent(),
 			value: AdopterInquiryTemplate.VISIT_MY_DOG,
 		},
@@ -475,6 +482,7 @@ export function createQuickTexts(): QuickText[] {
 		},
 		{
 			label: AdopterInquiryTemplateLabel[AdopterInquiryTemplate.PICK_UP_MY_DOG],
+			policySlug: "picking-up-your-dog",
 			templateContent: getPickUpMyDogContent(),
 			value: AdopterInquiryTemplate.PICK_UP_MY_DOG,
 		},

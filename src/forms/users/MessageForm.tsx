@@ -34,6 +34,8 @@ import { MessageAdopterFormFieldUpdater, useMessageFormState } from "./MessageFo
 
 export type QuickText = ValueLabelPair<number> & {
 	templateContent: ReactQuill.Value
+	// The chatbot policy that tells adopters to use this template; an answer citing it offers the template
+	policySlug?: string
 }
 
 export type WildcardDefaults = Partial<Record<BookingMessageTemplate, Record<string, string>>>
@@ -49,6 +51,7 @@ export function MessageForm({
 	isIssueReport,
 	isMessageToAdoptions,
 	modalState,
+	onBringingDogMarked,
 	onSuccess,
 	quickTextOptions,
 	readyToRollInstant,
@@ -64,6 +67,8 @@ export function MessageForm({
 	isIssueReport?: boolean
 	isMessageToAdoptions?: boolean
 	modalState: ModalState
+	// The chatbot marked the adopter as bringing their own dog
+	onBringingDogMarked?: () => void
 	onSuccess?: () => void
 	quickTextOptions?: QuickText[]
 	readyToRollInstant?: string
@@ -77,9 +82,14 @@ export function MessageForm({
 
 	// --- chatbot state ---
 	const [chatbotStatus, setChatbotStatus] = useState<ChatbotStatusResponse | null>(null)
-	const [botAnswer, setBotAnswer] = useState<Pick<AskResponse, "answer" | "awaitingReply" | "interactionID" | "offer" | "offerCancel" | "sentToStaff"> | null>(null)
+	const [botAnswer, setBotAnswer] = useState<Pick<
+		AskResponse,
+		"answer" | "awaitingReply" | "citedPolicies" | "interactionID" | "offer" | "offerCancel" | "sentToStaff"
+	> | null>(null)
 	// Resolves the pending submit once the adopter is done with the chatbot's answer
 	const finishBotAnswer = useRef<(() => void) | null>(null)
+	// The adopter chose the template the answer offered, so the form stays open with it instead of closing
+	const keepFormOpen = useRef(false)
 	const usesChatbot = isMessageToAdoptions && !isIssueReport && !adoptionID
 
 	useEffect(() => {
@@ -106,6 +116,7 @@ export function MessageForm({
 
 			const data: AskResponse = resp.data
 			setChatbotStatus({ ...chatbotStatus, questionsRemaining: data.questionsRemaining })
+			if (data.markedBringingDog) onBringingDogMarked?.()
 
 			if (data.answer) {
 				await new Promise<void>((resolve) => {
@@ -120,7 +131,7 @@ export function MessageForm({
 			await new Promise<void>((resolve) => setTimeout(resolve, 4000))
 			return true
 		},
-		[adopterID, chatbotStatus]
+		[adopterID, chatbotStatus, onBringingDogMarked]
 	)
 
 	// Moves the adopter's appointment to the time the chatbot offered. Returns the new time, or null if it's gone.
@@ -167,6 +178,7 @@ export function MessageForm({
 			}
 
 			const data: AskResponse = resp.data
+			if (data.markedBringingDog) onBringingDogMarked?.()
 			if (data.answer) {
 				setBotAnswer(pickBotAnswer(data))
 				return
@@ -178,7 +190,7 @@ export function MessageForm({
 			await new Promise<void>((resolve) => setTimeout(resolve, 4000))
 			finishBotAnswer.current?.()
 		},
-		[adopterID, botAnswer]
+		[adopterID, botAnswer, onBringingDogMarked]
 	)
 
 	const sendBotAnswerToStaff = useCallback(async () => {
@@ -246,6 +258,10 @@ export function MessageForm({
 
 			// No template, or the Blank Template (0), means the adopter wrote the message themselves
 			if (usesChatbot && !updatedReq.templateFlag && (await handledByChatbot(messageToPlainText(updatedReq.message), typeof updatedReq.message === "string" ? updatedReq.message : undefined))) {
+				if (keepFormOpen.current) {
+					keepFormOpen.current = false
+					return false
+				}
 				return
 			}
 
@@ -279,6 +295,25 @@ export function MessageForm({
 		setWildcardValues({})
 	}, [])
 
+	// A template the chatbot's answer points to, when the adopter can use it right now
+	const offeredTemplate =
+		botAnswer && !botAnswer.sentToStaff
+			? quickTextOptions?.find((qt) => qt.policySlug && botAnswer.citedPolicies.includes(qt.policySlug))
+			: undefined
+
+	// Back to the form with the offered template filled in, as if the adopter had picked it themselves
+	const switchToTemplate = useCallback(
+		(template: QuickText) => {
+			setField("templateFlag", template.value)
+			setField("message", template.templateContent)
+			handleTemplateChange(template.templateContent)
+			setBotAnswer(null)
+			keepFormOpen.current = true
+			finishBotAnswer.current?.()
+		},
+		[handleTemplateChange, setField]
+	)
+
 	useEffect(() => {
 		setField("adopterID", adopterID)
 
@@ -310,11 +345,13 @@ export function MessageForm({
 					offer={botAnswer.offer?.label}
 					offerCancel={botAnswer.offerCancel?.label}
 					sentToStaff={botAnswer.sentToStaff}
+					templateLabel={offeredTemplate?.label}
 					onAccept={() => finishBotAnswer.current?.()}
 					onAcceptCancellation={acceptBotCancellation}
 					onAcceptOffer={acceptBotOffer}
 					onReply={replyToBot}
 					onSendToStaff={sendBotAnswerToStaff}
+					onUseTemplate={offeredTemplate ? () => switchToTemplate(offeredTemplate) : undefined}
 				/>
 			) : (
 				<Fieldset
@@ -347,8 +384,8 @@ function isConflict(resp: unknown) {
 }
 
 function pickBotAnswer(data: AskResponse) {
-	const { answer, awaitingReply, interactionID, offer, offerCancel, sentToStaff } = data
-	return { answer, awaitingReply, interactionID, offer, offerCancel, sentToStaff }
+	const { answer, awaitingReply, citedPolicies, interactionID, offer, offerCancel, sentToStaff } = data
+	return { answer, awaitingReply, citedPolicies: citedPolicies ?? [], interactionID, offer, offerCancel, sentToStaff }
 }
 
 function Fieldset({

@@ -63,7 +63,9 @@ export function FormProvider<T extends object>({
 			}
 			setIsSubmitting(true)
 			try {
-				await onSubmit(getPostRequest())
+				if ((await onSubmit(getPostRequest())) === false) {
+					return
+				}
 				if (!avoidReset) {
 					reset()
 				}

@@ -9,7 +9,8 @@ import { TextInput } from "../../core/components/formInputs/TextInput"
  * - an offer to move or cancel their appointment: they confirm it or say never mind;
  * - a follow-up question: they reply in place, and the chatbot answers again;
  * - a partial answer: the message has already gone to staff, so they just read it and close;
- * - a full answer: they accept it or send their message on to staff.
+ * - a full answer: they accept it or send their message on to staff, or, when it points them to a message
+ *   template such as Visit My Dog, open that template in the form.
  */
 export function ChatbotAnswer({
 	answer,
@@ -17,11 +18,13 @@ export function ChatbotAnswer({
 	offer,
 	offerCancel,
 	sentToStaff,
+	templateLabel,
 	onAccept,
 	onAcceptCancellation,
 	onAcceptOffer,
 	onReply,
 	onSendToStaff,
+	onUseTemplate,
 }: {
 	answer: string
 	awaitingReply?: boolean
@@ -30,6 +33,8 @@ export function ChatbotAnswer({
 	// The appointment the chatbot offered to cancel
 	offerCancel?: string
 	sentToStaff: boolean
+	// The message template the answer points to, e.g. "Visit My Dog"
+	templateLabel?: string
 	onAccept: () => void
 	// Resolves to true once the appointment is canceled
 	onAcceptCancellation?: () => Promise<boolean>
@@ -37,6 +42,7 @@ export function ChatbotAnswer({
 	onAcceptOffer?: () => Promise<string | null>
 	onReply?: (reply: string) => Promise<void>
 	onSendToStaff: () => Promise<void>
+	onUseTemplate?: () => void
 }) {
 	const [busy, setBusy] = useState<"moving" | "canceling" | "replying" | "sending" | null>(null)
 	const [done, setDone] = useState<ReactNode>(null)
@@ -157,6 +163,7 @@ export function ChatbotAnswer({
 				<>
 					<div className="text-sm text-gray-500">This is an automated answer. If it doesn&apos;t help, we&apos;ll send your message to our team.</div>
 					<Buttons>
+						{templateLabel && onUseTemplate && <AnswerButton label={`Use the ${templateLabel} template`} primary onClick={onUseTemplate} />}
 						<AnswerButton label="That answers my question" onClick={onAccept} />
 						<AnswerButton
 							disabled={!!busy}

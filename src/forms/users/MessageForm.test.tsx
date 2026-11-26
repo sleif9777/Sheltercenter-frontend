@@ -67,6 +67,28 @@ describe("MessageForm chatbot", () => {
 		await vi.waitFor(() => expect(modalState.close).toHaveBeenCalled())
 	})
 
+	it("reports when the chatbot marks the adopter as bringing their dog", async () => {
+		chatbotStatus(true)
+		vi.spyOn(axios, "post").mockResolvedValue({
+			data: {
+				answer: "Got it, we've noted that you're bringing your dog.",
+				interactionID: 9,
+				markedBringingDog: true,
+				sentToStaff: false,
+				questionsRemaining: null,
+			},
+			status: 200,
+		})
+		const onBringingDogMarked = vi.fn()
+		render(<MessageForm adopterID={4} hideSubject isMessageToAdoptions modalState={modalState} onBringingDogMarked={onBringingDogMarked} />)
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("I will be bringing our dog with us to our appointment")
+
+		expect(await screen.findByText("Got it, we've noted that you're bringing your dog.")).toBeInTheDocument()
+		expect(onBringingDogMarked).toHaveBeenCalledTimes(1)
+	})
+
 	it("shows a partial answer and says the message went to the team", async () => {
 		chatbotStatus(true)
 		const post = vi
@@ -337,5 +359,52 @@ describe("MessageForm chatbot", () => {
 		expect(await screen.findByText(/Your message was sent!/)).toBeInTheDocument()
 		expect(post).toHaveBeenCalledTimes(1)
 		expect(post.mock.calls[0][0]).toBe("http://api.test/Adopters/MessageAdoptions/")
+	})
+
+	it("opens the template the chatbot's answer points to", async () => {
+		chatbotStatus(true)
+		const post = vi.spyOn(axios, "post").mockResolvedValueOnce({
+			data: {
+				answer: 'Choose the "Visit My Dog" template.',
+				citedPolicies: ["visiting-your-chosen-dog"],
+				interactionID: 9,
+				questionsRemaining: null,
+				sentToStaff: false,
+			},
+			status: 200,
+		})
+		renderForm([
+			{ label: "Visit my dog", policySlug: "visiting-your-chosen-dog", templateContent: plainTextToDelta("I'd like to visit.\n"), value: 1 },
+			{ label: "Calendar access", templateContent: plainTextToDelta("Calendar please.\n"), value: 3 },
+		])
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("Can I come see Loretta before she goes home?")
+		await userEvent.click(await screen.findByRole("button", { name: "Use the Visit my dog template" }))
+
+		expect(await screen.findByRole("checkbox", { name: "Visit my dog" })).toBeChecked()
+		expect(modalState.close).not.toHaveBeenCalled()
+
+		post.mockResolvedValueOnce({ data: {}, status: 204 })
+		await userEvent.click(screen.getByRole("button", { name: SUBMIT }))
+
+		expect(await screen.findByText(/Your message was sent!/)).toBeInTheDocument()
+		expect(post).toHaveBeenCalledTimes(2)
+		expect(post.mock.calls[1][0]).toBe("http://api.test/Adopters/MessageAdoptions/")
+	})
+
+	it("offers no template when the answer cites none", async () => {
+		chatbotStatus(true)
+		vi.spyOn(axios, "post").mockResolvedValue({
+			data: { answer: "We don't hold dogs.", citedPolicies: ["no-holds"], interactionID: 9, questionsRemaining: null, sentToStaff: false },
+			status: 200,
+		})
+		renderForm([{ label: "Visit my dog", policySlug: "visiting-your-chosen-dog", templateContent: plainTextToDelta("I'd like to visit.\n"), value: 1 }])
+		await vi.waitFor(() => expect(axios.get).toHaveBeenCalled())
+
+		await send("Can you hold Biscuit?")
+
+		expect(await screen.findByText("We don't hold dogs.")).toBeInTheDocument()
+		expect(screen.queryByRole("button", { name: /template/i })).not.toBeInTheDocument()
 	})
 })
